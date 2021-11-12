@@ -1,17 +1,74 @@
 {
+  "name": "web-maple",
+  "version": "0.1.0",
   "private": true,
+  "homepage": "http://0407chan.github.io/web-maple",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "switch-email": "git config --global user.email 0407chan@naver.com",
+    "dev": "yarn switch-email && BROWSER=none craco start",
+    "build": "rm -rf docs && GENERATE_SOURCEMAP=false craco build && mv build docs",
+    "test": "react-scripts test",
+    "predeploy": "GENERATE_SOURCEMAP=false craco build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
-    "date-fns": "^2.11.1",
-    "gray-matter": "^4.0.2",
-    "next": "latest",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "remark": "^14.0.1",
-    "remark-html": "^15.0.0"
-  }
+    "@craco/craco": "^6.2.0",
+    "@reduxjs/toolkit": "^1.6.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/react-redux": "^7.1.9",
+    "antd": "^4.16.13",
+    "axios": "^0.21.4",
+    "craco-alias": "^3.0.1",
+    "env-cmd": "^10.1.0",
+    "firebase": "^7.21.0",
+    "immutability-helper": "^3.1.1",
+    "node-sass": "^4.14.1",
+    "react": "^16.13.1",
+    "react-dnd": "^14.0.3",
+    "react-dnd-html5-backend": "^14.0.1",
+    "react-dnd-multi-backend": "^6.0.2",
+    "react-dnd-touch-backend": "^14.1.1",
+    "react-dom": "^16.13.1",
+    "react-draggable": "^4.4.3",
+    "react-ga": "^3.3.0",
+    "react-is": "^17.0.2",
+    "react-query": "^3.24.2",
+    "react-redux": "^7.2.1",
+    "react-scripts": "^4.0.3",
+    "redux": "^4.0.5",
+    "styled-components": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.6.1",
+    "@types/react": "^17.0.18",
+    "@types/react-dnd-multi-backend": "^6.0.1",
+    "@types/react-dom": "^17.0.9",
+    "@types/styled-components": "^5.1.12",
+    "@types/uuid": "^8.3.1",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
+    "babel-plugin-import": "^1.13.3",
+    "eslint": "^7.32.0",
+    "eslint-plugin-react": "^7.24.0",
+    "gh-pages": "^3.2.3",
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5",
+    "uuid": "^8.3.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "packageManager": "yarn@3.0.2"
 }
