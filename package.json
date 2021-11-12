@@ -1,8 +1,8 @@
 {
-  "name": "web-maple",
+  "name": "maple-demage-skin-simulator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://0407chan.github.io/web-maple",
+  "homepage": "https://0407chan.github.io/maple-demage-skin-simulator",
   "scripts": {
     "switch-email": "git config --global user.email 0407chan@naver.com",
     "dev": "yarn switch-email && BROWSER=none craco start",
@@ -34,7 +34,7 @@
     "react-draggable": "^4.4.3",
     "react-ga": "^3.3.0",
     "react-is": "^17.0.2",
-    "react-query": "^3.24.2",
+    "react-query": "^3.32.2",
     "react-redux": "^7.2.1",
     "react-scripts": "^4.0.3",
     "redux": "^4.0.5",
@@ -46,6 +46,7 @@
     "@types/react": "^17.0.18",
     "@types/react-dnd-multi-backend": "^6.0.1",
     "@types/react-dom": "^17.0.9",
+    "@types/react-query": "^1.2.9",
     "@types/styled-components": "^5.1.12",
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.29.1",

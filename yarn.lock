@@ -2433,6 +2433,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-query@^1.2.9":
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/@types/react-query/-/react-query-1.2.9.tgz#61df5a0594ea4b90234f9c0fdd8f12a06e331fed"
+  integrity sha512-xfVcv5zjC6fGf6axPyKxdXNm9RKK9OFzSIyZeCR3r9h4zDuqSpHc8ilTBtfQ1zU/uCx+tAsB+W6vzdCBMu1jtg==
+  dependencies:
+    react-query "*"
+
 "@types/react-redux@^7.1.20", "@types/react-redux@^7.1.9":
   version "7.1.20"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.1.20.tgz#42f0e61ababb621e12c66c96dda94c58423bd7df"
@@ -11386,7 +11393,7 @@ react-is@^17.0.2:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-query@^3.24.2:
+react-query@*, react-query@^3.32.2:
   version "3.32.2"
   resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.32.2.tgz#66da144c4b2862f06a679aea3790ccb17f099a4e"
   integrity sha512-g72+faJAwvYywXNrAbP+Iq5YJJzp94ADWHZMSJPi9I3DZdRDQ76gYi/YLzrA9fE9VZkoKz+OOH321eCsC2GPLQ==
