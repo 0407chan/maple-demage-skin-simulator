@@ -24,6 +24,7 @@ export const Body = styled.div`
   align-items: center;
   justify-content: center;
   background-color: #282c34;
+  gap: 20px;
   width: 100%;
   height: 100%;
 `
