@@ -1,14 +1,13 @@
 import Button from 'antd/lib/button'
 import InputNumber from 'antd/lib/input-number'
-import Radio from 'antd/lib/radio'
 import React, { useEffect, useState } from 'react'
-import { UseQueryResult } from 'react-query'
+import { v4 as uuid } from 'uuid'
 import { useGetDamageSkinAll } from './api/damage-skin'
 import * as S from './appStyle'
 import DamageSkin from './components/DamageSkin'
 import Horizontal from './components/Horizontal'
-import useDamage from './hooks/useDamage'
-import { GetDamageSkinResponse, SkinType } from './type/damage-skin'
+import MapleButton from './components/MapleButton'
+import { DamageType, SkinType } from './type/damage-skin'
 
 const skinTypeOptions = [
   { label: '일반0', value: 'NoRed0' },
@@ -18,56 +17,30 @@ const skinTypeOptions = [
   { label: '뭐야', value: 'NoRed3' }
 ]
 const App: React.FC = () => {
-  const [skinId, setSkinId] = useState<number>(200)
+  const [skinNumber, setSkinId] = useState<number>(200)
   const [skinType, setSkinType] = useState<SkinType>('NoCri1')
+  const [damageList, setDamageList] = useState<DamageType[]>([])
 
-  const damageAll = useGetDamageSkinAll({ skinId, skinType })
-  const {
-    Miss,
-    criEffect,
-    damage0,
-    damage1,
-    damage2,
-    damage3,
-    damage4,
-    damage5,
-    damage6,
-    damage7,
-    damage8,
-    damage9,
-    guard,
-    numberSpace,
-    resist
-  } = useDamage({ skinId, skinType })
+  const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   useEffect(() => {
     console.log(damageAll.data?.children)
   }, [damageAll.data])
 
-  const renderDamage = (
-    damageQuery: UseQueryResult<GetDamageSkinResponse, unknown>
-  ) => {
-    if (
-      !damageQuery.data ||
-      !damageQuery.data.value ||
-      damageQuery.data.value === ''
-    )
-      return null
+  const onAttack = () => {
+    const newDamage: DamageType = {
+      id: uuid(),
+      skinNumber,
+      damage: getRandomInt(100000, 400000),
+      isCritical: Math.random() * 100 < 60
+    }
+    setDamageList([...damageList, newDamage])
+  }
 
-    return (
-      <img
-        style={{
-          display: 'flex',
-          width: 'fit-content',
-          marginLeft:
-            numberSpace.data?.value !== undefined &&
-            Number(numberSpace.data?.value) < 0
-              ? Number(numberSpace.data?.value)
-              : undefined
-        }}
-        src={`data:image/png;base64,${damageQuery.data.value}`}
-      />
-    )
+  function getRandomInt(min: number, max: number) {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min)) + min //최댓값은 제외, 최솟값은 포함
   }
 
   return (
@@ -75,53 +48,31 @@ const App: React.FC = () => {
       {/* <S.Header>
       </S.Header> */}
       <Horizontal style={{ margin: '60px 0', justifyContent: 'center' }}>
-        <Button disabled={skinId === 1} onClick={() => setSkinId(skinId - 1)}>
+        <Button
+          disabled={skinNumber === 1}
+          onClick={() => setSkinId(skinNumber - 1)}
+        >
           -
         </Button>
-        <S.Text>{skinId}</S.Text>
-        <InputNumber value={skinId} onChange={(value) => setSkinId(value)} />
-        <Button onClick={() => setSkinId(skinId + 1)}>+</Button>
-      </Horizontal>
-      <Horizontal style={{ justifyContent: 'center' }}>
-        <Radio.Group
-          options={skinTypeOptions}
-          value={skinType}
-          buttonStyle="solid"
-          onChange={(event) => setSkinType(event.target.value)}
+        <InputNumber
+          value={skinNumber}
+          onChange={(value) => setSkinId(value)}
         />
+        <Button onClick={() => setSkinId(skinNumber + 1)}>+</Button>
       </Horizontal>
       <S.Body>
-        <Horizontal
-          gap={
-            numberSpace.data?.value !== undefined &&
-            Number(numberSpace.data?.value) > 0
-              ? Number(numberSpace.data?.value)
-              : 0
-          }
-          style={{ justifyContent: 'center' }}
-        >
-          {renderDamage(criEffect)}
-          {renderDamage(damage0)}
-          {renderDamage(damage1)}
-          {renderDamage(damage2)}
-          {renderDamage(damage3)}
-          {renderDamage(damage4)}
-          {renderDamage(damage5)}
-          {renderDamage(damage6)}
-          {renderDamage(damage7)}
-          {renderDamage(damage8)}
-          {renderDamage(damage9)}
-        </Horizontal>
         <Horizontal style={{ justifyContent: 'center' }}>
-          {renderDamage(guard)}
-          {renderDamage(Miss)}
-          {renderDamage(resist)}
-        </Horizontal>
-        <Horizontal style={{ justifyContent: 'center' }}>
-          <DamageSkin skinId={skinId} damage={993304} />
-          <DamageSkin skinId={skinId} damage={300} isCritical />
+          {damageList.map((item) => (
+            <DamageSkin
+              key={item.id}
+              damageItem={item}
+              setDamageList={setDamageList}
+              skinNumber={skinNumber}
+            />
+          ))}
         </Horizontal>
       </S.Body>
+      <MapleButton onClick={() => onAttack()}>공격</MapleButton>
     </S.Container>
   )
 }
