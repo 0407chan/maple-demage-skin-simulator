@@ -6,7 +6,6 @@ import { useGetDamageSkinAll } from './api/damage-skin'
 import * as S from './appStyle'
 import DamageSkin from './components/DamageSkin'
 import Horizontal from './components/Horizontal'
-import MapleButton from './components/MapleButton'
 import { DamageType, SkinType } from './type/damage-skin'
 
 const skinTypeOptions = [
@@ -71,8 +70,13 @@ const App: React.FC = () => {
             />
           ))}
         </Horizontal>
+        <S.OrangeMushroom
+          className="no-drag"
+          src="https://maplestory.io/api/KMS/356/mob/100004/render/stand"
+          alt="orange-mushroom"
+          onClick={() => onAttack()}
+        />
       </S.Body>
-      <MapleButton onClick={() => onAttack()}>공격</MapleButton>
     </S.Container>
   )
 }

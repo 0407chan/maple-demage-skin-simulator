@@ -34,3 +34,7 @@ export const Text = styled.span`
   font-size: 18px;
   font-weight: bold;
 `
+
+export const OrangeMushroom = styled.img`
+  cursor: pointer;
+`
