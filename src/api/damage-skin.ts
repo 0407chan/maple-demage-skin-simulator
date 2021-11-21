@@ -10,7 +10,7 @@ export const getDamageSkin = async (
   query: GetDamageSkinQuery
 ): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinId}/${query.skinType}/${query.skinNumber}`
+    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
     // `https://maplestory.io/api/wz/KMS/353/Effect/BasicEff.img/${query.skinType}/${query.skinNumber}`
   )
   return result.data
@@ -25,7 +25,7 @@ export const useGetDamageSkin = (
       return getDamageSkin(query)
     },
     {
-      enabled: query.skinId !== undefined,
+      enabled: query.skinNumber !== undefined,
       retry: false,
       keepPreviousData: false,
       refetchOnWindowFocus: false
@@ -34,17 +34,17 @@ export const useGetDamageSkin = (
 }
 
 export const getDamageSkinAll = async (query: {
-  skinId: number
+  skinNumber: number
   skinType: SkinType
 }): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinId}/${query.skinType}`
+    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}`
   )
   return result.data
 }
 
 export const useGetDamageSkinAll = (query: {
-  skinId: number
+  skinNumber: number
   skinType: SkinType
 }): UseQueryResult<GetDamageSkinResponse, unknown> => {
   return useQuery(
@@ -53,7 +53,7 @@ export const useGetDamageSkinAll = (query: {
       return getDamageSkinAll(query)
     },
     {
-      enabled: query.skinId !== undefined,
+      enabled: query.skinNumber !== undefined,
       retry: false,
       keepPreviousData: true,
       refetchOnWindowFocus: false
