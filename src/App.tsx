@@ -22,6 +22,11 @@ const App: React.FC = () => {
 
   const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
+  const onSetSkinId = (newId: number) => {
+    setSkinId(newId)
+    setDamageList([])
+  }
+
   useEffect(() => {
     console.log(damageAll.data?.children)
   }, [damageAll.data])
@@ -49,15 +54,15 @@ const App: React.FC = () => {
       <Horizontal style={{ margin: '60px 0', justifyContent: 'center' }}>
         <Button
           disabled={skinNumber === 1}
-          onClick={() => setSkinId(skinNumber - 1)}
+          onClick={() => onSetSkinId(skinNumber - 1)}
         >
           -
         </Button>
         <InputNumber
           value={skinNumber}
-          onChange={(value) => setSkinId(value)}
+          onChange={(value) => onSetSkinId(value)}
         />
-        <Button onClick={() => setSkinId(skinNumber + 1)}>+</Button>
+        <Button onClick={() => onSetSkinId(skinNumber + 1)}>+</Button>
       </Horizontal>
       <S.Body>
         <Horizontal style={{ justifyContent: 'center' }}>
