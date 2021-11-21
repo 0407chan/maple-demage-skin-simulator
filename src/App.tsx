@@ -3,11 +3,12 @@ import InputNumber from 'antd/lib/input-number'
 import Radio from 'antd/lib/radio'
 import React, { useEffect, useState } from 'react'
 import { UseQueryResult } from 'react-query'
-import { useGetDemageSkinAll, useGetWzImage } from './api/demage-skin'
+import { useGetDamageSkinAll } from './api/damage-skin'
 import * as S from './appStyle'
+import DamageSkin from './components/DamageSkin'
 import Horizontal from './components/Horizontal'
-import useDamage from './hooks/useDemage'
-import { GetDemageSkinResponse, SkinType } from './type/demage-skin'
+import useDamage from './hooks/useDamage'
+import { GetDamageSkinResponse, SkinType } from './type/damage-skin'
 
 const skinTypeOptions = [
   { label: '일반0', value: 'NoRed0' },
@@ -20,37 +21,36 @@ const App: React.FC = () => {
   const [skinId, setSkinId] = useState<number>(200)
   const [skinType, setSkinType] = useState<SkinType>('NoCri1')
 
-  const demageAll = useGetDemageSkinAll({ skinId, skinType })
+  const damageAll = useGetDamageSkinAll({ skinId, skinType })
   const {
     Miss,
     criEffect,
-    demage0,
-    demage1,
-    demage2,
-    demage3,
-    demage4,
-    demage5,
-    demage6,
-    demage7,
-    demage8,
-    demage9,
+    damage0,
+    damage1,
+    damage2,
+    damage3,
+    damage4,
+    damage5,
+    damage6,
+    damage7,
+    damage8,
+    damage9,
     guard,
     numberSpace,
     resist
   } = useDamage({ skinId, skinType })
 
-  const star = useGetWzImage()
   useEffect(() => {
-    console.log(demageAll.data?.children)
-  }, [demageAll.data])
+    console.log(damageAll.data?.children)
+  }, [damageAll.data])
 
-  const renderDemage = (
-    demageQuery: UseQueryResult<GetDemageSkinResponse, unknown>
+  const renderDamage = (
+    damageQuery: UseQueryResult<GetDamageSkinResponse, unknown>
   ) => {
     if (
-      !demageQuery.data ||
-      !demageQuery.data.value ||
-      demageQuery.data.value === ''
+      !damageQuery.data ||
+      !damageQuery.data.value ||
+      damageQuery.data.value === ''
     )
       return null
 
@@ -65,10 +65,11 @@ const App: React.FC = () => {
               ? Number(numberSpace.data?.value)
               : undefined
         }}
-        src={`data:image/png;base64,${demageQuery.data.value}`}
+        src={`data:image/png;base64,${damageQuery.data.value}`}
       />
     )
   }
+
   return (
     <S.Container>
       {/* <S.Header>
@@ -99,22 +100,26 @@ const App: React.FC = () => {
           }
           style={{ justifyContent: 'center' }}
         >
-          {renderDemage(criEffect)}
-          {renderDemage(demage0)}
-          {renderDemage(demage1)}
-          {renderDemage(demage2)}
-          {renderDemage(demage3)}
-          {renderDemage(demage4)}
-          {renderDemage(demage5)}
-          {renderDemage(demage6)}
-          {renderDemage(demage7)}
-          {renderDemage(demage8)}
-          {renderDemage(demage9)}
+          {renderDamage(criEffect)}
+          {renderDamage(damage0)}
+          {renderDamage(damage1)}
+          {renderDamage(damage2)}
+          {renderDamage(damage3)}
+          {renderDamage(damage4)}
+          {renderDamage(damage5)}
+          {renderDamage(damage6)}
+          {renderDamage(damage7)}
+          {renderDamage(damage8)}
+          {renderDamage(damage9)}
         </Horizontal>
         <Horizontal style={{ justifyContent: 'center' }}>
-          {renderDemage(guard)}
-          {renderDemage(Miss)}
-          {renderDemage(resist)}
+          {renderDamage(guard)}
+          {renderDamage(Miss)}
+          {renderDamage(resist)}
+        </Horizontal>
+        <Horizontal style={{ justifyContent: 'center' }}>
+          <DamageSkin skinId={skinId} damage={993304} />
+          <DamageSkin skinId={skinId} damage={300} isCritical />
         </Horizontal>
       </S.Body>
     </S.Container>
