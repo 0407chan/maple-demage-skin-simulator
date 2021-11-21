@@ -2,44 +2,44 @@ import { useGetDamageSkin } from '@/api/damage-skin'
 import { SkinType } from '@/type/damage-skin'
 
 type UseDamageProps = {
-  skinId: number
+  skinNumber: number
   skinType: SkinType
 }
-const useDamage = ({ skinId, skinType }: UseDamageProps) => {
-  const damage0 = useGetDamageSkin({ skinId, skinType, skinNumber: '0' })
-  const damage1 = useGetDamageSkin({ skinId, skinType, skinNumber: '1' })
-  const damage2 = useGetDamageSkin({ skinId, skinType, skinNumber: '2' })
-  const damage3 = useGetDamageSkin({ skinId, skinType, skinNumber: '3' })
-  const damage4 = useGetDamageSkin({ skinId, skinType, skinNumber: '4' })
-  const damage5 = useGetDamageSkin({ skinId, skinType, skinNumber: '5' })
-  const damage6 = useGetDamageSkin({ skinId, skinType, skinNumber: '6' })
-  const damage7 = useGetDamageSkin({ skinId, skinType, skinNumber: '7' })
-  const damage8 = useGetDamageSkin({ skinId, skinType, skinNumber: '8' })
-  const damage9 = useGetDamageSkin({ skinId, skinType, skinNumber: '9' })
+const useDamage = ({ skinNumber, skinType }: UseDamageProps) => {
+  const damage0 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '0' })
+  const damage1 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '1' })
+  const damage2 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '2' })
+  const damage3 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '3' })
+  const damage4 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '4' })
+  const damage5 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '5' })
+  const damage6 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '6' })
+  const damage7 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '7' })
+  const damage8 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '8' })
+  const damage9 = useGetDamageSkin({ skinNumber, skinType, damageNumber: '9' })
   const numberSpace = useGetDamageSkin({
-    skinId,
+    skinNumber,
     skinType,
-    skinNumber: 'numberSpace'
+    damageNumber: 'numberSpace'
   })
   const guard = useGetDamageSkin({
-    skinId,
+    skinNumber,
     skinType: 'NoRed0',
-    skinNumber: 'guard'
+    damageNumber: 'guard'
   })
   const Miss = useGetDamageSkin({
-    skinId,
+    skinNumber,
     skinType: 'NoRed0',
-    skinNumber: 'Miss'
+    damageNumber: 'Miss'
   })
   const resist = useGetDamageSkin({
-    skinId,
+    skinNumber,
     skinType: 'NoRed0',
-    skinNumber: 'resist'
+    damageNumber: 'resist'
   })
   const criEffect = useGetDamageSkin({
-    skinId,
+    skinNumber,
     skinType: 'NoCri1',
-    skinNumber: 'Effect3'
+    damageNumber: 'Effect3'
   })
   return {
     damage0,
