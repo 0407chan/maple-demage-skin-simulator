@@ -15,11 +15,15 @@ const skinTypeOptions = [
   { label: '크리티컬1', value: 'NoCri1' },
   { label: '뭐야', value: 'NoRed3' }
 ]
+
+const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
+const standImage = 'https://maplestory.io/api/KMS/356/mob/100004/render/stand'
+
 const App: React.FC = () => {
   const [skinNumber, setSkinId] = useState<number>(200)
   const [skinType, setSkinType] = useState<SkinType>('NoCri1')
   const [damageList, setDamageList] = useState<DamageType[]>([])
-
+  const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   const onSetSkinId = (newId: number) => {
@@ -32,12 +36,16 @@ const App: React.FC = () => {
   }, [damageAll.data])
 
   const onAttack = () => {
+    setIsAttacked(true)
     const newDamage: DamageType = {
       id: uuid(),
       skinNumber,
       damage: getRandomInt(100000, 400000),
       isCritical: Math.random() * 100 < 60
     }
+    setTimeout(() => {
+      setIsAttacked(false)
+    }, 1000)
     setDamageList([...damageList, newDamage])
   }
 
@@ -76,8 +84,8 @@ const App: React.FC = () => {
           ))}
         </Horizontal>
         <S.OrangeMushroom
-          className="no-drag"
-          src="https://maplestory.io/api/KMS/356/mob/100004/render/stand"
+          draggable="false"
+          src={isAttacked ? hitImage : standImage}
           alt="orange-mushroom"
           onClick={() => onAttack()}
         />

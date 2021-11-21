@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+const hit = '../../public/images/hit1.gif'
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
