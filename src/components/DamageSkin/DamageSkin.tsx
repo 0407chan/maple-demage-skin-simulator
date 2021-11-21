@@ -1,5 +1,5 @@
-import useDamage from '@/hooks/useDemage'
-import { GetDemageSkinResponse } from '@/type/demage-skin'
+import useDamage from '@/hooks/useDamage'
+import { GetDamageSkinResponse } from '@/type/damage-skin'
 import React from 'react'
 import { UseQueryResult } from 'react-query'
 import * as S from './style'
@@ -7,22 +7,22 @@ import * as S from './style'
 type Props = {
   skinId: number
   isCritical?: boolean
-  demage: number
+  damage: number
 }
-const DamageSkin: React.FC<Props> = ({ skinId, isCritical, demage }) => {
+const DamageSkin: React.FC<Props> = ({ skinId, isCritical, damage }) => {
   const {
     Miss,
     criEffect,
-    demage0,
-    demage1,
-    demage2,
-    demage3,
-    demage4,
-    demage5,
-    demage6,
-    demage7,
-    demage8,
-    demage9,
+    damage0,
+    damage1,
+    damage2,
+    damage3,
+    damage4,
+    damage5,
+    damage6,
+    damage7,
+    damage8,
+    damage9,
     guard,
     numberSpace,
     resist
@@ -31,37 +31,37 @@ const DamageSkin: React.FC<Props> = ({ skinId, isCritical, demage }) => {
   const getSkin = (num: number) => {
     switch (num) {
       case 0:
-        return demage0
+        return damage0
       case 1:
-        return demage1
+        return damage1
       case 2:
-        return demage2
+        return damage2
       case 3:
-        return demage3
+        return damage3
       case 4:
-        return demage4
+        return damage4
       case 5:
-        return demage5
+        return damage5
       case 6:
-        return demage6
+        return damage6
       case 7:
-        return demage7
+        return damage7
       case 8:
-        return demage8
+        return damage8
       case 9:
-        return demage9
+        return damage9
       default:
-        return demage9
+        return damage9
     }
   }
 
-  const renderDemage = (
-    demageQuery: UseQueryResult<GetDemageSkinResponse, unknown>
+  const renderDamage = (
+    damageQuery: UseQueryResult<GetDamageSkinResponse, unknown>
   ) => {
     if (
-      !demageQuery.data ||
-      !demageQuery.data.value ||
-      demageQuery.data.value === ''
+      !damageQuery.data ||
+      !damageQuery.data.value ||
+      damageQuery.data.value === ''
     )
       return null
 
@@ -76,15 +76,15 @@ const DamageSkin: React.FC<Props> = ({ skinId, isCritical, demage }) => {
               ? Number(numberSpace.data?.value)
               : undefined
         }}
-        src={`data:image/png;base64,${demageQuery.data.value}`}
+        src={`data:image/png;base64,${damageQuery.data.value}`}
       />
     )
   }
 
   return (
     <S.Container>
-      {`${demage}`.split('').map((num, index) => (
-        <div key={index}>{renderDemage(getSkin(Number(num)))} </div>
+      {`${damage}`.split('').map((num, index) => (
+        <div key={index}>{renderDamage(getSkin(Number(num)))} </div>
       ))}
     </S.Container>
   )
