@@ -14,7 +14,7 @@ const DamageSkin: React.FC<Props> = ({
   damageItem,
   setDamageList
 }) => {
-  const [timer, setTimer] = useState<number>(999)
+  const [timer, setTimer] = useState<number>(1000)
   const [visible, setVisible] = useState<boolean>(true)
 
   const {
