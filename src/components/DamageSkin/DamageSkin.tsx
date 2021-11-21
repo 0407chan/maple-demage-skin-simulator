@@ -1,15 +1,22 @@
 import useDamage from '@/hooks/useDamage'
-import { GetDamageSkinResponse } from '@/type/damage-skin'
-import React from 'react'
+import { DamageType, GetDamageSkinResponse } from '@/type/damage-skin'
+import React, { useEffect, useState } from 'react'
 import { UseQueryResult } from 'react-query'
 import * as S from './style'
 
 type Props = {
-  skinId: number
-  isCritical?: boolean
-  damage: number
+  skinNumber: number
+  damageItem: DamageType
+  setDamageList: React.Dispatch<React.SetStateAction<DamageType[]>>
 }
-const DamageSkin: React.FC<Props> = ({ skinId, isCritical, damage }) => {
+const DamageSkin: React.FC<Props> = ({
+  skinNumber,
+  damageItem,
+  setDamageList
+}) => {
+  const [timer, setTimer] = useState<number>(999)
+  const [visible, setVisible] = useState<boolean>(true)
+
   const {
     Miss,
     criEffect,
@@ -26,7 +33,10 @@ const DamageSkin: React.FC<Props> = ({ skinId, isCritical, damage }) => {
     guard,
     numberSpace,
     resist
-  } = useDamage({ skinId, skinType: isCritical ? 'NoCri1' : 'NoRed1' })
+  } = useDamage({
+    skinNumber,
+    skinType: damageItem.isCritical ? 'NoCri1' : 'NoRed1'
+  })
 
   const getSkin = (num: number) => {
     switch (num) {
@@ -81,9 +91,23 @@ const DamageSkin: React.FC<Props> = ({ skinId, isCritical, damage }) => {
     )
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      setDamageList((prev) => {
+        return prev.filter((item) => item.id !== damageItem.id)
+      })
+      setVisible(false)
+    }, timer)
+  }, [])
+
+  if (!visible) return null
+
   return (
     <S.Container>
-      {`${damage}`.split('').map((num, index) => (
+      {damageItem.isCritical && (
+        <S.CriEffect>{renderDamage(criEffect)} </S.CriEffect>
+      )}
+      {`${damageItem.damage}`.split('').map((num, index) => (
         <div key={index}>{renderDamage(getSkin(Number(num)))} </div>
       ))}
     </S.Container>
