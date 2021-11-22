@@ -31,7 +31,7 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
           />
           <Button onClick={() => onSetSkinNumber(skinNumber + 1)}>+</Button>
         </Horizontal>
-        <Button>세팅</Button>
+        <Button disabled>세팅</Button>
       </S.Container>
       <SkinSelectModal isOpen={showSkinModal} onCancel={onCloseModal} />
     </>
