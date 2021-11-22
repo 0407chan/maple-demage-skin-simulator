@@ -77,6 +77,7 @@ const DamageSkin: React.FC<Props> = ({
 
     return (
       <img
+        draggable="false"
         style={{
           display: 'flex',
           width: 'fit-content',
@@ -103,7 +104,7 @@ const DamageSkin: React.FC<Props> = ({
   if (!visible) return null
 
   return (
-    <S.Container>
+    <S.Container className="no-drag">
       {damageItem.isCritical && (
         <S.CriEffect>{renderDamage(criEffect)} </S.CriEffect>
       )}
