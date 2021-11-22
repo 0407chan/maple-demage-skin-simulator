@@ -30,6 +30,7 @@ export const useGetDamageSkin = (
       enabled: query.skinNumber !== undefined,
       retry: false,
       keepPreviousData: false,
+      staleTime: 1000 * 60 * 60,
       refetchOnWindowFocus: false
     }
   )
