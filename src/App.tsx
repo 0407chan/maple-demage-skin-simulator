@@ -1,5 +1,3 @@
-import Button from 'antd/lib/button'
-import InputNumber from 'antd/lib/input-number'
 import React, { useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { useGetDamageSkinAll } from './api/damage-skin'
@@ -21,14 +19,14 @@ const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
 const standImage = 'https://maplestory.io/api/KMS/356/mob/100004/render/stand'
 
 const App: React.FC = () => {
-  const [skinNumber, setSkinId] = useState<number>(200)
+  const [skinNumber, setSkinNumber] = useState<number>(200)
   const [skinType, setSkinType] = useState<SkinType>('NoCri1')
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
-  const onSetSkinId = (newId: number) => {
-    setSkinId(newId)
+  const onSetSkinNumber = (newId: number) => {
+    setSkinNumber(newId)
     setDamageList([])
   }
 
@@ -55,22 +53,9 @@ const App: React.FC = () => {
   return (
     <S.Container>
       <S.Header>
-        <Header />
+        <Header {...{ onSetSkinNumber, skinNumber }} />
       </S.Header>
-      <Horizontal style={{ margin: '60px 0', justifyContent: 'center' }}>
-        <Button
-          disabled={skinNumber === 1}
-          onClick={() => onSetSkinId(skinNumber - 1)}
-        >
-          -
-        </Button>
-        <InputNumber
-          value={skinNumber}
-          onChange={(value) => onSetSkinId(value)}
-        />
-        <Button onClick={() => onSetSkinId(skinNumber + 1)}>+</Button>
-      </Horizontal>
-      <S.Body>
+      <S.Body className="no-drag">
         <Horizontal style={{ justifyContent: 'center' }}>
           {damageList.map((item) => (
             <DamageSkin
