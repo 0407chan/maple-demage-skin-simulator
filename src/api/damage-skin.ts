@@ -1,6 +1,8 @@
 import {
   GetDamageSkinQuery,
   GetDamageSkinResponse,
+  GetItemListQuery,
+  ItemDto,
   SkinType
 } from '@/type/damage-skin'
 import axios from 'axios'
@@ -83,5 +85,26 @@ export const useGetWzImage = (): UseQueryResult<
       keepPreviousData: true,
       refetchOnWindowFocus: false
     }
+  )
+}
+
+export const getItemList = async (
+  query?: GetItemListQuery
+): Promise<ItemDto[]> => {
+  const result = await axios.get('https://maplestory.io/api/KMS/352/item', {
+    params: query
+  })
+  return result.data
+}
+
+export const useGetItemList = (
+  query?: GetItemListQuery
+): UseQueryResult<ItemDto[], unknown> => {
+  return useQuery(
+    ['getItemList', query],
+    async () => {
+      return getItemList(query)
+    },
+    { retry: false, refetchOnWindowFocus: false, keepPreviousData: true }
   )
 }
