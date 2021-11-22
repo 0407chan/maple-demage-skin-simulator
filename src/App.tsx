@@ -1,10 +1,11 @@
 import Button from 'antd/lib/button'
 import InputNumber from 'antd/lib/input-number'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { useGetDamageSkinAll } from './api/damage-skin'
 import * as S from './appStyle'
 import DamageSkin from './components/DamageSkin'
+import Header from './components/Header'
 import Horizontal from './components/Horizontal'
 import { DamageType, SkinType } from './type/damage-skin'
 
@@ -31,10 +32,6 @@ const App: React.FC = () => {
     setDamageList([])
   }
 
-  useEffect(() => {
-    console.log(damageAll.data?.children)
-  }, [damageAll.data])
-
   const onAttack = () => {
     setIsAttacked(true)
     const newDamage: DamageType = {
@@ -57,8 +54,9 @@ const App: React.FC = () => {
 
   return (
     <S.Container>
-      {/* <S.Header>
-      </S.Header> */}
+      <S.Header>
+        <Header />
+      </S.Header>
       <Horizontal style={{ margin: '60px 0', justifyContent: 'center' }}>
         <Button
           disabled={skinNumber === 1}

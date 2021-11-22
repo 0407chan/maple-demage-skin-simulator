@@ -18,7 +18,7 @@ export const Header = styled.div`
   justify-content: center;
   background-color: #282c34;
   width: 100%;
-  height: 200px;
+  height: 60px;
 `
 export const Body = styled.div`
   display: flex;
