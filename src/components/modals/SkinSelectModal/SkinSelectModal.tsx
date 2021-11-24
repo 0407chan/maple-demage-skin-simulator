@@ -1,5 +1,4 @@
 import { useGetItemList } from '@/api/damage-skin'
-import useWindowSize from '@/hooks/useWindowSize'
 import { ItemDto } from '@/type/damage-skin'
 import React, { useEffect, useState } from 'react'
 import * as S from './style'
@@ -16,13 +15,8 @@ const Header: React.FC<Props> = ({
 }) => {
   const [skinList, setSkinList] = useState<ItemDto[]>([])
   const [searchKey, setSearchKey] = useState<string>('')
-  const { isMobile } = useWindowSize()
   const damageSkinList = useGetItemList({
-    // cashFilter: false,
-    // categoryFilter: 'Consumable',
-    // overallCategoryFilter: 'Use',
     searchFor: '데미지 스킨'
-    // subCategoryFilter: 'Other'
   })
   useEffect(() => {
     const result: ItemDto[] = []
