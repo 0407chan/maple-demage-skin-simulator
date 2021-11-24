@@ -62,6 +62,27 @@ export const Body = styled.div`
   gap: 4px;
   width: 100%;
   height: 100%;
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: unset;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: #777;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #888;
+  }
 `
 
 export const SkinItem = styled.div`
