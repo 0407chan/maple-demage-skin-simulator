@@ -19,10 +19,14 @@ const Header: React.FC<Props> = ({
     searchFor: '데미지 스킨'
   })
   useEffect(() => {
-    const result: ItemDto[] = []
+    let result: ItemDto[] = []
+
     damageSkinList.data?.forEach((item) => {
       if (
-        !result.find((skin) => skin.name === item.name) &&
+        !result.find(
+          (skin) =>
+            skin.name !== '파티 퀘스트 데미지 스킨' && skin.name === item.name
+        ) &&
         item.name.includes('데미지 스킨') &&
         !item.name.includes('상자') &&
         !item.name.includes('저장 스크롤') &&
@@ -32,11 +36,27 @@ const Header: React.FC<Props> = ({
         !item.name.includes('보름달 티켓') &&
         !item.name.includes('VIP 티켓') &&
         !item.name.includes('RISE 티켓') &&
-        !item.name.includes('각성의 티켓')
+        !item.name.includes('각성의 티켓') &&
+        !item.name.includes('교환권')
       ) {
         result.push(item)
       }
     })
+
+    let isPartyQuest = 0
+    result = result.filter((item) => {
+      if (item.name !== '파티 퀘스트 데미지 스킨') {
+        return true
+      } else if (item.name === '파티 퀘스트 데미지 스킨') {
+        if (isPartyQuest < 2) {
+          isPartyQuest += 1
+          return true
+        } else {
+          return false
+        }
+      }
+    })
+
     setSkinList(result.sort((a, b) => a.id - b.id))
   }, [damageSkinList.data])
 
@@ -96,7 +116,6 @@ const Header: React.FC<Props> = ({
           {getSearchedList().length > 0 ? (
             getSearchedList().map((skin) => (
               <S.SkinItem key={skin.id} onClick={() => onSelectSkin(skin)}>
-                <div className="skin-text">{skin.id}</div>
                 <img
                   className="skin-img"
                   src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
