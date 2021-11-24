@@ -32,7 +32,13 @@ const Header: React.FC<Props> = ({
         item.name.includes('데미지 스킨') &&
         !item.name.includes('상자') &&
         !item.name.includes('저장 스크롤') &&
-        !item.name.includes('1칸 확장권')
+        !item.name.includes('1칸 확장권') &&
+        !item.name.includes('선택권') &&
+        !item.name.includes('추출권') &&
+        !item.name.includes('보름달 티켓') &&
+        !item.name.includes('VIP 티켓') &&
+        !item.name.includes('RISE 티켓') &&
+        !item.name.includes('각성의 티켓')
       ) {
         result.push(item)
       }
