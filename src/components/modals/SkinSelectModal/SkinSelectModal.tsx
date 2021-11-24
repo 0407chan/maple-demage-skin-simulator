@@ -37,12 +37,28 @@ const Header: React.FC<Props> = ({
         result.push(item)
       }
     })
-    setSkinList(result)
+    setSkinList(result.sort((a, b) => a.id - b.id))
   }, [damageSkinList.data])
 
   useEffect(() => {
     console.log('skinList', skinList)
   }, [skinList])
+
+  const onCloseModal = () => {
+    setSearchKey('')
+    onCancel()
+  }
+  const getSearchedList = () => {
+    if (searchKey === undefined || searchKey === '') {
+      return skinList
+    }
+
+    return skinList.filter(
+      (item) =>
+        item.name.toLocaleLowerCase().indexOf(searchKey.toLocaleLowerCase()) >
+        -1
+    )
+  }
 
   const highlightDiv = (value: string) => {
     const replacedKeyowrd = searchKey.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
@@ -60,26 +76,39 @@ const Header: React.FC<Props> = ({
     )
   }
 
+  const onSelectSkin = (skin: ItemDto) => {
+    console.log(skin.name, skin.id)
+  }
   return (
     <>
-      <S.BackBoard isOpen={isOpen} onClick={onCancel} />
+      {/* <S.BackBoard isOpen={isOpen} onClick={onCloseModal} /> */}
       <S.Container isOpen={isOpen}>
         <S.Header>데미지 스킨 선택</S.Header>
+        <S.Input
+          maxLength={20}
+          placeholder="검색"
+          onChange={(event) => setSearchKey(event.target.value)}
+        ></S.Input>
         {!hideCloseButton && (
-          <S.CloseButton onClick={onCancel}>✖</S.CloseButton>
+          <S.CloseButton onClick={onCloseModal}>✖</S.CloseButton>
         )}
         <S.Body>
-          {skinList.map((skin, index) => (
-            <S.SkinItem key={index}>
-              <img
-                className="skin-img"
-                src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
-              />
-              <span className="skin-text">
-                {skin.name ? highlightDiv(skin.name) : undefined}
-              </span>
-            </S.SkinItem>
-          ))}
+          {getSearchedList().length > 0 ? (
+            getSearchedList().map((skin) => (
+              <S.SkinItem key={skin.id} onClick={() => onSelectSkin(skin)}>
+                <div className="skin-text">{skin.id}</div>
+                <img
+                  className="skin-img"
+                  src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
+                />
+                <span className="skin-text">
+                  {skin.name ? highlightDiv(skin.name) : undefined}
+                </span>
+              </S.SkinItem>
+            ))
+          ) : (
+            <S.InfoText>[{searchKey}] 스킨이 없습니다.</S.InfoText>
+          )}
         </S.Body>
       </S.Container>
     </>

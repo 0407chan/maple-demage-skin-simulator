@@ -1,5 +1,5 @@
+import { Input as OriginalInput } from 'antd/lib'
 import styled from 'styled-components'
-
 export const BackBoard = styled.div<{ isOpen: boolean }>`
   display: flex;
   position: absolute;
@@ -17,6 +17,7 @@ export const BackBoard = styled.div<{ isOpen: boolean }>`
 export const Container = styled.div<{ isOpen: boolean }>`
   display: flex;
   position: absolute;
+  left: 20px;
   top: 20px;
   flex-direction: column;
   align-items: center;
@@ -109,6 +110,7 @@ export const SkinItem = styled.div`
 
 export const HighlightText = styled.span`
   background-color: #ffc60a;
+  color: #3e3003;
   font-weight: bold;
 `
 
@@ -143,4 +145,19 @@ export const CloseButton = styled.button`
     cursor: pointer;
     color: #ffd884;
   }
+`
+
+export const Input = styled(OriginalInput)`
+  width: calc(100% - 30px);
+  background-color: #eeeeee;
+  &:disabled {
+    background-color: #c8c8c8;
+  }
+`
+
+export const InfoText = styled.span`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  color: #eeeeee;
 `
