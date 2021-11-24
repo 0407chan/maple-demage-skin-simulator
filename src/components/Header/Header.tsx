@@ -25,7 +25,7 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
             -
           </Button>
           <InputNumber
-            style={{ width: 60, textAlign: 'center' }}
+            style={{ width: 80, textAlign: 'center' }}
             value={skinNumber}
             onChange={(value) => onSetSkinNumber(value)}
           />
