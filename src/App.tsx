@@ -19,7 +19,7 @@ const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
 const standImage = 'https://maplestory.io/api/KMS/356/mob/100004/render/stand'
 
 const App: React.FC = () => {
-  const [skinNumber, setSkinNumber] = useState<number>(200)
+  const [skinNumber, setSkinNumber] = useState<number>(287)
   const [skinType, setSkinType] = useState<SkinType>('NoCri1')
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
