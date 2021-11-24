@@ -17,7 +17,7 @@ export const BackBoard = styled.div<{ isOpen: boolean }>`
 export const Container = styled.div<{ isOpen: boolean }>`
   display: flex;
   position: absolute;
-  left: 20px;
+  /* left: 20px; */
   top: 20px;
   flex-direction: column;
   align-items: center;

@@ -60,9 +60,9 @@ const Header: React.FC<Props> = ({
     setSkinList(result.sort((a, b) => a.id - b.id))
   }, [damageSkinList.data])
 
-  useEffect(() => {
-    console.log('skinList', skinList)
-  }, [skinList])
+  // useEffect(() => {
+  //   console.log('skinList', skinList)
+  // }, [skinList])
 
   const onCloseModal = () => {
     setSearchKey('')
@@ -101,7 +101,7 @@ const Header: React.FC<Props> = ({
   }
   return (
     <>
-      {/* <S.BackBoard isOpen={isOpen} onClick={onCloseModal} /> */}
+      <S.BackBoard isOpen={isOpen} onClick={onCloseModal} />
       <S.Container isOpen={isOpen}>
         <S.Header>데미지 스킨 선택</S.Header>
         <S.Input
