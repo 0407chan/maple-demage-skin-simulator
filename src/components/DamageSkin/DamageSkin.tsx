@@ -1,95 +1,32 @@
-import useDamage from '@/hooks/useDamage'
-import { DamageType, GetDamageSkinResponse } from '@/type/damage-skin'
+import { DamageType } from '@/type/damage-skin'
 import React, { useEffect, useState } from 'react'
-import { UseQueryResult } from 'react-query'
 import * as S from './style'
 
 type Props = {
-  skinNumber: number
   damageItem: DamageType
   setDamageList: React.Dispatch<React.SetStateAction<DamageType[]>>
 }
-const DamageSkin: React.FC<Props> = ({
-  skinNumber,
-  damageItem,
-  setDamageList
-}) => {
+const DamageSkin: React.FC<Props> = ({ damageItem, setDamageList }) => {
   const [timer, setTimer] = useState<number>(1000)
   const [visible, setVisible] = useState<boolean>(true)
 
-  const {
-    Miss,
-    criEffect,
-    damage0,
-    damage1,
-    damage2,
-    damage3,
-    damage4,
-    damage5,
-    damage6,
-    damage7,
-    damage8,
-    damage9,
-    guard,
-    numberSpace,
-    resist
-  } = useDamage({
-    skinNumber,
-    skinType: damageItem.isCritical ? 'NoCri1' : 'NoRed1'
-  })
-
-  const getSkin = (num: number) => {
-    switch (num) {
-      case 0:
-        return damage0
-      case 1:
-        return damage1
-      case 2:
-        return damage2
-      case 3:
-        return damage3
-      case 4:
-        return damage4
-      case 5:
-        return damage5
-      case 6:
-        return damage6
-      case 7:
-        return damage7
-      case 8:
-        return damage8
-      case 9:
-        return damage9
-      default:
-        return damage9
+  const getSkin1Image = (num: number) => {
+    if (damageItem.isCritical) {
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${num}.png`
+    } else {
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${num}.png`
+    }
+  }
+  const getSkin0Image = (num: number) => {
+    if (damageItem.isCritical) {
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${num}.png`
+    } else {
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${num}.png`
     }
   }
 
-  const renderDamage = (
-    damageQuery: UseQueryResult<GetDamageSkinResponse, unknown>
-  ) => {
-    if (
-      !damageQuery.data ||
-      !damageQuery.data.value ||
-      damageQuery.data.value === ''
-    )
-      return null
-
-    return (
-      <img
-        draggable="false"
-        style={{
-          display: 'flex',
-          width: 'fit-content',
-          marginLeft:
-            numberSpace.data?.value !== undefined &&
-            Number(numberSpace.data?.value) < 0
-              ? Number(numberSpace.data?.value)
-              : undefined
-        }}
-        src={`data:image/png;base64,${damageQuery.data.value}`}
-      />
-    )
+  const getCriticalImage = () => {
+    return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
   }
 
   useEffect(() => {
@@ -106,10 +43,26 @@ const DamageSkin: React.FC<Props> = ({
   return (
     <S.Container className="no-drag">
       {damageItem.isCritical && (
-        <S.CriEffect>{renderDamage(criEffect)} </S.CriEffect>
+        <S.CriEffect>
+          <img draggable={false} alt="critical-img" src={getCriticalImage()} />
+        </S.CriEffect>
       )}
       {`${damageItem.damage}`.split('').map((num, index) => (
-        <div key={index}>{renderDamage(getSkin(Number(num)))} </div>
+        <img
+          key={index}
+          style={{
+            width: 'fit-content',
+            height: 'fit-content',
+            zIndex: index + 1
+          }}
+          draggable={false}
+          alt={`skin-img-${num}-${index}`}
+          src={
+            index === 0
+              ? getSkin1Image(Number(num))
+              : getSkin0Image(Number(num))
+          }
+        />
       ))}
     </S.Container>
   )

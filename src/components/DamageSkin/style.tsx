@@ -20,6 +20,7 @@ const skinDisapper = keyframes`
 export const Container = styled.div`
   display: flex;
   position: absolute;
+  align-items: center;
   opacity: 0;
   animation: ${skinDisapper} 1s linear;
 `
