@@ -1,29 +1,19 @@
 import React, { useState } from 'react'
 import { v4 as uuid } from 'uuid'
-import { useGetDamageSkinAll } from './api/damage-skin'
 import * as S from './appStyle'
 import DamageSkin from './components/DamageSkin'
 import Header from './components/Header'
 import Horizontal from './components/Horizontal'
-import { DamageType, SkinType } from './type/damage-skin'
-
-const skinTypeOptions = [
-  { label: '일반0', value: 'NoRed0' },
-  { label: '일반1', value: 'NoRed1' },
-  { label: '크리티컬0', value: 'NoCri0' },
-  { label: '크리티컬1', value: 'NoCri1' },
-  { label: '뭐야', value: 'NoRed3' }
-]
+import { DamageType } from './type/damage-skin'
 
 const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
 const standImage = 'https://maplestory.io/api/KMS/356/mob/100004/render/stand'
 
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
-  const [skinType, setSkinType] = useState<SkinType>('NoCri1')
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
-  const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
+  // const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   const onSetSkinNumber = (newId: number) => {
     setSkinNumber(newId)
@@ -62,7 +52,6 @@ const App: React.FC = () => {
               key={item.id}
               damageItem={item}
               setDamageList={setDamageList}
-              skinNumber={skinNumber}
             />
           ))}
         </Horizontal>
