@@ -53,7 +53,9 @@ const DamageSkin: React.FC<Props> = ({ damageItem, setDamageList }) => {
           style={{
             width: 'fit-content',
             height: 'fit-content',
-            zIndex: index + 1
+            zIndex: index + 1,
+            marginBottom: index % 2 === 0 ? 4 : 0,
+            marginTop: index % 2 === 1 ? 4 : 0
           }}
           draggable={false}
           alt={`skin-img-${num}-${index}`}
