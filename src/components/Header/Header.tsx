@@ -24,6 +24,20 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
             <span className="skin-text">{currentSkin.name}</span>
           </S.SkinButton>
         )}
+        {/* <Horizontal style={{ justifyContent: 'center' }}>
+          <Button
+          disabled={skinNumber === 1}
+          onClick={() => onSetSkinNumber(skinNumber - 1)}
+          >
+          -
+          </Button>
+          <InputNumber
+          style={{ width: 80, textAlign: 'center' }}
+          value={skinNumber}
+          onChange={(value) => onSetSkinNumber(value)}
+          />
+          <Button onClick={() => onSetSkinNumber(skinNumber + 1)}>+</Button>
+        </Horizontal> */}
         {/* <Button disabled>세팅</Button> */}
       </S.Container>
       <SkinSelectModal

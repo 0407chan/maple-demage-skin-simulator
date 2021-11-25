@@ -107,6 +107,7 @@ const Header: React.FC<Props> = ({
   }
 
   const onSelectSkin = (skin: ItemDto) => {
+    // console.log(skin.id, SkinMap[skin.id])
     setCurrentSkin(skin)
     onConfirm(SkinMap[skin.id])
     onCloseModal()
