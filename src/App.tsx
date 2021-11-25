@@ -42,7 +42,7 @@ const App: React.FC = () => {
   }
 
   const initReactGA = () => {
-    ReactGA.initialize('UA-178457189-1')
+    ReactGA.initialize('UA-178457189-2')
   }
 
   useEffect(() => {
