@@ -6,6 +6,7 @@ import * as S from './style'
 
 type Props = {
   isOpen: boolean
+  currentSkin?: ItemDto
   onCancel: () => void
   onConfirm: (num: number) => void
   setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
@@ -13,6 +14,7 @@ type Props = {
 }
 const Header: React.FC<Props> = ({
   isOpen,
+  currentSkin,
   onCancel,
   hideCloseButton = false,
   setCurrentSkin,
@@ -125,7 +127,15 @@ const Header: React.FC<Props> = ({
         <S.Body>
           {getSearchedList().length > 0 ? (
             getSearchedList().map((skin) => (
-              <S.SkinItem key={skin.id} onClick={() => onSelectSkin(skin)}>
+              <S.SkinItem
+                key={skin.id}
+                className={
+                  currentSkin && currentSkin.id === skin.id
+                    ? 'current-skin'
+                    : ''
+                }
+                onClick={() => onSelectSkin(skin)}
+              >
                 <img
                   className="skin-img"
                   src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
@@ -133,6 +143,9 @@ const Header: React.FC<Props> = ({
                 <span className="skin-text">
                   {skin.name ? highlightDiv(skin.name) : undefined}
                 </span>
+                {currentSkin && currentSkin.id === skin.id && (
+                  <span className="current-skin-text">착용중</span>
+                )}
               </S.SkinItem>
             ))
           ) : (

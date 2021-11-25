@@ -94,7 +94,9 @@ export const SkinItem = styled.div`
   gap: 16px;
   cursor: pointer;
   padding: 4px 16px;
+  margin-left: 16px;
   border-radius: 5px;
+  width: calc(100% - 32px);
 
   &:hover {
     color: #eeeeee;
@@ -105,6 +107,17 @@ export const SkinItem = styled.div`
   }
   .skin-text {
     color: #e1e1e1;
+  }
+  &.current-skin {
+    box-shadow: 0px 0px 5px 1px #eeeeee9a;
+    background-color: #eeeeee9a;
+    .skin-text {
+      color: #181818;
+    }
+  }
+  .current-skin-text {
+    color: #91ff31;
+    font-weight: bold;
   }
 `
 
