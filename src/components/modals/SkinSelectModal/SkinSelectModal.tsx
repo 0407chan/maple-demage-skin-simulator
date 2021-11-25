@@ -1,4 +1,5 @@
 import { useGetItemList } from '@/api/damage-skin'
+import { SkinMap } from '@/constants/damageSkinMapper'
 import { ItemDto } from '@/type/damage-skin'
 import React, { useEffect, useState } from 'react'
 import * as S from './style'
@@ -6,12 +7,16 @@ import * as S from './style'
 type Props = {
   isOpen: boolean
   onCancel: () => void
+  onConfirm: (num: number) => void
+  setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
   hideCloseButton?: boolean
 }
 const Header: React.FC<Props> = ({
   isOpen,
   onCancel,
-  hideCloseButton = false
+  hideCloseButton = false,
+  setCurrentSkin,
+  onConfirm
 }) => {
   const [skinList, setSkinList] = useState<ItemDto[]>([])
   const [searchKey, setSearchKey] = useState<string>('')
@@ -40,6 +45,9 @@ const Header: React.FC<Props> = ({
         !item.name.includes('교환권')
       ) {
         result.push(item)
+        if (item.name === '흐물냥 데미지 스킨') {
+          setCurrentSkin(item)
+        }
       }
     })
 
@@ -97,7 +105,9 @@ const Header: React.FC<Props> = ({
   }
 
   const onSelectSkin = (skin: ItemDto) => {
-    console.log(skin.name, skin.id)
+    setCurrentSkin(skin)
+    onConfirm(SkinMap[skin.id])
+    onCloseModal()
   }
   return (
     <>
