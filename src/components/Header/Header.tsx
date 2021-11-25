@@ -29,6 +29,7 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
       </S.Container>
       <SkinSelectModal
         isOpen={showSkinModal}
+        currentSkin={currentSkin}
         setCurrentSkin={setCurrentSkin}
         onCancel={onCloseModal}
         onConfirm={(num: number) => onSetSkinNumber(num)}
