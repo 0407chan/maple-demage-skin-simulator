@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/maple-demage-skin-simulator/static/css/main.46179d1e.chunk.css",
-    "main.js": "/maple-demage-skin-simulator/static/js/main.45e6db4c.chunk.js",
+    "main.js": "/maple-demage-skin-simulator/static/js/main.5d490505.chunk.js",
     "runtime-main.js": "/maple-demage-skin-simulator/static/js/runtime-main.fa028b93.js",
     "static/css/2.296b8887.chunk.css": "/maple-demage-skin-simulator/static/css/2.296b8887.chunk.css",
-    "static/js/2.1bdeef76.chunk.js": "/maple-demage-skin-simulator/static/js/2.1bdeef76.chunk.js",
+    "static/js/2.ad2b5f1f.chunk.js": "/maple-demage-skin-simulator/static/js/2.ad2b5f1f.chunk.js",
     "index.html": "/maple-demage-skin-simulator/index.html",
-    "static/js/2.1bdeef76.chunk.js.LICENSE.txt": "/maple-demage-skin-simulator/static/js/2.1bdeef76.chunk.js.LICENSE.txt"
+    "static/js/2.ad2b5f1f.chunk.js.LICENSE.txt": "/maple-demage-skin-simulator/static/js/2.ad2b5f1f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.fa028b93.js",
     "static/css/2.296b8887.chunk.css",
-    "static/js/2.1bdeef76.chunk.js",
+    "static/js/2.ad2b5f1f.chunk.js",
     "static/css/main.46179d1e.chunk.css",
-    "static/js/main.45e6db4c.chunk.js"
+    "static/js/main.5d490505.chunk.js"
   ]
 }
