@@ -80,6 +80,8 @@ const DamageSkin: React.FC<Props> = ({
         if (Number(numString.slice(-4)) > 0) {
           result += `${numString.slice(-4)}`
         }
+      } else {
+        result += `${numString.slice(-4)}`
       }
       return result
     } else {
