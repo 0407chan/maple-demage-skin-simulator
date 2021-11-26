@@ -1,5 +1,5 @@
 import { ItemDto } from '@/type/damage-skin'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SkinSelectModal from '../modals/SkinSelectModal'
 import * as S from './style'
 
@@ -14,6 +14,10 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
 
   const onConfirm = (skinNumber: number) => {
+    onSetSkinNumber(skinNumber)
+  }
+
+  const preLoadImage = () => {
     for (let index = 0; index <= 9; index++) {
       new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
       new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
@@ -21,9 +25,10 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
       new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
     }
     new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
-
-    onSetSkinNumber(skinNumber)
   }
+  useEffect(() => {
+    preLoadImage()
+  }, [skinNumber])
 
   return (
     <>
