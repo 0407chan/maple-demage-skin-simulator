@@ -5,7 +5,7 @@ import * as S from './appStyle'
 import DamageSkin from './components/DamageSkin'
 import Header from './components/Header'
 import Horizontal from './components/Horizontal'
-import { DamageType } from './type/damage-skin'
+import { DamageType, ItemDto } from './type/damage-skin'
 
 const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
 const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
+  const [currentSkin, setCurrentSkin] = useState<ItemDto>()
   // const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   const onSetSkinNumber = (newId: number) => {
@@ -26,7 +27,7 @@ const App: React.FC = () => {
     const newDamage: DamageType = {
       id: uuid(),
       skinNumber,
-      damage: getRandomInt(100000, 400000),
+      damage: getRandomInt(10000000000, 10000000000),
       isCritical: Math.random() * 100 < 60
     }
     setTimeout(() => {
@@ -52,7 +53,9 @@ const App: React.FC = () => {
   return (
     <S.Container>
       <S.Header>
-        <Header {...{ onSetSkinNumber, skinNumber }} />
+        <Header
+          {...{ onSetSkinNumber, skinNumber, currentSkin, setCurrentSkin }}
+        />
       </S.Header>
       <S.Body className="no-drag">
         <Horizontal style={{ justifyContent: 'center' }}>
@@ -61,6 +64,7 @@ const App: React.FC = () => {
               key={item.id}
               damageItem={item}
               setDamageList={setDamageList}
+              currentSkin={currentSkin}
             />
           ))}
         </Horizontal>
