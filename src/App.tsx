@@ -79,6 +79,7 @@ const App: React.FC = () => {
         />
       </S.Header>
       <S.Body className="no-drag">
+        <div style={{ height: '30%' }} />
         <Horizontal style={{ justifyContent: 'center' }}>
           {damageList.map((item) => (
             <DamageSkin
