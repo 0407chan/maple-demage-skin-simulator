@@ -123,7 +123,10 @@ const Header: React.FC<Props> = ({
           onChange={(event) => setSearchKey(event.target.value)}
         ></S.Input>
         {!hideCloseButton && (
-          <S.CloseButton onClick={onCloseModal}>✖</S.CloseButton>
+          <S.CloseButton size="small" onClick={onCloseModal}>
+            <div className="ex left" />
+            <div className="ex right" />
+          </S.CloseButton>
         )}
         <S.Body>
           {getSearchedList().length > 0 ? (

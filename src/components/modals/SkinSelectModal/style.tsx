@@ -1,5 +1,6 @@
-import { Input as OriginalInput } from 'antd/lib'
+import { Button as OriginalButton, Input as OriginalInput } from 'antd/lib'
 import styled from 'styled-components'
+
 export const BackBoard = styled.div<{ isOpen: boolean }>`
   display: flex;
   position: absolute;
@@ -45,7 +46,7 @@ export const Container = styled.div<{ isOpen: boolean }>`
 export const Header = styled.div`
   display: flex;
   width: 100%;
-  font-size: 12px;
+  font-size: 15px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   align-items: center;
@@ -141,22 +142,50 @@ export const Footer = styled.div`
   justify-content: center;
 `
 
-export const CloseButton = styled.button`
+export const CloseButton = styled(OriginalButton)`
   display: flex;
   position: absolute;
-  top: 7px;
-  right: 10px;
+  top: 12px;
+  right: 15px;
+  width: 22px;
+  height: 22px;
   font-weight: bold;
-  width: fit-content;
-  align-items: center;
-  border: unset;
-  background-color: unset;
   justify-content: center;
+  align-items: center;
+  border-radius: 5px !important;
+  background-color: #e6ae35;
   color: #eeeeee;
+  font-weight: bolder;
+  border: unset;
 
   &:hover {
-    cursor: pointer;
-    color: #ffd884;
+    color: #eeeeee;
+    background-color: #f4c04f;
+  }
+
+  &:active {
+    color: #eeeeee;
+    background-color: #e6ae35;
+  }
+  &:focus {
+    background-color: #c9982d;
+    color: #eeeeee;
+  }
+
+  .ex {
+    display: flex;
+    position: absolute;
+    left: 4;
+    width: 14px;
+    border-radius: 2px;
+    background-color: #eeeeee;
+    border: 2px solid #eeeeee;
+  }
+  .left {
+    transform: rotate(45deg);
+  }
+  .right {
+    transform: rotate(135deg);
   }
 `
 
