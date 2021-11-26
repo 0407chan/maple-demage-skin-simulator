@@ -32,7 +32,8 @@ const App: React.FC = () => {
   const onAttack = () => {
     ReactGA.event({
       category: 'Attack Event',
-      action: 'Attack!'
+      action: 'Attack',
+      value: 1
     })
     setIsAttacked(true)
     const newDamageList: DamageType[] = []

@@ -112,7 +112,7 @@ const Header: React.FC<Props> = ({
       category: 'Select Skin',
       action: 'Select Skin',
       label: skin.name,
-      value: SkinMap[skin.id]
+      value: 1
     })
     setCurrentSkin(skin)
     onConfirm(SkinMap[skin.id])
