@@ -42,12 +42,10 @@ const Header: React.FC<Props> = ({
       new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
     }
     new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
-    if (currentSkin?.name.includes('유닛')) {
-      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-3.png` // 만
-      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-4.png` // 억
-      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-3.png`
-      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-4.png`
-    }
+    new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-3.png` // 만
+    new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-4.png` // 억
+    new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-3.png`
+    new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-4.png`
   }
 
   const changeFavicon = () => {
