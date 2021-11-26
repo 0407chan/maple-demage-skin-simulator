@@ -50,6 +50,25 @@ const Header: React.FC<Props> = ({
     }
   }
 
+  const changeFavicon = () => {
+    if (currentSkin === undefined) return
+    let link: HTMLLinkElement | null =
+      document.querySelector('link[rel="shortcut icon"]') ||
+      document.querySelector('link[rel="icon"]')
+
+    if (!link) {
+      link = document.createElement('link')
+      link.id = 'favicon'
+      link.rel = 'shortcut icon'
+      document.head.appendChild(link)
+    }
+
+    link.href = `https://maplestory.io/api/KMS/352/item/${currentSkin.id}/icon`
+  }
+  useEffect(() => {
+    changeFavicon()
+  }, [currentSkin])
+
   useEffect(() => {
     preLoadImage()
   }, [skinNumber])
