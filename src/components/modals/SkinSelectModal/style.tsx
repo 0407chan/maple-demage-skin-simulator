@@ -60,7 +60,7 @@ export const Body = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  overflow-y: scroll;
+  overflow-y: overlay;
   gap: 4px;
   width: 100%;
   height: 100%;

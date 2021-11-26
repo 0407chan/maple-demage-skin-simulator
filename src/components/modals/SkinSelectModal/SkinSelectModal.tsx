@@ -144,12 +144,15 @@ const Header: React.FC<Props> = ({
                   className="skin-img"
                   src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
                 />
-                <span className="skin-text">
+                <span
+                  className={`skin-text ${
+                    currentSkin && currentSkin.id === skin.id
+                      ? 'current-skin-text'
+                      : ''
+                  }`}
+                >
                   {skin.name ? highlightDiv(skin.name) : undefined}
                 </span>
-                {currentSkin && currentSkin.id === skin.id && (
-                  <span className="current-skin-text">착용중</span>
-                )}
               </S.SkinItem>
             ))
           ) : (
