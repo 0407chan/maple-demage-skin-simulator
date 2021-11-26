@@ -6,12 +6,18 @@ import * as S from './style'
 type Props = {
   skinNumber: number
   onSetSkinNumber: (newId: number) => void
+  currentSkin?: ItemDto
+  setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
 }
-const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
+const Header: React.FC<Props> = ({
+  skinNumber,
+  onSetSkinNumber,
+  currentSkin,
+  setCurrentSkin
+}) => {
   const [showSkinModal, setShowSkinModal] = useState<boolean>(false)
   const onOpenModal = () => setShowSkinModal(true)
   const onCloseModal = () => setShowSkinModal(false)
-  const [currentSkin, setCurrentSkin] = useState<ItemDto>()
 
   const onConfirm = (skinNumber: number) => {
     onSetSkinNumber(skinNumber)
@@ -25,8 +31,16 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
       new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
     }
     new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
+    if (currentSkin?.name.includes('유닛')) {
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-3.png` // 만
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-4.png` // 억
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-3.png`
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-4.png`
+    }
   }
+
   useEffect(() => {
+    console.log(currentSkin?.id, skinNumber)
     preLoadImage()
   }, [skinNumber])
 
