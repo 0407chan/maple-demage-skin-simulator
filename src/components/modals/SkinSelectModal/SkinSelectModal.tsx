@@ -75,7 +75,6 @@ const Header: React.FC<Props> = ({
   // }, [skinList])
 
   const onCloseModal = () => {
-    setSearchKey('')
     onCancel()
   }
   const getSearchedList = () => {
@@ -119,9 +118,10 @@ const Header: React.FC<Props> = ({
         <S.Header>데미지 스킨 선택</S.Header>
         <S.Input
           maxLength={20}
+          value={searchKey}
           placeholder="검색"
           onChange={(event) => setSearchKey(event.target.value)}
-        ></S.Input>
+        />
         {!hideCloseButton && (
           <S.CloseButton size="small" onClick={onCloseModal}>
             <div className="ex left" />
