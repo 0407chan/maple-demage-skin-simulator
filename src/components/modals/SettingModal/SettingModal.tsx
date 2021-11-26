@@ -110,7 +110,7 @@ const SettingModal: React.FC<Props> = ({
           <S.TitleLabel>크리티컬 세팅</S.TitleLabel>
           <S.Content>
             <Horizontal gap={16}>
-              <S.Label>크리티컬 확률</S.Label>
+              <S.Label>크리티컬</S.Label>
               <MapleInput
                 maxLength={4}
                 style={{ width: '100%' }}
