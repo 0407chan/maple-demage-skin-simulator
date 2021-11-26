@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/maple-demage-skin-simulator/static/css/main.92356a7f.chunk.css",
-    "main.js": "/maple-demage-skin-simulator/static/js/main.e3824dde.chunk.js",
+    "main.js": "/maple-demage-skin-simulator/static/js/main.7ddd383f.chunk.js",
     "runtime-main.js": "/maple-demage-skin-simulator/static/js/runtime-main.fa028b93.js",
     "static/css/2.296b8887.chunk.css": "/maple-demage-skin-simulator/static/css/2.296b8887.chunk.css",
     "static/js/2.37130657.chunk.js": "/maple-demage-skin-simulator/static/js/2.37130657.chunk.js",
@@ -13,6 +13,6 @@
     "static/css/2.296b8887.chunk.css",
     "static/js/2.37130657.chunk.js",
     "static/css/main.92356a7f.chunk.css",
-    "static/js/main.e3824dde.chunk.js"
+    "static/js/main.7ddd383f.chunk.js"
   ]
 }
