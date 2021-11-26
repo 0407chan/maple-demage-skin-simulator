@@ -6,6 +6,7 @@ import DamageSkin from './components/DamageSkin'
 import Header from './components/Header'
 import Horizontal from './components/Horizontal'
 import { DamageType, ItemDto } from './type/damage-skin'
+import { Setting } from './type/setting'
 
 const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
 const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
@@ -15,6 +16,12 @@ const App: React.FC = () => {
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
+  const [setting, setSetting] = useState<Setting>({
+    numberAttack: 1,
+    maxDamage: 1000000,
+    minDamage: 100000,
+    criticalRate: 60
+  })
   // const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   const onSetSkinNumber = (newId: number) => {
@@ -24,19 +31,26 @@ const App: React.FC = () => {
 
   const onAttack = () => {
     setIsAttacked(true)
-    const newDamage: DamageType = {
-      id: uuid(),
-      skinNumber,
-      damage: getRandomInt(10000000000, 10000000000),
-      isCritical: Math.random() * 100 < 60
+    const newDamageList: DamageType[] = []
+    for (let index = 0; index < (setting.numberAttack || 0); index++) {
+      const newDamage: DamageType = {
+        id: uuid(),
+        skinNumber,
+        damage: getRandomInt({
+          min: setting.minDamage || 0,
+          max: setting.maxDamage || 0
+        }),
+        isCritical: Math.random() * 100 < (setting.criticalRate || 0)
+      }
+      newDamageList.push(newDamage)
     }
     setTimeout(() => {
       setIsAttacked(false)
     }, 1000)
-    setDamageList([...damageList, newDamage])
+    setDamageList([...damageList, ...newDamageList])
   }
 
-  function getRandomInt(min: number, max: number) {
+  function getRandomInt({ min, max }: { min: number; max: number }) {
     min = Math.ceil(min)
     max = Math.floor(max)
     return Math.floor(Math.random() * (max - min)) + min //최댓값은 제외, 최솟값은 포함
@@ -54,7 +68,14 @@ const App: React.FC = () => {
     <S.Container>
       <S.Header>
         <Header
-          {...{ onSetSkinNumber, skinNumber, currentSkin, setCurrentSkin }}
+          {...{
+            onSetSkinNumber,
+            skinNumber,
+            currentSkin,
+            setCurrentSkin,
+            setting,
+            setSetting
+          }}
         />
       </S.Header>
       <S.Body className="no-drag">
