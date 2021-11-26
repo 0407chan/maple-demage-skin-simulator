@@ -8,7 +8,7 @@ export const BackBoard = styled.div<{ isOpen: boolean }>`
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 4;
+  z-index: 10;
   background-color: rgba(0, 0, 0, 0.3);
   ${(props) =>
     props.isOpen
@@ -30,7 +30,7 @@ export const Container = styled.div<{ isOpen: boolean }>`
   gap: 10px;
   opacity: 0;
   z-index: 10;
-  @media screen and (max-width: 400px) {
+  @media screen and (max-width: 500px) {
     width: calc(100vw - 40px);
     height: calc(100vh - 40px);
   }
