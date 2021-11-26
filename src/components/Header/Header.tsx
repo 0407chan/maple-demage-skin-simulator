@@ -12,6 +12,19 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
   const onOpenModal = () => setShowSkinModal(true)
   const onCloseModal = () => setShowSkinModal(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
+
+  const onConfirm = (skinNumber: number) => {
+    for (let index = 0; index <= 9; index++) {
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-${index}.png`
+      new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
+    }
+    new Image().src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
+
+    onSetSkinNumber(skinNumber)
+  }
+
   return (
     <>
       <S.Container>
@@ -45,7 +58,7 @@ const Header: React.FC<Props> = ({ skinNumber, onSetSkinNumber }) => {
         currentSkin={currentSkin}
         setCurrentSkin={setCurrentSkin}
         onCancel={onCloseModal}
-        onConfirm={(num: number) => onSetSkinNumber(num)}
+        onConfirm={onConfirm}
       />
     </>
   )
