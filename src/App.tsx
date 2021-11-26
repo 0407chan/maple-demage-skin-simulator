@@ -31,7 +31,7 @@ const App: React.FC = () => {
 
   const onAttack = () => {
     ReactGA.event({
-      category: 'Attack Event',
+      category: 'Attack_Event',
       action: 'Attack',
       value: 1
     })

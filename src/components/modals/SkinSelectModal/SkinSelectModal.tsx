@@ -109,8 +109,8 @@ const Header: React.FC<Props> = ({
   const onSelectSkin = (skin: ItemDto) => {
     // console.log(skin.id, SkinMap[skin.id])
     ReactGA.event({
-      category: 'Select Skin',
-      action: 'Select Skin',
+      category: 'Select_Skin',
+      action: 'Select_Skin',
       label: skin.name,
       value: 1
     })
