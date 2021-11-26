@@ -8,7 +8,7 @@ import Horizontal from './components/Horizontal'
 import { DamageType } from './type/damage-skin'
 
 const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
-const standImage = 'https://maplestory.io/api/KMS/356/mob/100004/render/stand'
+const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
 
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
