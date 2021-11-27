@@ -149,7 +149,7 @@ const Header: React.FC<Props> = ({
               >
                 <img
                   className="skin-img"
-                  src={`https://maplestory.io/api/KMS/352/item/${skin.id}/icon`}
+                  src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
                 />
                 <span
                   className={`skin-text ${

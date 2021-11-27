@@ -92,7 +92,7 @@ export const useGetWzImage = (): UseQueryResult<
 export const getItemList = async (
   query?: GetItemListQuery
 ): Promise<ItemDto[]> => {
-  const result = await axios.get('https://maplestory.io/api/KMS/352/item', {
+  const result = await axios.get('https://maplestory.io/api/KMS/356/item', {
     params: query
   })
   return result.data

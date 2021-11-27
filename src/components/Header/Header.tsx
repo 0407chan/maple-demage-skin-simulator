@@ -61,7 +61,7 @@ const Header: React.FC<Props> = ({
       document.head.appendChild(link)
     }
 
-    link.href = `https://maplestory.io/api/KMS/352/item/${currentSkin.id}/icon`
+    link.href = `https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`
   }
   useEffect(() => {
     changeFavicon()
@@ -78,7 +78,7 @@ const Header: React.FC<Props> = ({
           <S.SkinButton onClick={onOpenModal}>
             <img
               className="skin-img"
-              src={`https://maplestory.io/api/KMS/352/item/${currentSkin.id}/icon`}
+              src={`https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`}
             />
             <span className="skin-text">{currentSkin.name}</span>
           </S.SkinButton>
