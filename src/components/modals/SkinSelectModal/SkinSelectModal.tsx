@@ -23,13 +23,34 @@ const Header: React.FC<Props> = ({
 }) => {
   const [skinList, setSkinList] = useState<ItemDto[]>([])
   const [searchKey, setSearchKey] = useState<string>('')
-  const damageSkinList = useGetItemList({
+
+  const [newSkinItems, setNewSkinItems] = useState<ItemDto[]>([])
+
+  const damageSkinItemListQuery = useGetItemList({
     searchFor: '데미지 스킨'
   })
+
+  /**
+   * 새로운 스킨이 생겼을때 조회하는 API
+   */
+  // const [newSkins, setNewSkins] = useState<number[]>([])
+  // const damageSkinQuery = useGetDamageSkinAll()
+  // useEffect(() => {
+  //   const result: number[] = []
+  //   const prevSkins = Object.values(SkinMap)
+  //   damageSkinQuery.data?.children.forEach((item) => {
+  //     if (!prevSkins.find((skin) => skin === Number(item))) {
+  //       result.push(Number(item))
+  //     }
+  //   })
+  //   console.log('새 스킨', result)
+  //   setNewSkins(result)
+  // }, [damageSkinQuery.data])
+
   useEffect(() => {
     let result: ItemDto[] = []
 
-    damageSkinList.data?.forEach((item) => {
+    damageSkinItemListQuery.data?.forEach((item) => {
       if (
         !result.find(
           (skin) =>
@@ -48,6 +69,9 @@ const Header: React.FC<Props> = ({
         !item.name.includes('교환권')
       ) {
         result.push(item)
+        if (SkinMap[item.id] === undefined) {
+          newSkinItems.push(item)
+        }
         if (item.name === '흐물냥 데미지 스킨') {
           setCurrentSkin(item)
         }
@@ -68,8 +92,10 @@ const Header: React.FC<Props> = ({
       }
     })
 
+    // console.log('새 스킨 아이템', newSkinItems)
+    setNewSkinItems(newSkinItems)
     setSkinList(result.sort((a, b) => a.id - b.id))
-  }, [damageSkinList.data])
+  }, [damageSkinItemListQuery.data])
 
   // useEffect(() => {
   //   console.log('skinList', skinList)
