@@ -5,7 +5,10 @@ type WindowSize = {
   height?: number
 }
 
-const useWindowSize = () => {
+const useWindowSize = (): {
+  windowSize: WindowSize
+  isMobile: () => boolean
+} => {
   const [windowSize, setWindowSize] = useState<WindowSize>({
     width: undefined,
     height: undefined
@@ -24,7 +27,8 @@ const useWindowSize = () => {
   }, [])
 
   const isMobile = () => {
-    return windowSize.width && windowSize.width <= 500
+    if (windowSize.width === undefined) return false
+    return windowSize.width <= 500
   }
 
   return {
