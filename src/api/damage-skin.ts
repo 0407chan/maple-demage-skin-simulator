@@ -2,8 +2,7 @@ import {
   GetDamageSkinQuery,
   GetDamageSkinResponse,
   GetItemListQuery,
-  ItemDto,
-  SkinType
+  ItemDto
 } from '@/type/damage-skin'
 import axios from 'axios'
 import { useQuery, UseQueryResult } from 'react-query'
@@ -12,8 +11,8 @@ export const getDamageSkin = async (
   query: GetDamageSkinQuery
 ): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
-    // `https://maplestory.io/api/wz/KMS/353/Effect/BasicEff.img/${query.skinType}/${query.skinNumber}`
+    `https://maplestory.io/api/wz/KMS/356/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
+    // `https://maplestory.io/api/wz/KMS/356/Effect/BasicEff.img/${query.skinType}/${query.skinNumber}`
   )
   return result.data
 }
@@ -36,27 +35,23 @@ export const useGetDamageSkin = (
   )
 }
 
-export const getDamageSkinAll = async (query: {
-  skinNumber: number
-  skinType: SkinType
-}): Promise<GetDamageSkinResponse> => {
+export const getDamageSkinAll = async (): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/353/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}`
+    `https://maplestory.io/api/wz/KMS/356/Effect/DamageSkin.img`
   )
   return result.data
 }
 
-export const useGetDamageSkinAll = (query: {
-  skinNumber: number
-  skinType: SkinType
-}): UseQueryResult<GetDamageSkinResponse, unknown> => {
+export const useGetDamageSkinAll = (): UseQueryResult<
+  GetDamageSkinResponse,
+  unknown
+> => {
   return useQuery(
-    ['getDamageSkinAll', query],
+    ['getDamageSkinAll'],
     async () => {
-      return getDamageSkinAll(query)
+      return getDamageSkinAll()
     },
     {
-      enabled: query.skinNumber !== undefined,
       retry: false,
       keepPreviousData: true,
       refetchOnWindowFocus: false
@@ -66,8 +61,8 @@ export const useGetDamageSkinAll = (query: {
 
 export const getWzImage = async (): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/353/UI/UIWindow4.img/enchantUI/miniGame/star/STAR`
-    // `https://maplestory.io/api/wz/KMS/353/UI/UIWindow4.img/enchantUI/miniGame/particle/0`
+    `https://maplestory.io/api/wz/KMS/356/UI/UIWindow4.img/enchantUI/miniGame/star/STAR`
+    // `https://maplestory.io/api/wz/KMS/356/UI/UIWindow4.img/enchantUI/miniGame/particle/0`
   )
   return result.data
 }
