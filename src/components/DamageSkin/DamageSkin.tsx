@@ -4,13 +4,15 @@ import * as S from './style'
 
 type Props = {
   damageItem: DamageType
-  setDamageList: React.Dispatch<React.SetStateAction<DamageType[]>>
+  damageList: DamageType[]
+  updateDamageList: (newDamageList: DamageType[]) => void
   currentSkin?: ItemDto
   style?: React.CSSProperties
 }
 const DamageSkin: React.FC<Props> = ({
   damageItem,
-  setDamageList,
+  damageList,
+  updateDamageList,
   currentSkin,
   style
 }) => {
@@ -84,9 +86,7 @@ const DamageSkin: React.FC<Props> = ({
 
   useEffect(() => {
     setTimeout(() => {
-      setDamageList((prev) => {
-        return prev.filter((item) => item.id !== damageItem.id)
-      })
+      updateDamageList(damageList.filter((item) => item.id !== damageItem.id))
       setVisible(false)
     }, timer)
   }, [])
