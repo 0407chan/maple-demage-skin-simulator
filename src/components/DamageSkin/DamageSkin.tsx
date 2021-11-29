@@ -1,24 +1,12 @@
 import { DamageType, ItemDto } from '@/type/damage-skin'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import * as S from './style'
 
 type Props = {
   damageItem: DamageType
-  damageList: DamageType[]
-  setDamageList: React.Dispatch<React.SetStateAction<DamageType[]>>
   currentSkin?: ItemDto
-  style?: React.CSSProperties
 }
-const DamageSkin: React.FC<Props> = ({
-  damageItem,
-  damageList,
-  setDamageList,
-  currentSkin,
-  style
-}) => {
-  const [timer] = useState<number>(2000)
-  const [visible, setVisible] = useState<boolean>(true)
-
+const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   const getSkin1Image = (num: number) => {
     if (damageItem.isCritical) {
       return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${num}.png`
@@ -84,19 +72,11 @@ const DamageSkin: React.FC<Props> = ({
     }
   }
 
-  useEffect(() => {
-    setTimeout(() => {
-      setDamageList(damageList.filter((item) => item.id !== damageItem.id))
-      setVisible(false)
-    }, timer)
-  }, [])
-
-  if (!visible) return null
   return (
     <S.Container
       className="no-drag"
       delay={damageItem.level}
-      style={{ ...style, marginBottom: damageItem.marginBottom }}
+      style={{ marginBottom: damageItem.marginBottom }}
       // stop
     >
       {damageItem.isCritical && (
