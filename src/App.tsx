@@ -16,8 +16,11 @@ const App: React.FC = () => {
   const [damageList, setDamageList] = useState<DamageType[]>([])
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
+  const [criticalHeight, setCriticalHeight] = useState<number>(0)
+  const [normarHeight, setNormarHeight] = useState<number>(0)
+
   const [setting, setSetting] = useState<Setting>({
-    numberAttack: 1,
+    numberAttack: 5,
     maxDamage: 1000000,
     minDamage: 100000,
     criticalRate: 60
@@ -37,16 +40,20 @@ const App: React.FC = () => {
     })
     setIsAttacked(true)
     const newDamageList: DamageType[] = []
+    let totalHeight = 0
     for (let index = 0; index < (setting.numberAttack || 0); index++) {
       const newDamage: DamageType = {
         id: uuid(),
         skinNumber,
+        level: index,
+        marginBottom: totalHeight,
         damage: getRandomInt({
           min: setting.minDamage || 0,
           max: setting.maxDamage || 0
         }),
         isCritical: Math.random() * 100 < (setting.criticalRate || 0)
       }
+      totalHeight += newDamage.isCritical ? criticalHeight : normarHeight
       newDamageList.push(newDamage)
     }
     setTimeout(() => {
@@ -69,6 +76,19 @@ const App: React.FC = () => {
     initReactGA()
   }, [])
 
+  useEffect(() => {
+    const criImg: HTMLImageElement = new Image()
+    const normalImg: HTMLImageElement = new Image()
+    criImg.src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
+    normalImg.src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
+    criImg.onload = function () {
+      setCriticalHeight(criImg.height)
+    }
+    normalImg.onload = function () {
+      setNormarHeight(normalImg.height)
+    }
+  }, [skinNumber])
+
   return (
     <S.Container>
       <S.Header>
@@ -85,7 +105,9 @@ const App: React.FC = () => {
       </S.Header>
       <S.Body className="no-drag">
         <div style={{ height: '30%' }} />
-        <Horizontal style={{ justifyContent: 'center' }}>
+        <Horizontal
+          style={{ justifyContent: 'center', alignItems: 'flex-end' }}
+        >
           {damageList.map((item) => (
             <DamageSkin
               key={item.id}
