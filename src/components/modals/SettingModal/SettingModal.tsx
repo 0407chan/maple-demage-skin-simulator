@@ -9,6 +9,7 @@ import * as S from './style'
 const MAX_DAMAGE = 150000000000
 const MIN_DAMAGE = 1
 const MAX_CRITICAL = 100
+const MAX_NUMBER_ATTACK = 10
 type Props = {
   isOpen: boolean
   setting: Setting
@@ -130,6 +131,36 @@ const SettingModal: React.FC<Props> = ({
                   setSetting({
                     ...setting,
                     criticalRate: newValue !== '' ? Number(newValue) : undefined
+                  })
+                }}
+              />
+            </Horizontal>
+          </S.Content>
+        </S.Body>
+        <S.Body style={{ marginTop: 8 }}>
+          <S.TitleLabel>타수 세팅</S.TitleLabel>
+          <S.Content>
+            <Horizontal gap={16}>
+              <S.Label>타수</S.Label>
+              <MapleInput
+                maxLength={3}
+                style={{ width: '100%' }}
+                placeholder="타수를 입력하세요."
+                value={
+                  setting.numberAttack !== undefined
+                    ? numberWithCommas(setting.numberAttack)
+                    : ''
+                }
+                onChange={(event) => {
+                  let newValue = event.target.value
+                    .replace(/[^0-9]/g, '')
+                    .replaceAll(',', '')
+                  if (Number(newValue) >= MAX_NUMBER_ATTACK) {
+                    newValue = `${MAX_NUMBER_ATTACK}`
+                  }
+                  setSetting({
+                    ...setting,
+                    numberAttack: newValue !== '' ? Number(newValue) : undefined
                   })
                 }}
               />
