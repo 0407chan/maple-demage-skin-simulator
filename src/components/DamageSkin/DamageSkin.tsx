@@ -6,11 +6,13 @@ type Props = {
   damageItem: DamageType
   setDamageList: React.Dispatch<React.SetStateAction<DamageType[]>>
   currentSkin?: ItemDto
+  style?: React.CSSProperties
 }
 const DamageSkin: React.FC<Props> = ({
   damageItem,
   setDamageList,
-  currentSkin
+  currentSkin,
+  style
 }) => {
   const [timer] = useState<number>(1000)
   const [visible, setVisible] = useState<boolean>(true)
@@ -52,15 +54,6 @@ const DamageSkin: React.FC<Props> = ({
     return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
   }
 
-  useEffect(() => {
-    setTimeout(() => {
-      setDamageList((prev) => {
-        return prev.filter((item) => item.id !== damageItem.id)
-      })
-      setVisible(false)
-    }, timer)
-  }, [])
-
   const getDamageString = () => {
     if (isUnit()) {
       const numString = `${damageItem.damage}`
@@ -89,10 +82,23 @@ const DamageSkin: React.FC<Props> = ({
     }
   }
 
-  if (!visible) return null
+  useEffect(() => {
+    setTimeout(() => {
+      setDamageList((prev) => {
+        return prev.filter((item) => item.id !== damageItem.id)
+      })
+      setVisible(false)
+    }, timer)
+  }, [])
 
+  if (!visible) return null
   return (
-    <S.Container className="no-drag">
+    <S.Container
+      className="no-drag"
+      delay={damageItem.level}
+      style={{ ...style, marginBottom: damageItem.marginBottom }}
+      // stop
+    >
       {damageItem.isCritical && (
         <S.CriEffect>
           <img draggable={false} alt="critical-img" src={getCriticalImage()} />

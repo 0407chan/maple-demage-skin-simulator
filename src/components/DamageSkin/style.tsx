@@ -17,12 +17,22 @@ const skinDisapper = keyframes`
   }
 `
 
-export const Container = styled.div`
+export const Container = styled.div<{ stop?: boolean; delay?: number }>`
   display: flex;
   position: absolute;
   align-items: center;
   opacity: 0;
   animation: ${skinDisapper} 1s linear;
+  ${(props) =>
+    props.stop && {
+      animation: 'unset',
+      opacity: 1
+    }}
+
+  ${(props) =>
+    props.delay !== undefined && {
+      animationDelay: `${props.delay * 0.1}s`
+    }}
 `
 
 export const CriEffect = styled.div`
