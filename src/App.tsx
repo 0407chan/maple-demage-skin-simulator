@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga'
 import { v4 as uuid } from 'uuid'
 import * as S from './appStyle'
@@ -14,12 +14,6 @@ const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
   const [damageList, setDamageList] = useState<DamageType[]>([])
-  const damageListRef = useRef(damageList)
-
-  const updateDamageList = (newDamageList: DamageType[]) => {
-    setDamageList(newDamageList)
-    damageListRef.current = [...newDamageList]
-  }
 
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
@@ -36,7 +30,7 @@ const App: React.FC = () => {
 
   const onSetSkinNumber = (newId: number) => {
     setSkinNumber(newId)
-    updateDamageList([])
+    setDamageList([])
   }
 
   const onAttack = () => {
@@ -66,7 +60,7 @@ const App: React.FC = () => {
     setTimeout(() => {
       setIsAttacked(false)
     }, 1000)
-    updateDamageList([...damageListRef.current, ...newDamageList])
+    setDamageList([...damageList, ...newDamageList])
   }
 
   function getRandomInt({ min, max }: { min: number; max: number }) {
@@ -115,12 +109,12 @@ const App: React.FC = () => {
         <Horizontal
           style={{ justifyContent: 'center', alignItems: 'flex-end' }}
         >
-          {damageListRef.current.map((item) => (
+          {damageList.map((item) => (
             <DamageSkin
               key={item.id}
               damageItem={item}
-              damageList={damageListRef.current}
-              updateDamageList={updateDamageList}
+              damageList={damageList}
+              setDamageList={setDamageList}
               currentSkin={currentSkin}
             />
           ))}
