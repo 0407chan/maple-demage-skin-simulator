@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga'
 import { v4 as uuid } from 'uuid'
 import * as S from './appStyle'
-import DamageSkin from './components/DamageSkin'
+import DamageWrapper from './components/DamageWrapper'
 import Header from './components/Header'
-import Horizontal from './components/Horizontal'
-import { DamageType, ItemDto } from './type/damage-skin'
+import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
 const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
@@ -13,7 +12,9 @@ const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
 
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
-  const [damageList, setDamageList] = useState<DamageType[]>([])
+  const [damageWrapperList, setDamageWrapperList] = useState<
+    DamageWrapperType[]
+  >([])
 
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
@@ -30,7 +31,7 @@ const App: React.FC = () => {
 
   const onSetSkinNumber = (newId: number) => {
     setSkinNumber(newId)
-    setDamageList([])
+    setDamageWrapperList([])
   }
 
   const onAttack = () => {
@@ -40,6 +41,10 @@ const App: React.FC = () => {
       value: 1
     })
     setIsAttacked(true)
+    const newDamageWrapper: DamageWrapperType = {
+      id: uuid(),
+      damageList: []
+    }
     const newDamageList: DamageType[] = []
     let totalHeight = 0
     for (let index = 0; index < (setting.numberAttack || 0); index++) {
@@ -60,7 +65,10 @@ const App: React.FC = () => {
     setTimeout(() => {
       setIsAttacked(false)
     }, 1000)
-    setDamageList([...damageList, ...newDamageList])
+    setDamageWrapperList([
+      ...damageWrapperList,
+      { ...newDamageWrapper, damageList: newDamageList }
+    ])
   }
 
   function getRandomInt({ min, max }: { min: number; max: number }) {
@@ -106,19 +114,14 @@ const App: React.FC = () => {
       </S.Header>
       <S.Body className="no-drag">
         <div style={{ height: '30%' }} />
-        <Horizontal
-          style={{ justifyContent: 'center', alignItems: 'flex-end' }}
-        >
-          {damageList.map((item) => (
-            <DamageSkin
-              key={item.id}
-              damageItem={item}
-              damageList={damageList}
-              setDamageList={setDamageList}
-              currentSkin={currentSkin}
-            />
-          ))}
-        </Horizontal>
+        {damageWrapperList.map((item) => (
+          <DamageWrapper
+            key={item.id}
+            damageWrapper={item}
+            setDamageWrapperList={setDamageWrapperList}
+            currentSkin={currentSkin}
+          />
+        ))}
         <S.OrangeMushroom
           draggable="false"
           src={isAttacked ? hitImage : standImage}

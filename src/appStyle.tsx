@@ -35,4 +35,6 @@ export const Text = styled.span`
 
 export const OrangeMushroom = styled.img`
   cursor: pointer;
+  position: absolute;
+  bottom: 20%;
 `
