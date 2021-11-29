@@ -10,6 +10,10 @@ export type GetDamageSkinResponse = {
   value: string
 }
 
+export type DamageWrapperType = {
+  id: string
+  damageList: DamageType[]
+}
 export type DamageType = {
   id: string
   skinNumber: number
