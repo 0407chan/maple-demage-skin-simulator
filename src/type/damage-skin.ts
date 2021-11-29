@@ -13,6 +13,8 @@ export type GetDamageSkinResponse = {
 export type DamageType = {
   id: string
   skinNumber: number
+  level: number
+  marginBottom: number
   isCritical?: boolean
   damage: number
 }
