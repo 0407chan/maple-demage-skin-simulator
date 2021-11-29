@@ -14,7 +14,7 @@ const DamageSkin: React.FC<Props> = ({
   currentSkin,
   style
 }) => {
-  const [timer] = useState<number>(1000)
+  const [timer] = useState<number>(2000)
   const [visible, setVisible] = useState<boolean>(true)
 
   const getSkin1Image = (num: number) => {
