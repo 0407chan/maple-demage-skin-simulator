@@ -2,7 +2,7 @@ import { useGetItemList } from '@/api/damage-skin'
 import { SkinMap } from '@/constants/damageSkinMapper'
 import { ItemDto } from '@/type/damage-skin'
 import React, { useEffect, useState } from 'react'
-import ReactGA from 'react-ga'
+import ReactGA from 'react-ga4'
 import * as S from './style'
 
 type Props = {
@@ -135,8 +135,8 @@ const Header: React.FC<Props> = ({
   const onSelectSkin = (skin: ItemDto) => {
     // console.log(skin.id, SkinMap[skin.id])
     ReactGA.event({
-      category: 'Select_Skin',
-      action: 'Select_Skin',
+      category: 'button_click',
+      action: 'select_skin',
       label: skin.name,
       value: 1
     })

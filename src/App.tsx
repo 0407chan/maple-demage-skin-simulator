@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import ReactGA from 'react-ga'
+import ReactGA from 'react-ga4'
 import { v4 as uuid } from 'uuid'
 import * as S from './appStyle'
 import DamageWrapper from './components/DamageWrapper'
@@ -36,8 +36,8 @@ const App: React.FC = () => {
 
   const onAttack = () => {
     ReactGA.event({
-      category: 'Attack_Event',
-      action: 'Attack',
+      category: 'button_click',
+      action: 'attack_mushroom',
       value: 1
     })
     setIsAttacked(true)
