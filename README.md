@@ -1,5 +1,5 @@
 # maple-demage-skin-simulator
-메이플 데미지 스킨 시뮬레이터
+DEMO (https://0407chan.github.io/maple-demage-skin-simulator/)
 
 ## Simulate MapleStory Damage Skin
 - Mushrum will never die. don't worry
