@@ -8,17 +8,25 @@ type Props = {
 }
 const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   const getSkin1Image = (num: number) => {
+    let newNum = num
+    if (currentSkin?.name.includes('럭키세븐')) {
+      newNum = 0
+    }
     if (damageItem.isCritical) {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${num}.png`
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${newNum}.png`
     } else {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${num}.png`
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${newNum}.png`
     }
   }
   const getSkin0Image = (num: number) => {
+    let newNum = num
+    if (currentSkin?.name.includes('럭키세븐')) {
+      newNum = 0
+    }
     if (damageItem.isCritical) {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${num}.png`
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${newNum}.png`
     } else {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${num}.png`
+      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${newNum}.png`
     }
   }
 
