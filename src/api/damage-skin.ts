@@ -4,6 +4,7 @@ import {
   GetItemListQuery,
   ItemDto
 } from '@/type/damage-skin'
+import { WzType } from '@/type/wz'
 import axios from 'axios'
 import { useQuery, UseQueryResult } from 'react-query'
 
@@ -104,3 +105,19 @@ export const useGetItemList = (
     { retry: false, refetchOnWindowFocus: false, keepPreviousData: true }
   )
 }
+export const getWzVersion = async (): Promise<WzType[]> => {
+  const result = await axios.get('https://maplestory.io/api/wz')
+  return result.data
+}
+
+// export const useGetItemList = (
+//   query?: GetItemListQuery
+// ): UseQueryResult<ItemDto[], unknown> => {
+//   return useQuery(
+//     ['getItemList', query],
+//     async () => {
+//       return getItemList(query)
+//     },
+//     { retry: false, refetchOnWindowFocus: false, keepPreviousData: true }
+//   )
+// }
