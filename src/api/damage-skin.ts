@@ -13,7 +13,6 @@ export const getDamageSkin = async (
 ): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
     `https://maplestory.io/api/wz/KMS/356/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
-    // `https://maplestory.io/api/wz/KMS/356/Effect/BasicEff.img/${query.skinType}/${query.skinNumber}`
   )
   return result.data
 }
