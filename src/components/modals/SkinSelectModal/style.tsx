@@ -1,4 +1,8 @@
-import { Button as OriginalButton, Input as OriginalInput } from 'antd/lib'
+import {
+  Button as OriginalButton,
+  Divider as OriginalDivider,
+  Input as OriginalInput
+} from 'antd/lib'
 import styled from 'styled-components'
 
 export const BackBoard = styled.div<{ isOpen: boolean }>`
@@ -210,4 +214,68 @@ export const InfoText = styled.span`
   width: 100%;
   justify-content: center;
   color: #eeeeee;
+`
+
+export const NewSkinListWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  height: fit-content;
+`
+
+export const Divider = styled(OriginalDivider)`
+  margin: 8px 0;
+  border-top: 1px dashed #2b2b2b;
+  border-bottom: 1px dashed #565656;
+`
+
+const borderWidth = '2px'
+export const NewBadge = styled.div`
+  font-weight: bold;
+  /* margin-top: 5px; */
+  background-color: orange;
+
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Lato, sans-serif;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: white;
+  background: #222;
+  border-radius: ${borderWidth};
+  padding: 4px 8px 1px;
+  &::after {
+    position: absolute;
+    content: '';
+    top: calc(-1 * ${borderWidth});
+    left: calc(-1 * ${borderWidth});
+    z-index: -1;
+    width: calc(100% + ${borderWidth} * 2);
+    height: calc(100% + ${borderWidth} * 2);
+    background: linear-gradient(
+      60deg,
+      hsl(224, 85%, 66%),
+      hsl(269, 85%, 66%),
+      hsl(314, 85%, 66%),
+      hsl(359, 85%, 66%),
+      hsl(44, 85%, 66%),
+      hsl(89, 85%, 66%),
+      hsl(134, 85%, 66%),
+      hsl(179, 85%, 66%)
+    );
+    background-size: 300% 300%;
+    background-position: 0 50%;
+    border-radius: calc(2 * ${borderWidth});
+    animation: moveGradient 4s alternate infinite;
+  }
+
+  @keyframes moveGradient {
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 `
