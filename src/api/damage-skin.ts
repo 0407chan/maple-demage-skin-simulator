@@ -60,31 +60,6 @@ export const useGetDamageSkinAll = (): UseQueryResult<
   )
 }
 
-export const getWzImage = async (): Promise<GetDamageSkinResponse> => {
-  const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/356/UI/UIWindow4.img/enchantUI/miniGame/star/STAR`
-    // `https://maplestory.io/api/wz/KMS/356/UI/UIWindow4.img/enchantUI/miniGame/particle/0`
-  )
-  return result.data
-}
-
-export const useGetWzImage = (): UseQueryResult<
-  GetDamageSkinResponse,
-  unknown
-> => {
-  return useQuery(
-    ['getWzImage'],
-    async () => {
-      return getWzImage()
-    },
-    {
-      retry: false,
-      keepPreviousData: true,
-      refetchOnWindowFocus: false
-    }
-  )
-}
-
 export const getItemList = async (
   query?: GetItemListQuery
 ): Promise<ItemDto[]> => {
