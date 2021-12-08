@@ -3,6 +3,7 @@ export type GetDamageSkinQuery = {
   skinNumber?: number
   skinType: SkinType
   damageNumber: string
+  version: number
 }
 export type GetDamageSkinResponse = {
   children: string[]
@@ -24,6 +25,7 @@ export type DamageType = {
 }
 
 export type GetItemListQuery = {
+  version: number
   startPosition?: number
   count?: number
   overallCategoryFilter?: string

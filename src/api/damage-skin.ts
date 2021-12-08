@@ -1,5 +1,4 @@
 import {
-  GetDamageSkinQuery,
   GetDamageSkinResponse,
   GetItemListQuery,
   ItemDto
@@ -8,48 +7,49 @@ import { WzType } from '@/type/wz'
 import axios from 'axios'
 import { useQuery, UseQueryResult } from 'react-query'
 
-export const getDamageSkin = async (
-  query: GetDamageSkinQuery
+// export const getDamageSkin = async (
+//   query: GetDamageSkinQuery
+// ): Promise<GetDamageSkinResponse> => {
+//   const result = await axios.get(
+//     `https://maplestory.io/api/wz/KMS/${query.version}/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
+//   )
+//   return result.data
+// }
+
+// export const useGetDamageSkin = (
+//   query: GetDamageSkinQuery
+// ): UseQueryResult<GetDamageSkinResponse, unknown> => {
+//   return useQuery(
+//     ['getDamageSkin', query],
+//     async () => {
+//       return getDamageSkin(query)
+//     },
+//     {
+//       enabled: query.skinNumber !== undefined,
+//       retry: false,
+//       keepPreviousData: false,
+//       staleTime: 1000 * 60 * 60,
+//       refetchOnWindowFocus: false
+//     }
+//   )
+// }
+
+export const getDamageSkinAll = async (
+  version: number
 ): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/356/Effect/DamageSkin.img/${query.skinNumber}/${query.skinType}/${query.damageNumber}`
+    `https://maplestory.io/api/wz/KMS/${version}/Effect/DamageSkin.img`
   )
   return result.data
 }
 
-export const useGetDamageSkin = (
-  query: GetDamageSkinQuery
+export const useGetDamageSkinAll = (
+  version: number
 ): UseQueryResult<GetDamageSkinResponse, unknown> => {
   return useQuery(
-    ['getDamageSkin', query],
+    ['getDamageSkinAll', version],
     async () => {
-      return getDamageSkin(query)
-    },
-    {
-      enabled: query.skinNumber !== undefined,
-      retry: false,
-      keepPreviousData: false,
-      staleTime: 1000 * 60 * 60,
-      refetchOnWindowFocus: false
-    }
-  )
-}
-
-export const getDamageSkinAll = async (): Promise<GetDamageSkinResponse> => {
-  const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/356/Effect/DamageSkin.img`
-  )
-  return result.data
-}
-
-export const useGetDamageSkinAll = (): UseQueryResult<
-  GetDamageSkinResponse,
-  unknown
-> => {
-  return useQuery(
-    ['getDamageSkinAll'],
-    async () => {
-      return getDamageSkinAll()
+      return getDamageSkinAll(version)
     },
     {
       retry: false,
@@ -60,16 +60,19 @@ export const useGetDamageSkinAll = (): UseQueryResult<
 }
 
 export const getItemList = async (
-  query?: GetItemListQuery
+  query: GetItemListQuery
 ): Promise<ItemDto[]> => {
-  const result = await axios.get('https://maplestory.io/api/KMS/356/item', {
-    params: query
-  })
+  const result = await axios.get(
+    `https://maplestory.io/api/KMS/${query.version}/item`,
+    {
+      params: query
+    }
+  )
   return result.data
 }
 
 export const useGetItemList = (
-  query?: GetItemListQuery
+  query: GetItemListQuery
 ): UseQueryResult<ItemDto[], unknown> => {
   return useQuery(
     ['getItemList', query],
