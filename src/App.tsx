@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
+import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
+import { getWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
+import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
 import Header from './components/Header'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
@@ -16,6 +19,8 @@ const App: React.FC = () => {
     DamageWrapperType[]
   >([])
 
+  const [_, setWzVersion] = useRecoilState(wzVersionState)
+
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
   const [criticalHeight, setCriticalHeight] = useState<number>(0)
@@ -27,7 +32,6 @@ const App: React.FC = () => {
     minDamage: 100000,
     criticalRate: 60
   })
-  // const damageAll = useGetDamageSkinAll({ skinNumber, skinType })
 
   const onSetSkinNumber = (newId: number) => {
     setSkinNumber(newId)
@@ -81,7 +85,17 @@ const App: React.FC = () => {
     ReactGA.initialize('G-E8PR0MD0NH')
   }
 
+  const getWz = async () => {
+    const res = await getWzVersion()
+    const latestVersion = res
+      .filter((item) => item.region === 'KMS')
+      .at(-1)?.mapleVersionId
+    if (latestVersion !== undefined) {
+      setWzVersion(Number(latestVersion))
+    }
+  }
   useEffect(() => {
+    getWz()
     initReactGA()
   }, [])
 
