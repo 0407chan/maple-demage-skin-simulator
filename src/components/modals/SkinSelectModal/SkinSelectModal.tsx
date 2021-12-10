@@ -147,6 +147,30 @@ const Header: React.FC<Props> = ({
     onConfirm(SkinMap[skin.id])
     onCloseModal()
   }
+
+  const renderDamageItem = (skin: ItemDto) => {
+    return (
+      <S.SkinItem
+        key={skin.id}
+        className={
+          currentSkin && currentSkin.id === skin.id ? 'current-skin' : ''
+        }
+        onClick={() => onSelectSkin(skin)}
+      >
+        <img
+          className="skin-img"
+          src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
+        />
+        <span
+          className={`skin-text ${
+            currentSkin && currentSkin.id === skin.id ? 'current-skin-text' : ''
+          }`}
+        >
+          {skin.name ? highlightDiv(skin.name) : undefined}
+        </span>
+      </S.SkinItem>
+    )
+  }
   return (
     <>
       <S.BackBoard isOpen={isOpen} onClick={onCloseModal} />
@@ -170,60 +194,12 @@ const Header: React.FC<Props> = ({
               <Horizontal style={{ justifyContent: 'center', marginTop: 5 }}>
                 <S.NewBadge>NEW</S.NewBadge>
               </Horizontal>
-              {getLatestSearchedList().map((skin) => (
-                <S.SkinItem
-                  key={skin.id}
-                  className={
-                    currentSkin && currentSkin.id === skin.id
-                      ? 'current-skin'
-                      : ''
-                  }
-                  onClick={() => onSelectSkin(skin)}
-                >
-                  <img
-                    className="skin-img"
-                    src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
-                  />
-                  <span
-                    className={`skin-text ${
-                      currentSkin && currentSkin.id === skin.id
-                        ? 'current-skin-text'
-                        : ''
-                    }`}
-                  >
-                    {skin.name ? highlightDiv(skin.name) : undefined}
-                  </span>
-                </S.SkinItem>
-              ))}
+              {getLatestSearchedList().map((skin) => renderDamageItem(skin))}
               <S.Divider />
             </S.NewSkinListWrapper>
           )}
           {getSearchedList().length > 0 ? (
-            getSearchedList().map((skin) => (
-              <S.SkinItem
-                key={skin.id}
-                className={
-                  currentSkin && currentSkin.id === skin.id
-                    ? 'current-skin'
-                    : ''
-                }
-                onClick={() => onSelectSkin(skin)}
-              >
-                <img
-                  className="skin-img"
-                  src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
-                />
-                <span
-                  className={`skin-text ${
-                    currentSkin && currentSkin.id === skin.id
-                      ? 'current-skin-text'
-                      : ''
-                  }`}
-                >
-                  {skin.name ? highlightDiv(skin.name) : undefined}
-                </span>
-              </S.SkinItem>
-            ))
+            getSearchedList().map((skin) => renderDamageItem(skin))
           ) : (
             <S.InfoText>[{searchKey}] 스킨이 없습니다.</S.InfoText>
           )}
