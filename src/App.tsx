@@ -82,7 +82,7 @@ const App: React.FC = () => {
   }
 
   const initReactGA = () => {
-    ReactGA.initialize('G-E8PR0MD0NH')
+    ReactGA.initialize(process.env.REACT_APP_ID || '')
   }
 
   const getWz = async () => {
