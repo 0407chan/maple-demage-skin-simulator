@@ -11,5 +11,6 @@ export default defineConfig({
   build: {
     manifest: true,
     outDir: 'build'
-  }
+  },
+  base: '/maple-demage-skin-simulator/'
 })
