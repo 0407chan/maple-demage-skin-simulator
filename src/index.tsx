@@ -1,20 +1,29 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import 'antd/dist/antd.css'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import ReactDOM from 'react-dom/client'
 import { RecoilRoot } from 'recoil'
 import App from './App'
 import './styles/globals.scss'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+      keepPreviousData: true
+    }
+  }
+})
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+
+root.render(
   <React.StrictMode>
-    <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
         <App />
-      </QueryClientProvider>
-    </RecoilRoot>
-  </React.StrictMode>,
-  document.getElementById('root')
+      </RecoilRoot>
+    </QueryClientProvider>
+  </React.StrictMode>
 )
