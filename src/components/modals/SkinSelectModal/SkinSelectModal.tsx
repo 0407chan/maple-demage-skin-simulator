@@ -1,11 +1,11 @@
-import { useGetItemList } from '@/api/damage-skin'
-import { wzVersionState } from '@/atoms/wzVersion'
-import Horizontal from '@/components/Horizontal'
-import { SkinMap } from '@/constants/damageSkinMapper'
-import { ItemDto } from '@/type/damage-skin'
+import { useGetItemList } from 'api/damage-skin'
+import { wzVersionState } from 'atoms/wzVersion'
+import Horizontal from 'components/Horizontal'
+import { SkinMap } from 'constants/damageSkinMapper'
 import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
+import { ItemDto } from 'type/damage-skin'
 import * as S from './style'
 import { filterSkinItems } from './util'
 
@@ -47,7 +47,7 @@ const Header: React.FC<Props> = ({
   // useEffect(() => {
   //   const result: number[] = []
   //   const prevSkins = Object.values(SkinMap)
-  //   damageSkinQuery.data?.children.forEach((item) => {
+  //   damageSkinQuery.data?.children.forEach((item: any) => {
   //     if (!prevSkins.find((skin) => skin === Number(item))) {
   //       result.push(Number(item))
   //     }
