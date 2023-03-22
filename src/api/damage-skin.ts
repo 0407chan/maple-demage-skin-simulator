@@ -1,11 +1,11 @@
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import axios from 'axios'
 import {
   GetDamageSkinResponse,
   GetItemListQuery,
   ItemDto
-} from '@/type/damage-skin'
-import { WzType } from '@/type/wz'
-import axios from 'axios'
-import { useQuery, UseQueryResult } from 'react-query'
+} from 'type/damage-skin'
+import { WzType } from 'type/wz'
 
 // export const getDamageSkin = async (
 //   query: GetDamageSkinQuery
@@ -46,17 +46,9 @@ export const getDamageSkinAll = async (
 export const useGetDamageSkinAll = (
   version: number
 ): UseQueryResult<GetDamageSkinResponse, unknown> => {
-  return useQuery(
-    ['getDamageSkinAll', version],
-    async () => {
-      return getDamageSkinAll(version)
-    },
-    {
-      retry: false,
-      keepPreviousData: true,
-      refetchOnWindowFocus: false
-    }
-  )
+  return useQuery(['getDamageSkinAll', version], async () => {
+    return getDamageSkinAll(version)
+  })
 }
 
 export const getItemList = async (
