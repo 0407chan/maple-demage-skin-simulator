@@ -10,8 +10,8 @@ import Header from './components/Header'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
-const hitImage = `/images/hit1_0.png`
-const standImage = `/images/stand.gif`
+const hitImage = `./images/hit1_0.png`
+const standImage = `./images/stand.gif`
 
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)

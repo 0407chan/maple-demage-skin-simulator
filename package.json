@@ -9,7 +9,7 @@
     "dev": "pnpm switch-email && vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "gh-deploy": "gh-pages -d build"
+    "gh-deploy": "pnpm build && gh-pages -d build"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.28.0",
