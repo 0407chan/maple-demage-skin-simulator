@@ -1,7 +1,7 @@
-import { DamageWrapperType, ItemDto } from '@/type/damage-skin'
+import Horizontal from 'components/Horizontal'
 import React, { useEffect, useState } from 'react'
+import { DamageWrapperType, ItemDto } from 'type/damage-skin'
 import DamageSkin from '../DamageSkin'
-import Horizontal from '../Horizontal'
 import * as S from './style'
 
 type Props = {
@@ -19,6 +19,7 @@ const DamageWrapper: React.FC<Props> = ({
   const [timer] = useState<number>(2000)
   const [visible, setVisible] = useState<boolean>(true)
 
+  // 일정 시간 지난후 dom 제거
   useEffect(() => {
     setTimeout(() => {
       setDamageWrapperList((prev) => {

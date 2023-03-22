@@ -1,4 +1,4 @@
-import { ItemDto } from '@/type/damage-skin'
+import { ItemDto } from 'type/damage-skin'
 
 export const filterSkinItems = (itemList: ItemDto[]): ItemDto[] => {
   let result: ItemDto[] = []
