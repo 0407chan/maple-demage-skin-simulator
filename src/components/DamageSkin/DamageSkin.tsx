@@ -13,9 +13,9 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
       newNum = 0
     }
     if (damageItem.isCritical) {
-      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${newNum}.png`
+      return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${newNum}.png`
     } else {
-      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${newNum}.png`
+      return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${newNum}.png`
     }
   }
   const getSkin0Image = (num: number) => {
@@ -24,9 +24,9 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
       newNum = 0
     }
     if (damageItem.isCritical) {
-      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${newNum}.png`
+      return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${newNum}.png`
     } else {
-      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${newNum}.png`
+      return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${newNum}.png`
     }
   }
 
@@ -35,21 +35,21 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   const getUnit = (unit: '만' | '억') => {
     if (damageItem.isCritical) {
       if (unit === '만') {
-        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-3.png` // 만
+        return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-3.png` // 만
       } else {
-        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-4.png` // 억
+        return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-4.png` // 억
       }
     } else {
       if (unit === '만') {
-        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-3.png`
+        return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-3.png`
       } else {
-        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-4.png`
+        return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-4.png`
       }
     }
   }
 
   const getCriticalImage = () => {
-    return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
+    return `./images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
   }
 
   const getDamageString = () => {

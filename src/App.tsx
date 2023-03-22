@@ -102,8 +102,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const criImg: HTMLImageElement = new Image()
     const normalImg: HTMLImageElement = new Image()
-    criImg.src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
-    normalImg.src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
+    criImg.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
+    normalImg.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
     criImg.onload = function () {
       setCriticalHeight(criImg.height - 10)
     }
