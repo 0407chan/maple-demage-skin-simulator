@@ -1,6 +1,5 @@
 import { useGetItemList } from 'api/damage-skin'
 import { wzVersionState } from 'atoms/wzVersion'
-import Horizontal from 'components/Horizontal'
 import { SkinMap } from 'constants/damageSkinMapper'
 import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
@@ -189,7 +188,7 @@ const Header: React.FC<Props> = ({
           </S.CloseButton>
         )}
         <S.Body>
-          {getLatestSearchedList().length > 0 && (
+          {/* {getLatestSearchedList().length > 0 && (
             <S.NewSkinListWrapper>
               <Horizontal style={{ justifyContent: 'center', marginTop: 5 }}>
                 <S.NewBadge>NEW</S.NewBadge>
@@ -197,7 +196,7 @@ const Header: React.FC<Props> = ({
               {getLatestSearchedList().map((skin) => renderDamageItem(skin))}
               <S.Divider />
             </S.NewSkinListWrapper>
-          )}
+          )} */}
           {getSearchedList().length > 0 ? (
             getSearchedList().map((skin) => renderDamageItem(skin))
           ) : (
