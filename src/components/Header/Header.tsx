@@ -36,34 +36,16 @@ const Header: React.FC<Props> = ({
 
   const preLoadImage = () => {
     for (let index = 0; index <= 9; index++) {
-      new Image().src = `${
-        import.meta.env.PUBLIC_URL
-      }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
-      new Image().src = `${
-        import.meta.env.PUBLIC_URL
-      }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
-      new Image().src = `${
-        import.meta.env.PUBLIC_URL
-      }/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-${index}.png`
-      new Image().src = `${
-        import.meta.env.PUBLIC_URL
-      }/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
+      new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
+      new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
+      new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-${index}.png`
+      new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
     }
-    new Image().src = `${
-      import.meta.env.PUBLIC_URL
-    }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
-    new Image().src = `${
-      import.meta.env.PUBLIC_URL
-    }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-3.png` // 만
-    new Image().src = `${
-      import.meta.env.PUBLIC_URL
-    }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-4.png` // 억
-    new Image().src = `${
-      import.meta.env.PUBLIC_URL
-    }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-3.png`
-    new Image().src = `${
-      import.meta.env.PUBLIC_URL
-    }/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-4.png`
+    new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
+    new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-3.png` // 만
+    new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-4.png` // 억
+    new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-3.png`
+    new Image().src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-4.png`
   }
 
   const changeFavicon = () => {
