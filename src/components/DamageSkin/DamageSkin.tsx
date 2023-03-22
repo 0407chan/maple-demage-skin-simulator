@@ -1,5 +1,5 @@
-import { DamageType, ItemDto } from '@/type/damage-skin'
 import React from 'react'
+import { DamageType, ItemDto } from 'type/damage-skin'
 import * as S from './style'
 
 type Props = {
@@ -13,9 +13,9 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
       newNum = 0
     }
     if (damageItem.isCritical) {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${newNum}.png`
+      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-${newNum}.png`
     } else {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${newNum}.png`
+      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed1-${newNum}.png`
     }
   }
   const getSkin0Image = (num: number) => {
@@ -24,9 +24,9 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
       newNum = 0
     }
     if (damageItem.isCritical) {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${newNum}.png`
+      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri0-${newNum}.png`
     } else {
-      return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${newNum}.png`
+      return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoRed0-${newNum}.png`
     }
   }
 
@@ -35,21 +35,21 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   const getUnit = (unit: '만' | '억') => {
     if (damageItem.isCritical) {
       if (unit === '만') {
-        return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-3.png` // 만
+        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-3.png` // 만
       } else {
-        return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-4.png` // 억
+        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoCri1-4.png` // 억
       }
     } else {
       if (unit === '만') {
-        return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-3.png`
+        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-3.png`
       } else {
-        return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-4.png`
+        return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCustom-NoRed1-4.png`
       }
     }
   }
 
   const getCriticalImage = () => {
-    return `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
+    return `/images/export/Effect-DamageSkin.img-${damageItem.skinNumber}-NoCri1-effect3.png`
   }
 
   const getDamageString = () => {
@@ -84,7 +84,8 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
     <S.Container
       className="no-drag"
       delay={damageItem.level}
-      style={{ marginBottom: damageItem.marginBottom }}
+      style={{ bottom: damageItem.marginBottom }}
+      // stop = 멈춤
       // stop
     >
       {damageItem.isCritical && (
@@ -101,6 +102,8 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
               width: 'fit-content',
               height: 'fit-content',
               zIndex: index + 1,
+
+              // 데미지 스킨의 자연스러운 지그재그를 위한 margin
               marginBottom: index % 2 === 0 ? 4 : 0,
               marginTop: index % 2 === 1 ? 4 : 0
             }}

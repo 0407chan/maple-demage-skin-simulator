@@ -10,8 +10,8 @@ import Header from './components/Header'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
-const hitImage = `${process.env.PUBLIC_URL}/images/hit1_0.png`
-const standImage = `${process.env.PUBLIC_URL}/images/stand.gif`
+const hitImage = `/images/hit1_0.png`
+const standImage = `/images/stand.gif`
 
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
@@ -82,7 +82,7 @@ const App: React.FC = () => {
   }
 
   const initReactGA = () => {
-    ReactGA.initialize(process.env.REACT_APP_ID || '')
+    ReactGA.initialize(import.meta.env.VITE_ID || '')
   }
 
   const getWz = async () => {
@@ -102,13 +102,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const criImg: HTMLImageElement = new Image()
     const normalImg: HTMLImageElement = new Image()
-    criImg.src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
-    normalImg.src = `${process.env.PUBLIC_URL}/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
+    criImg.src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
+    normalImg.src = `/images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
     criImg.onload = function () {
-      setCriticalHeight(criImg.height)
+      setCriticalHeight(criImg.height - 10)
     }
     normalImg.onload = function () {
-      setNormarHeight(normalImg.height)
+      setNormarHeight(normalImg.height - 5)
     }
   }, [skinNumber])
 

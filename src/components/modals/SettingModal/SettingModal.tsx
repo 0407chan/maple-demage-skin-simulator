@@ -1,11 +1,11 @@
-import GreenButton from '@/components/GreenButton'
-import Horizontal from '@/components/Horizontal'
-import MapleButton from '@/components/MapleButton'
-import MapleInput from '@/components/MapleInput'
-import useWindowSize from '@/hooks/useWindowSize'
-import { Setting } from '@/type/setting'
-import { numberWithCommas } from '@/utils/number'
+import GreenButton from 'components/GreenButton'
+import Horizontal from 'components/Horizontal'
+import MapleButton from 'components/MapleButton'
+import MapleInput from 'components/MapleInput'
+import useWindowSize from 'hooks/useWindowSize'
 import React from 'react'
+import { Setting } from 'type/setting'
+import { numberWithCommas } from 'utils/number'
 import * as S from './style'
 
 const MAX_DAMAGE = 150000000000
