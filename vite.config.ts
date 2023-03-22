@@ -9,6 +9,7 @@ export default defineConfig({
     port: 3000
   },
   build: {
-    manifest: true
+    manifest: true,
+    outDir: 'build'
   }
 })
