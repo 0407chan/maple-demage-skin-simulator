@@ -187,6 +187,14 @@ const Header: React.FC<Props> = ({
             <div className="ex right" />
           </S.CloseButton>
         )}
+        {currentSkin !== undefined ? (
+          <>
+            <div style={{ color: '#eeeeee' }}>현재 스킨</div>
+            {renderDamageItem(currentSkin)}
+            <S.Divider />
+          </>
+        ) : null}
+
         <S.Body>
           {/* {getLatestSearchedList().length > 0 && (
             <S.NewSkinListWrapper>

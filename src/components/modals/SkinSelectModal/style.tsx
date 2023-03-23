@@ -28,9 +28,9 @@ export const Container = styled.div<{ isOpen: boolean }>`
   align-items: center;
   justify-content: center;
   background-color: rgba(60, 60, 60, 0.93);
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.4);
   border-radius: 5px;
-  border: 1px solid rgba(169, 169, 169, 0.9);
+  /* border: 1px solid rgba(169, 169, 169, 0.9); */
   gap: 10px;
   opacity: 0;
   z-index: 10;
