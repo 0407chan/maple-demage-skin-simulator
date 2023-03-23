@@ -114,7 +114,6 @@ export const SkinItem = styled.div`
     color: #e1e1e1;
   }
   &.current-skin {
-    box-shadow: 0px 0px 5px 1px #eeeeee9a;
     background-color: #eeeeee9a;
     .skin-text {
       color: #181818;
