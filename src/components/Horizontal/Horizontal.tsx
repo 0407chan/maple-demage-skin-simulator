@@ -1,5 +1,4 @@
-import React from 'react'
-import { CSSProperties } from 'styled-components'
+import React, { CSSProperties } from 'react'
 import * as S from './style'
 
 export type GapOptionType = 'small' | 'middle' | 'large' | 'none'

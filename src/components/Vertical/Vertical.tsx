@@ -1,5 +1,4 @@
-import React from 'react'
-import { CSSProperties } from 'styled-components'
+import React, { CSSProperties } from 'react'
 import { GapOptionType } from '../Horizontal/Horizontal'
 import * as S from './style'
 
