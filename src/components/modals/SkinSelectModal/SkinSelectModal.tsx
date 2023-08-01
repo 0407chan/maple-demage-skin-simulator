@@ -3,6 +3,7 @@ import { wzVersionState } from 'atoms/wzVersion'
 import { SkinMap } from 'constants/damageSkinMapper'
 import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
+import Highlighter from 'react-highlight-words'
 import { useRecoilState } from 'recoil'
 import { ItemDto } from 'type/damage-skin'
 import * as S from './style'
@@ -16,7 +17,7 @@ type Props = {
   setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
   hideCloseButton?: boolean
 }
-const Header: React.FC<Props> = ({
+const SkinSelectModal: React.FC<Props> = ({
   isOpen,
   currentSkin,
   onCancel,
@@ -118,22 +119,6 @@ const Header: React.FC<Props> = ({
     )
   }
 
-  const highlightDiv = (value: string) => {
-    const replacedKeyowrd = searchKey.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
-    const parts = value.split(new RegExp(`(${replacedKeyowrd})`, 'gi'))
-    return (
-      <>
-        {parts.map((part, idx) =>
-          part.toLowerCase() === searchKey.toLowerCase() ? (
-            <S.HighlightText key={idx}>{part}</S.HighlightText>
-          ) : (
-            <React.Fragment key={idx}>{part}</React.Fragment>
-          )
-        )}
-      </>
-    )
-  }
-
   const onSelectSkin = (skin: ItemDto) => {
     // console.log(skin.id, SkinMap[skin.id])
     ReactGA.event({
@@ -165,7 +150,13 @@ const Header: React.FC<Props> = ({
             currentSkin && currentSkin.id === skin.id ? 'current-skin-text' : ''
           }`}
         >
-          {skin.name ? highlightDiv(skin.name) : undefined}
+          <Highlighter
+            autoEscape
+            caseSensitive
+            highlightClassName="highlight"
+            searchWords={[searchKey]}
+            textToHighlight={skin.name ?? ''}
+          />
         </span>
       </S.SkinItem>
     )
@@ -216,4 +207,4 @@ const Header: React.FC<Props> = ({
   )
 }
 
-export default Header
+export default SkinSelectModal
