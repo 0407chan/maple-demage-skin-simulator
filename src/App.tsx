@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
-import { getWzVersion } from './api/damage-skin'
+import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
@@ -21,10 +21,26 @@ const App: React.FC = () => {
 
   const [_, setWzVersion] = useRecoilState(wzVersionState)
 
+  useGetWzVersion({
+    options: {
+      onSuccess(data) {
+        const version = data
+          .filter((item) => item.region === 'KMST')
+          .at(-1)?.mapleVersionId
+
+        console.log('current version: KMST', version)
+
+        if (version !== undefined) {
+          setWzVersion(Number(version))
+        }
+      }
+    }
+  })
+
   const [isAttacked, setIsAttacked] = useState<boolean>(false)
   const [currentSkin, setCurrentSkin] = useState<ItemDto>()
   const [criticalHeight, setCriticalHeight] = useState<number>(0)
-  const [normarHeight, setNormarHeight] = useState<number>(0)
+  const [normalHeight, setNormalHeight] = useState<number>(0)
 
   const [setting, setSetting] = useState<Setting>({
     numberAttack: 5,
@@ -63,7 +79,7 @@ const App: React.FC = () => {
         }),
         isCritical: Math.random() * 100 < (setting.criticalRate || 0)
       }
-      totalHeight += newDamage.isCritical ? criticalHeight : normarHeight
+      totalHeight += newDamage.isCritical ? criticalHeight : normalHeight
       newDamageList.push(newDamage)
     }
     setTimeout(() => {
@@ -85,17 +101,7 @@ const App: React.FC = () => {
     ReactGA.initialize(import.meta.env.VITE_ID || '')
   }
 
-  const getWz = async () => {
-    const res = await getWzVersion()
-    const latestVersion = res
-      .filter((item) => item.region === 'KMS')
-      .at(-1)?.mapleVersionId
-    if (latestVersion !== undefined) {
-      setWzVersion(Number(latestVersion))
-    }
-  }
   useEffect(() => {
-    getWz()
     initReactGA()
   }, [])
 
@@ -108,7 +114,7 @@ const App: React.FC = () => {
       setCriticalHeight(criImg.height - 10)
     }
     normalImg.onload = function () {
-      setNormarHeight(normalImg.height - 5)
+      setNormalHeight(normalImg.height - 5)
     }
   }, [skinNumber])
 

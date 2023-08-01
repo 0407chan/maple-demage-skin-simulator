@@ -1,4 +1,8 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult
+} from '@tanstack/react-query'
 import axios from 'axios'
 import {
   GetDamageSkinResponse,
@@ -77,6 +81,14 @@ export const useGetItemList = (
 export const getWzVersion = async (): Promise<WzType[]> => {
   const result = await axios.get('https://maplestory.io/api/wz')
   return result.data
+}
+
+export const useGetWzVersion = ({
+  options
+}: {
+  options?: UseQueryOptions<WzType[], unknown, WzType[], string[]>
+}): UseQueryResult<WzType[], unknown> => {
+  return useQuery(['getWzVersion'], getWzVersion, options)
 }
 
 // export const useGetItemList = (
