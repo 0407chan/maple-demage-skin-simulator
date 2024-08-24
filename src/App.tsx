@@ -13,6 +13,8 @@ import { Setting } from './type/setting'
 const hitImage = `./images/hit1_0.png`
 const standImage = `./images/stand.gif`
 
+const REGION = 'KMST'
+
 const App: React.FC = () => {
   const [skinNumber, setSkinNumber] = useState<number>(287)
   const [damageWrapperList, setDamageWrapperList] = useState<
@@ -25,10 +27,10 @@ const App: React.FC = () => {
     options: {
       onSuccess(data) {
         const version = data
-          .filter((item) => item.region === 'KMST')
+          .filter((item) => item.region === REGION)
           .at(-1)?.mapleVersionId
 
-        console.log('current version: KMST', version)
+        console.log(`current version: ${REGION}`, version)
 
         if (version !== undefined) {
           setWzVersion(Number(version))
