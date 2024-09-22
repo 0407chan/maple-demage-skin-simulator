@@ -23,7 +23,7 @@ DEMO (https://0407chan.github.io/maple-demage-skin-simulator/)
 
 ## With React
 ```
-yarn     // to install package
+bun i     // to install package
 
-yarn dev // to start ploject on local
+bun dev // to start ploject on local
 ```
