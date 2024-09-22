@@ -163,8 +163,8 @@ const SkinSelectModal: React.FC<Props> = ({
   }
   return (
     <>
-      <S.BackBoard isOpen={isOpen} onClick={onCloseModal} />
-      <S.Container isOpen={isOpen}>
+      <S.BackBoard open={isOpen} onClick={onCloseModal} />
+      <S.Container open={isOpen}>
         <S.Header>데미지 스킨 선택</S.Header>
         <S.Input
           maxLength={20}

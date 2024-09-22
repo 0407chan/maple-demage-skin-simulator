@@ -5,8 +5,7 @@
   "type": "module",
   "homepage": "https://0407chan.github.io/maple-demage-skin-simulator",
   "scripts": {
-    "switch-email": "git config --global user.email 0407chan@naver.com",
-    "dev": "bun switch-email && vite",
+    "dev": "bun vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "predeploy": "bun run build",

@@ -5,7 +5,7 @@ import {
 } from 'antd/lib'
 import styled from 'styled-components'
 
-export const BackBoard = styled.div<{ isOpen: boolean }>`
+export const BackBoard = styled.div<{ open: boolean }>`
   display: flex;
   position: absolute;
   top: 0;
@@ -15,11 +15,11 @@ export const BackBoard = styled.div<{ isOpen: boolean }>`
   z-index: 10;
   background-color: rgba(0, 0, 0, 0.3);
   ${(props) =>
-    props.isOpen
+    props.open
       ? { visibility: 'visible', opacity: 1 }
       : { visibility: 'hidden', opacity: 0 }}
 `
-export const Container = styled.div<{ isOpen: boolean }>`
+export const Container = styled.div<{ open: boolean }>`
   display: flex;
   position: absolute;
   left: 20px;
@@ -42,7 +42,7 @@ export const Container = styled.div<{ isOpen: boolean }>`
   height: calc(100vh - 40px);
   transition: all 0.3s ease;
   ${(props) =>
-    props.isOpen
+    props.open
       ? { visibility: 'visible', opacity: 1 }
       : { visibility: 'hidden', opacity: 0 }}
 `

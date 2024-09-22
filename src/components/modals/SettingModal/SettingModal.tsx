@@ -30,8 +30,8 @@ const SettingModal: React.FC<Props> = ({
   }
   return (
     <>
-      {isMobile() && <S.BackBoard isOpen={isOpen} onClick={onCloseModal} />}
-      <S.Container isOpen={isOpen}>
+      {isMobile() && <S.BackBoard open={isOpen} onClick={onCloseModal} />}
+      <S.Container open={isOpen}>
         <S.Header>SETTING</S.Header>
         <S.CloseButton size="small" onClick={onCloseModal}>
           <div className="ex left" />
