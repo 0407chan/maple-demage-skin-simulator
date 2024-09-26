@@ -3,6 +3,7 @@ import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
+import { ATTACK_ANIMATION_DURATION, DEFAULT_SETTINGS, DEFAULT_SKIN_NUMBER, GA_EVENTS, REGION } from 'constants/app_constants'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { getRandomInt } from 'utils/number'
@@ -14,9 +15,6 @@ import Header from './components/Header'
 import { useImageLoader } from './hooks/useImageLoader'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
-
-const REGION = 'KMST'
-
 export interface AppState {
   skinNumber: number;
   damageWrapperList: DamageWrapperType[];
@@ -27,15 +25,15 @@ export interface AppState {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
-    skinNumber: 287,
+    skinNumber: DEFAULT_SKIN_NUMBER,
     damageWrapperList: [],
     isAttacked: false,
     currentSkin: undefined,
     setting: {
-      numberAttack: 5,
-      maxDamage: 1000000,
-      minDamage: 100000,
-      criticalRate: 60
+      numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
+      maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
+      minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
+      criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
     }
   });
 
@@ -68,11 +66,7 @@ const App: React.FC = () => {
   };
 
   const handleAttack = () => {
-    ReactGA.event({
-      category: 'button_click',
-      action: 'attack_mushroom',
-      value: 1
-    })
+    ReactGA.event(GA_EVENTS.ATTACK_MUSHROOM)
     const newDamageWrapper: DamageWrapperType = {
       id: uuid(),
       damageList: []
@@ -114,7 +108,7 @@ const App: React.FC = () => {
     if (state.isAttacked) {
       const timer = setTimeout(() => {
         setState(prevState => ({ ...prevState, isAttacked: false }));
-      }, 1000);
+      }, ATTACK_ANIMATION_DURATION);
 
       // 정리 함수 반환
       return () => {
