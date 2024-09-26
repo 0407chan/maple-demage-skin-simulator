@@ -7,6 +7,7 @@ import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
 import Header from './components/Header'
+import { useImageLoader } from './hooks/useImageLoader'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
@@ -20,8 +21,6 @@ export interface AppState {
   damageWrapperList: DamageWrapperType[];
   isAttacked: boolean;
   currentSkin?: ItemDto;
-  criticalHeight: number;
-  normalHeight: number;
   setting: Setting;
 }
 
@@ -31,8 +30,6 @@ const App: React.FC = () => {
     damageWrapperList: [],
     isAttacked: false,
     currentSkin: undefined,
-    criticalHeight: 0,
-    normalHeight: 0,
     setting: {
       numberAttack: 5,
       maxDamage: 1000000,
@@ -40,6 +37,8 @@ const App: React.FC = () => {
       criticalRate: 60
     }
   });
+
+  const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber);
 
   const [_, setWzVersion] = useRecoilState(wzVersionState)
 
@@ -91,7 +90,7 @@ const App: React.FC = () => {
         }),
         isCritical: Math.random() * 100 < (state.setting.criticalRate || 0)
       }
-      totalHeight += newDamage.isCritical ? state.criticalHeight : state.normalHeight
+      totalHeight += newDamage.isCritical ? criticalHeight : normalHeight
       newDamageList.push(newDamage)
     }
     setState(prevState => ({
@@ -120,19 +119,6 @@ const App: React.FC = () => {
   useEffect(() => {
     initReactGA()
   }, [])
-
-  useEffect(() => {
-    const criImg: HTMLImageElement = new Image();
-    const normalImg: HTMLImageElement = new Image();
-    criImg.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-1.png`;
-    normalImg.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-1.png`;
-    criImg.onload = function () {
-      setState(prevState => ({ ...prevState, criticalHeight: criImg.height - 10 }));
-    };
-    normalImg.onload = function () {
-      setState(prevState => ({ ...prevState, normalHeight: normalImg.height - 5 }));
-    };
-  }, [state.skinNumber])
 
   return (
     <S.Container>
