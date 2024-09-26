@@ -14,7 +14,7 @@ type Props = {
   currentSkin?: ItemDto
   onCancel: () => void
   onConfirm: (num: number) => void
-  setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
+  setCurrentSkin: (skin?: ItemDto) => void
   hideCloseButton?: boolean
 }
 const SkinSelectModal: React.FC<Props> = ({
@@ -146,9 +146,8 @@ const SkinSelectModal: React.FC<Props> = ({
           src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
         />
         <span
-          className={`skin-text ${
-            currentSkin && currentSkin.id === skin.id ? 'current-skin-text' : ''
-          }`}
+          className={`skin-text ${currentSkin && currentSkin.id === skin.id ? 'current-skin-text' : ''
+            }`}
         >
           <Highlighter
             autoEscape

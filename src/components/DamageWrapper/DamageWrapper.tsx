@@ -1,3 +1,4 @@
+import { AppState } from 'App'
 import Horizontal from 'components/Horizontal'
 import React, { useEffect, useState } from 'react'
 import { DamageWrapperType, ItemDto } from 'type/damage-skin'
@@ -6,14 +7,12 @@ import * as S from './style'
 
 type Props = {
   damageWrapper: DamageWrapperType
-  setDamageWrapperList: React.Dispatch<
-    React.SetStateAction<DamageWrapperType[]>
-  >
+  setState: React.Dispatch<React.SetStateAction<AppState>>
   currentSkin?: ItemDto
 }
 const DamageWrapper: React.FC<Props> = ({
   damageWrapper,
-  setDamageWrapperList,
+  setState,
   currentSkin
 }) => {
   const [timer] = useState<number>(2000)
@@ -22,9 +21,7 @@ const DamageWrapper: React.FC<Props> = ({
   // 일정 시간 지난후 dom 제거
   useEffect(() => {
     setTimeout(() => {
-      setDamageWrapperList((prev) => {
-        return prev.filter((item) => item.id !== damageWrapper.id)
-      })
+      setState((prev) => ({ ...prev, damageWrapperList: prev.damageWrapperList.filter((item) => item.id !== damageWrapper.id) }))
       setVisible(false)
     }, timer)
   }, [])

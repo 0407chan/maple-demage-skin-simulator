@@ -15,11 +15,31 @@ const standImage = `./images/stand.gif`
 
 const REGION = 'KMST'
 
+export interface AppState {
+  skinNumber: number;
+  damageWrapperList: DamageWrapperType[];
+  isAttacked: boolean;
+  currentSkin?: ItemDto;
+  criticalHeight: number;
+  normalHeight: number;
+  setting: Setting;
+}
+
 const App: React.FC = () => {
-  const [skinNumber, setSkinNumber] = useState<number>(287)
-  const [damageWrapperList, setDamageWrapperList] = useState<
-    DamageWrapperType[]
-  >([])
+  const [state, setState] = useState<AppState>({
+    skinNumber: 287,
+    damageWrapperList: [],
+    isAttacked: false,
+    currentSkin: undefined,
+    criticalHeight: 0,
+    normalHeight: 0,
+    setting: {
+      numberAttack: 5,
+      maxDamage: 1000000,
+      minDamage: 100000,
+      criticalRate: 60
+    }
+  });
 
   const [_, setWzVersion] = useRecoilState(wzVersionState)
 
@@ -39,22 +59,13 @@ const App: React.FC = () => {
     }
   })
 
-  const [isAttacked, setIsAttacked] = useState<boolean>(false)
-  const [currentSkin, setCurrentSkin] = useState<ItemDto>()
-  const [criticalHeight, setCriticalHeight] = useState<number>(0)
-  const [normalHeight, setNormalHeight] = useState<number>(0)
-
-  const [setting, setSetting] = useState<Setting>({
-    numberAttack: 5,
-    maxDamage: 1000000,
-    minDamage: 100000,
-    criticalRate: 60
-  })
-
   const onSetSkinNumber = (newId: number) => {
-    setSkinNumber(newId)
-    setDamageWrapperList([])
-  }
+    setState(prevState => ({
+      ...prevState,
+      skinNumber: newId,
+      damageWrapperList: []
+    }));
+  };
 
   const onAttack = () => {
     ReactGA.event({
@@ -62,35 +73,38 @@ const App: React.FC = () => {
       action: 'attack_mushroom',
       value: 1
     })
-    setIsAttacked(true)
     const newDamageWrapper: DamageWrapperType = {
       id: uuid(),
       damageList: []
     }
     const newDamageList: DamageType[] = []
     let totalHeight = 0
-    for (let index = 0; index < (setting.numberAttack || 0); index++) {
+    for (let index = 0; index < (state.setting.numberAttack || 0); index++) {
       const newDamage: DamageType = {
         id: uuid(),
-        skinNumber,
+        skinNumber: state.skinNumber,
         level: index,
         marginBottom: totalHeight,
         damage: getRandomInt({
-          min: setting.minDamage || 0,
-          max: setting.maxDamage || 0
+          min: state.setting.minDamage || 0,
+          max: state.setting.maxDamage || 0
         }),
-        isCritical: Math.random() * 100 < (setting.criticalRate || 0)
+        isCritical: Math.random() * 100 < (state.setting.criticalRate || 0)
       }
-      totalHeight += newDamage.isCritical ? criticalHeight : normalHeight
+      totalHeight += newDamage.isCritical ? state.criticalHeight : state.normalHeight
       newDamageList.push(newDamage)
     }
+    setState(prevState => ({
+      ...prevState,
+      isAttacked: true,
+      damageWrapperList: [
+        ...prevState.damageWrapperList,
+        { ...newDamageWrapper, damageList: newDamageList }
+      ]
+    }));
     setTimeout(() => {
-      setIsAttacked(false)
+      setState(prevState => ({ ...prevState, isAttacked: false }));
     }, 1000)
-    setDamageWrapperList([
-      ...damageWrapperList,
-      { ...newDamageWrapper, damageList: newDamageList }
-    ])
   }
 
   function getRandomInt({ min, max }: { min: number; max: number }) {
@@ -108,45 +122,43 @@ const App: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const criImg: HTMLImageElement = new Image()
-    const normalImg: HTMLImageElement = new Image()
-    criImg.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-1.png`
-    normalImg.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-1.png`
+    const criImg: HTMLImageElement = new Image();
+    const normalImg: HTMLImageElement = new Image();
+    criImg.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-1.png`;
+    normalImg.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-1.png`;
     criImg.onload = function () {
-      setCriticalHeight(criImg.height - 10)
-    }
+      setState(prevState => ({ ...prevState, criticalHeight: criImg.height - 10 }));
+    };
     normalImg.onload = function () {
-      setNormalHeight(normalImg.height - 5)
-    }
-  }, [skinNumber])
+      setState(prevState => ({ ...prevState, normalHeight: normalImg.height - 5 }));
+    };
+  }, [state.skinNumber])
 
   return (
     <S.Container>
       <S.Header>
         <Header
-          {...{
-            onSetSkinNumber,
-            skinNumber,
-            currentSkin,
-            setCurrentSkin,
-            setting,
-            setSetting
-          }}
+          onSetSkinNumber={onSetSkinNumber}
+          currentSkin={state.currentSkin}
+          setCurrentSkin={(skin?: ItemDto) => setState(prevState => ({ ...prevState, currentSkin: skin }))}
+          setting={state.setting}
+          setSetting={(newSetting: Setting) => setState(prevState => ({ ...prevState, setting: newSetting }))}
+          skinNumber={state.skinNumber}
         />
       </S.Header>
       <S.Body className="no-drag">
         <div style={{ height: '30%' }} />
-        {damageWrapperList.map((item) => (
+        {state.damageWrapperList.map((item) => (
           <DamageWrapper
             key={item.id}
             damageWrapper={item}
-            setDamageWrapperList={setDamageWrapperList}
-            currentSkin={currentSkin}
+            setState={setState}
+            currentSkin={state.currentSkin}
           />
         ))}
         <S.OrangeMushroom
           draggable="false"
-          src={isAttacked ? hitImage : standImage}
+          src={state.isAttacked ? hitImage : standImage}
           alt="orange-mushroom"
           onClick={() => onAttack()}
         />

@@ -10,9 +10,9 @@ type Props = {
   skinNumber: number
   onSetSkinNumber: (newId: number) => void
   currentSkin?: ItemDto
-  setCurrentSkin: React.Dispatch<React.SetStateAction<ItemDto | undefined>>
+  setCurrentSkin: (skin?: ItemDto) => void
   setting: Setting
-  setSetting: React.Dispatch<React.SetStateAction<Setting>>
+  setSetting: (newSetting: Setting) => void
 }
 const Header: React.FC<Props> = ({
   skinNumber,

@@ -15,7 +15,7 @@ const MAX_NUMBER_ATTACK = 10
 type Props = {
   isOpen: boolean
   setting: Setting
-  setSetting: React.Dispatch<React.SetStateAction<Setting>>
+  setSetting: (newSetting: Setting) => void
   onCancel: () => void
 }
 const SettingModal: React.FC<Props> = ({
