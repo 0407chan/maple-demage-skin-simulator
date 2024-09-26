@@ -119,7 +119,7 @@ const App: React.FC = () => {
 
 
   const initReactGA = () => {
-    ReactGA.initialize(import.meta.env.VITE_ID || '')
+    ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID || '')
   }
 
   useEffect(() => {
