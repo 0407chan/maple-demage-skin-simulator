@@ -4,11 +4,18 @@
     "src": "index.css"
   },
   "index.html": {
+    "assets": [
+      "assets/stand-fddffa30.gif"
+    ],
     "css": [
       "assets/index-d895d111.css"
     ],
-    "file": "assets/index-5cac3d90.js",
+    "file": "assets/index-39cb5cae.js",
     "isEntry": true,
     "src": "index.html"
+  },
+  "src/images/stand.gif": {
+    "file": "assets/stand-fddffa30.gif",
+    "src": "src/images/stand.gif"
   }
 }
