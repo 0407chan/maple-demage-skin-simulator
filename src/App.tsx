@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
+// 이미지 임포트
+import hitImage from 'images/hit1_0.png'
+import standImage from 'images/stand.gif'
 import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
@@ -10,9 +13,6 @@ import Header from './components/Header'
 import { useImageLoader } from './hooks/useImageLoader'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
-
-const hitImage = `./images/hit1_0.png`
-const standImage = `./images/stand.gif`
 
 const REGION = 'KMST'
 
