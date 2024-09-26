@@ -101,10 +101,20 @@ const App: React.FC = () => {
         { ...newDamageWrapper, damageList: newDamageList }
       ]
     }));
-    setTimeout(() => {
-      setState(prevState => ({ ...prevState, isAttacked: false }));
-    }, 1000)
   }
+
+  useEffect(() => {
+    if (state.isAttacked) {
+      const timer = setTimeout(() => {
+        setState(prevState => ({ ...prevState, isAttacked: false }));
+      }, 1000);
+
+      // 정리 함수 반환
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [state.isAttacked]);
 
   function getRandomInt({ min, max }: { min: number; max: number }) {
     min = Math.ceil(min)
@@ -119,6 +129,14 @@ const App: React.FC = () => {
   useEffect(() => {
     initReactGA()
   }, [])
+
+  useEffect(() => {
+    setState(prevState => ({
+      ...prevState,
+      criticalHeight,
+      normalHeight
+    }));
+  }, [criticalHeight, normalHeight])
 
   return (
     <S.Container>
