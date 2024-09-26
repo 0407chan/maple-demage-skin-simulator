@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid'
 // 이미지 임포트
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
+import { getRandomInt } from 'utils/number'
 import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
@@ -116,11 +117,6 @@ const App: React.FC = () => {
     }
   }, [state.isAttacked]);
 
-  function getRandomInt({ min, max }: { min: number; max: number }) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min)) + min //최댓값은 제외, 최솟값은 포함
-  }
 
   const initReactGA = () => {
     ReactGA.initialize(import.meta.env.VITE_ID || '')
