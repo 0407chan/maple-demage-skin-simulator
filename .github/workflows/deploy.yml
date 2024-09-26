@@ -28,7 +28,7 @@ jobs:
         run: bun install
 
       - name: Build
-        run: bun run build
+        run: VITE_GA_MEASUREMENT_ID=${{ secrets.VITE_GA_MEASUREMENT_ID }} bun run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
