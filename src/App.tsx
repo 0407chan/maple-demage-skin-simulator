@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { KeyboardEvent, useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
@@ -67,7 +67,7 @@ const App: React.FC = () => {
     }));
   };
 
-  const onAttack = () => {
+  const handleAttack = () => {
     ReactGA.event({
       category: 'button_click',
       action: 'attack_mushroom',
@@ -102,6 +102,12 @@ const App: React.FC = () => {
         { ...newDamageWrapper, damageList: newDamageList }
       ]
     }));
+  }
+
+  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      handleAttack()
+    }
   }
 
   useEffect(() => {
@@ -159,8 +165,12 @@ const App: React.FC = () => {
         <S.OrangeMushroom
           draggable="false"
           src={state.isAttacked ? hitImage : standImage}
-          alt="orange-mushroom"
-          onClick={() => onAttack()}
+          alt="주황 버섯 공격하기"
+          onClick={handleAttack}
+          onKeyPress={handleKeyPress}
+          tabIndex={0}
+          role="button"
+          aria-label="주황 버섯 공격하기"
         />
       </S.Body>
     </S.Container>
