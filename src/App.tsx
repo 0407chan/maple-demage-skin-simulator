@@ -15,6 +15,9 @@ import Header from './components/Header'
 import { useImageLoader } from './hooks/useImageLoader'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
+
+const LOCAL_STORAGE_KEY = 'damageSkinState';
+
 export interface AppState {
   skinNumber: number;
   damageWrapperList: DamageWrapperType[];
@@ -24,17 +27,35 @@ export interface AppState {
 }
 
 const App: React.FC = () => {
-  const [state, setState] = useState<AppState>({
-    skinNumber: DEFAULT_SKIN_NUMBER,
-    damageWrapperList: [],
-    isAttacked: false,
-    currentSkin: undefined,
-    setting: {
-      numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
-      maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
-      minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
-      criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
+  const [state, setState] = useState<AppState>(() => {
+    const savedSettings = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedSettings) {
+      const parsedSettings = JSON.parse(savedSettings);
+      return {
+        skinNumber: parsedSettings.skinNumber || DEFAULT_SKIN_NUMBER,
+        damageWrapperList: [],
+        isAttacked: false,
+        currentSkin: parsedSettings.currentSkin,
+        setting: {
+          numberAttack: parsedSettings.setting.numberAttack || DEFAULT_SETTINGS.NUMBER_ATTACK,
+          maxDamage: parsedSettings.setting.maxDamage || DEFAULT_SETTINGS.MAX_DAMAGE,
+          minDamage: parsedSettings.setting.minDamage || DEFAULT_SETTINGS.MIN_DAMAGE,
+          criticalRate: parsedSettings.setting.criticalRate || DEFAULT_SETTINGS.CRITICAL_RATE
+        }
+      };
     }
+    return {
+      skinNumber: DEFAULT_SKIN_NUMBER,
+      damageWrapperList: [],
+      isAttacked: false,
+      currentSkin: undefined,
+      setting: {
+        numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
+        maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
+        minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
+        criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
+      }
+    };
   });
 
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber);
@@ -56,6 +77,15 @@ const App: React.FC = () => {
       }
     }
   })
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+      skinNumber: state.skinNumber,
+      currentSkin: state.currentSkin,
+      setting: state.setting
+    }));
+  }, [state.skinNumber, state.currentSkin, state.setting]);
+
 
   const onSetSkinNumber = (newId: number) => {
     setState(prevState => ({

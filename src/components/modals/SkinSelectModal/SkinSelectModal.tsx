@@ -80,9 +80,11 @@ const SkinSelectModal: React.FC<Props> = ({
     })
 
     setNewSkinItems(newSkinItemList)
-    setCurrentSkin(
-      currentItemList.find((item) => item.name.includes('흐물냥 데미지 스킨'))
-    )
+    if (!currentSkin) {
+      setCurrentSkin(
+        currentItemList.find((item) => item.name.includes('흐물냥 데미지 스킨'))
+      )
+    }
     // setNewSkinItems(newSkinItems)
 
     setSkinList(currentItemList)
