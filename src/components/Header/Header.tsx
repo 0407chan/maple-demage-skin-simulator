@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ItemDto } from 'type/damage-skin'
 import { Setting } from 'type/setting'
 import GreenButton from '../GreenButton'
@@ -23,53 +23,57 @@ const Header: React.FC<Props> = ({
   setSetting
 }) => {
   const [showSkinModal, setShowSkinModal] = useState<boolean>(false)
-  const onOpenModal = () => setShowSkinModal(true)
-  const onCloseModal = () => setShowSkinModal(false)
-
   const [showSettingModal, setShowSettingModal] = useState<boolean>(false)
-  const onOpenSetting = () => setShowSettingModal(true)
-  const onCloseSetting = () => setShowSettingModal(false)
 
-  const onConfirm = (skinNumber: number) => {
-    onSetSkinNumber(skinNumber)
-  }
+  const onOpenModal = useCallback(() => setShowSkinModal(true), [])
+  const onCloseModal = useCallback(() => setShowSkinModal(false), [])
+  const onOpenSetting = useCallback(() => setShowSettingModal(true), [])
+  const onCloseSetting = useCallback(() => setShowSettingModal(false), [])
 
-  const preLoadImage = () => {
+  const onConfirm = useCallback((newSkinNumber: number) => {
+    onSetSkinNumber(newSkinNumber)
+  }, [onSetSkinNumber])
+
+  const preLoadImage = useCallback(() => {
+    const img = new Image()
     for (let index = 0; index <= 9; index++) {
-      new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
-      new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
-      new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-${index}.png`
-      new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri0-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed1-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoRed0-${index}.png`
     }
-    new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
-    new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-3.png` // 만
-    new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-4.png` // 억
-    new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-3.png`
-    new Image().src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-4.png`
-  }
+    img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCri1-effect3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoCri0-4.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${skinNumber}-NoCustom-NoRed0-4.png`
+  }, [skinNumber])
 
-  const changeFavicon = () => {
-    if (currentSkin === undefined) return
-    let link: HTMLLinkElement | null =
-      document.querySelector('link[rel="shortcut icon"]') ||
-      document.querySelector('link[rel="icon"]')
+  const changeFavicon = useMemo(() => {
+    return () => {
+      if (currentSkin === undefined) return
+      let link: HTMLLinkElement | null =
+        document.querySelector('link[rel="shortcut icon"]') ||
+        document.querySelector('link[rel="icon"]')
 
-    if (!link) {
-      link = document.createElement('link')
-      link.id = 'favicon'
-      link.rel = 'shortcut icon'
-      document.head.appendChild(link)
+      if (!link) {
+        link = document.createElement('link')
+        link.id = 'favicon'
+        link.rel = 'shortcut icon'
+        document.head.appendChild(link)
+      }
+
+      link.href = `https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`
     }
-
-    link.href = `https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`
-  }
-  useEffect(() => {
-    changeFavicon()
   }, [currentSkin])
 
   useEffect(() => {
+    changeFavicon()
+  }, [changeFavicon])
+
+  useEffect(() => {
     preLoadImage()
-  }, [skinNumber])
+  }, [preLoadImage])
 
   return (
     <>
