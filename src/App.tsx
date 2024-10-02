@@ -166,7 +166,7 @@ const App: React.FC = () => {
     }));
   }, [criticalHeight, normalHeight])
 
-  const preLoadImage = useCallback(() => {
+  const preloadDamageSkinImages = useCallback(() => {
     const imageUrls = [
       ...Array(10).fill(0).flatMap((_, index) => [
         `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-${index}.png`,
@@ -195,8 +195,8 @@ const App: React.FC = () => {
   }, [state.skinNumber]);
 
   useEffect(() => {
-    preLoadImage();
-  }, [preLoadImage]);
+    preloadDamageSkinImages();
+  }, [preloadDamageSkinImages]);
 
   return (
     <S.Container>
