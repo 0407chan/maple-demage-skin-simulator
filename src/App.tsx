@@ -3,6 +3,7 @@ import ReactGA from 'react-ga4'
 import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
+import SettingModal from 'components/modals/SettingModal'
 import { ATTACK_ANIMATION_DURATION, DEFAULT_SETTINGS, DEFAULT_SKIN_NUMBER, GA_EVENTS, REGION } from 'constants/app_constants'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
@@ -166,6 +167,10 @@ const App: React.FC = () => {
 
   return (
     <S.Container>
+      <SettingModal
+        setting={state.setting}
+        setSetting={(newSetting: Setting) => setState(prevState => ({ ...prevState, setting: newSetting }))}
+      />
       <S.Header>
         <Header
           onSetSkinNumber={onSetSkinNumber}

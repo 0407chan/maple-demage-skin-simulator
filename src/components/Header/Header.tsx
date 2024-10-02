@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ItemDto } from 'type/damage-skin'
 import { Setting } from 'type/setting'
-import GreenButton from '../GreenButton'
-import SettingModal from '../modals/SettingModal'
 import SkinSelectModal from '../modals/SkinSelectModal'
 import * as S from './style'
 
@@ -23,12 +21,9 @@ const Header: React.FC<Props> = ({
   setSetting
 }) => {
   const [showSkinModal, setShowSkinModal] = useState<boolean>(false)
-  const [showSettingModal, setShowSettingModal] = useState<boolean>(false)
 
   const onOpenModal = useCallback(() => setShowSkinModal(true), [])
   const onCloseModal = useCallback(() => setShowSkinModal(false), [])
-  const onOpenSetting = useCallback(() => setShowSettingModal(true), [])
-  const onCloseSetting = useCallback(() => setShowSettingModal(false), [])
 
   const onConfirm = useCallback((newSkinNumber: number) => {
     onSetSkinNumber(newSkinNumber)
@@ -100,15 +95,9 @@ const Header: React.FC<Props> = ({
           />
           <Button onClick={() => onSetSkinNumber(skinNumber + 1)}>+</Button>
         </Horizontal> */}
-          <GreenButton onClick={onOpenSetting}>세팅</GreenButton>
         </S.Container>
       )}
-      <SettingModal
-        isOpen={showSettingModal}
-        setting={setting}
-        setSetting={setSetting}
-        onCancel={onCloseSetting}
-      />
+
       <SkinSelectModal
         isOpen={showSkinModal}
         currentSkin={currentSkin}

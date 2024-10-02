@@ -2,6 +2,7 @@ import GreenButton from 'components/GreenButton'
 import Horizontal from 'components/Horizontal'
 import MapleButton from 'components/MapleButton'
 import MapleInput from 'components/MapleInput'
+import useBoolean from 'hooks/useBoolean'
 import useWindowSize from 'hooks/useWindowSize'
 import React from 'react'
 import { Setting } from 'type/setting'
@@ -13,27 +14,27 @@ const MIN_DAMAGE = 1
 const MAX_CRITICAL = 100
 const MAX_NUMBER_ATTACK = 10
 type Props = {
-  isOpen: boolean
   setting: Setting
   setSetting: (newSetting: Setting) => void
-  onCancel: () => void
 }
 const SettingModal: React.FC<Props> = ({
-  isOpen,
-  onCancel,
   setting,
   setSetting
 }) => {
+  const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
+
   const { isMobile } = useWindowSize()
-  const onCloseModal = () => {
-    onCancel()
-  }
   return (
     <>
-      {isMobile() && <S.BackBoard open={isOpen} onClick={onCloseModal} />}
-      <S.Container open={isOpen}>
+      <GreenButton style={{
+        position: 'absolute',
+        top: 20,
+        right: 20
+      }} onClick={onOpen}>세팅</GreenButton>
+      {isMobile() && <S.BackBoard open={open} onClick={onClose} />}
+      <S.Container open={open}>
         <S.Header>SETTING</S.Header>
-        <S.CloseButton size="small" onClick={onCloseModal}>
+        <S.CloseButton size="small" onClick={onClose}>
           <div className="ex left" />
           <div className="ex right" />
         </S.CloseButton>
