@@ -167,24 +167,36 @@ const App: React.FC = () => {
   }, [criticalHeight, normalHeight])
 
   const preLoadImage = useCallback(() => {
-    const img = new Image()
-    for (let index = 0; index <= 9; index++) {
-      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-${index}.png`
-      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri0-${index}.png`
-      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-${index}.png`
-      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed0-${index}.png`
-    }
-    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-effect3.png`
-    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-3.png`
-    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-4.png`
-    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-3.png`
-    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-4.png`
-  }, [state.skinNumber])
+    const imageUrls = [
+      ...Array(10).fill(0).flatMap((_, index) => [
+        `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-${index}.png`,
+        `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri0-${index}.png`,
+        `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-${index}.png`,
+        `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed0-${index}.png`,
+      ]),
+      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-effect3.png`,
+      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-3.png`,
+      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-4.png`,
+      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-3.png`,
+      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-4.png`,
+    ];
 
+    const img = new Image();
+    let index = 0;
+
+    const loadNextImage = () => {
+      if (index < imageUrls.length) {
+        img.onload = img.onerror = loadNextImage;
+        img.src = imageUrls[index++];
+      }
+    };
+
+    loadNextImage();
+  }, [state.skinNumber]);
 
   useEffect(() => {
-    preLoadImage()
-  }, [preLoadImage])
+    preLoadImage();
+  }, [preLoadImage]);
 
   return (
     <S.Container>
