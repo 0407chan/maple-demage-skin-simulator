@@ -9,7 +9,7 @@ import { ATTACK_ANIMATION_DURATION, DEFAULT_SETTINGS, DEFAULT_SKIN_NUMBER, GA_EV
 import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { getRandomInt } from 'utils/number'
 import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
@@ -181,27 +181,6 @@ const App: React.FC = () => {
     img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-4.png`
   }, [state.skinNumber])
 
-  const changeFavicon = useMemo(() => {
-    return () => {
-      if (state.currentSkin === undefined) return
-      let link: HTMLLinkElement | null =
-        document.querySelector('link[rel="shortcut icon"]') ||
-        document.querySelector('link[rel="icon"]')
-
-      if (!link) {
-        link = document.createElement('link')
-        link.id = 'favicon'
-        link.rel = 'shortcut icon'
-        document.head.appendChild(link)
-      }
-
-      link.href = `https://maplestory.io/api/KMS/356/item/${state.currentSkin.id}/icon`
-    }
-  }, [state.currentSkin])
-
-  useEffect(() => {
-    changeFavicon()
-  }, [changeFavicon])
 
   useEffect(() => {
     preLoadImage()
