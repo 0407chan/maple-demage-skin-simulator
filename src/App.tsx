@@ -4,16 +4,17 @@ import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
 import SettingModal from 'components/modals/SettingModal'
+import SkinSelectModal from 'components/modals/SkinSelectModal'
 import { ATTACK_ANIMATION_DURATION, DEFAULT_SETTINGS, DEFAULT_SKIN_NUMBER, GA_EVENTS, REGION } from 'constants/app_constants'
+import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
+import { useCallback, useMemo } from 'react'
 import { getRandomInt } from 'utils/number'
 import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
-import Header from './components/Header'
-import { useImageLoader } from './hooks/useImageLoader'
 import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
@@ -165,22 +166,58 @@ const App: React.FC = () => {
     }));
   }, [criticalHeight, normalHeight])
 
+  const preLoadImage = useCallback(() => {
+    const img = new Image()
+    for (let index = 0; index <= 9; index++) {
+      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri0-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-${index}.png`
+      img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed0-${index}.png`
+    }
+    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-effect3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-4.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-3.png`
+    img.src = `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-4.png`
+  }, [state.skinNumber])
+
+  const changeFavicon = useMemo(() => {
+    return () => {
+      if (state.currentSkin === undefined) return
+      let link: HTMLLinkElement | null =
+        document.querySelector('link[rel="shortcut icon"]') ||
+        document.querySelector('link[rel="icon"]')
+
+      if (!link) {
+        link = document.createElement('link')
+        link.id = 'favicon'
+        link.rel = 'shortcut icon'
+        document.head.appendChild(link)
+      }
+
+      link.href = `https://maplestory.io/api/KMS/356/item/${state.currentSkin.id}/icon`
+    }
+  }, [state.currentSkin])
+
+  useEffect(() => {
+    changeFavicon()
+  }, [changeFavicon])
+
+  useEffect(() => {
+    preLoadImage()
+  }, [preLoadImage])
+
   return (
     <S.Container>
       <SettingModal
         setting={state.setting}
         setSetting={(newSetting: Setting) => setState(prevState => ({ ...prevState, setting: newSetting }))}
       />
-      <S.Header>
-        <Header
-          onSetSkinNumber={onSetSkinNumber}
-          currentSkin={state.currentSkin}
-          setCurrentSkin={(skin?: ItemDto) => setState(prevState => ({ ...prevState, currentSkin: skin }))}
-          setting={state.setting}
-          setSetting={(newSetting: Setting) => setState(prevState => ({ ...prevState, setting: newSetting }))}
-          skinNumber={state.skinNumber}
-        />
-      </S.Header>
+      <SkinSelectModal
+        currentSkin={state.currentSkin}
+        setCurrentSkin={(skin?: ItemDto) => setState(prevState => ({ ...prevState, currentSkin: skin }))}
+        onConfirm={(newId: number) => onSetSkinNumber(newId)}
+      />
       <S.Body className="no-drag">
         <div style={{ height: '30%' }} />
         {state.damageWrapperList.map((item) => (

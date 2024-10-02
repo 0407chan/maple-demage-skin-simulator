@@ -1,6 +1,7 @@
 import { useGetItemList } from 'api/damage-skin'
 import { wzVersionState } from 'atoms/wzVersion'
 import { SkinMap } from 'constants/damageSkinMapper'
+import useBoolean from 'hooks/useBoolean'
 import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import Highlighter from 'react-highlight-words'
@@ -10,21 +11,18 @@ import * as S from './style'
 import { filterSkinItems } from './util'
 
 type Props = {
-  isOpen: boolean
   currentSkin?: ItemDto
-  onCancel: () => void
   onConfirm: (num: number) => void
   setCurrentSkin: (skin?: ItemDto) => void
   hideCloseButton?: boolean
 }
 const SkinSelectModal: React.FC<Props> = ({
-  isOpen,
   currentSkin,
-  onCancel,
   hideCloseButton = false,
   setCurrentSkin,
   onConfirm
 }) => {
+  const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const [skinList, setSkinList] = useState<ItemDto[]>([])
   const [searchKey, setSearchKey] = useState<string>('')
 
@@ -94,9 +92,6 @@ const SkinSelectModal: React.FC<Props> = ({
   //   console.log('skinList', skinList)
   // }, [skinList])
 
-  const onCloseModal = () => {
-    onCancel()
-  }
   const getLatestSearchedList = () => {
     if (searchKey === undefined || searchKey === '') {
       return newSkinItems
@@ -131,7 +126,7 @@ const SkinSelectModal: React.FC<Props> = ({
     })
     setCurrentSkin(skin)
     onConfirm(SkinMap[skin.id])
-    onCloseModal()
+    onClose()
   }
 
   const renderDamageItem = (skin: ItemDto) => {
@@ -164,8 +159,20 @@ const SkinSelectModal: React.FC<Props> = ({
   }
   return (
     <>
-      <S.BackBoard open={isOpen} onClick={onCloseModal} />
-      <S.Container open={isOpen}>
+      {currentSkin && (
+        <S.SkinButton style={{
+          position: 'absolute',
+          top: 8,
+          left: 0,
+        }} onClick={onOpen}>
+          <img
+            className="skin-img"
+            src={`https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`}
+          />
+          <span className="skin-text">{currentSkin.name}</span>
+        </S.SkinButton>)}
+      <S.BackBoard open={open} onClick={onClose} />
+      <S.Container open={open}>
         <S.Header>데미지 스킨 선택</S.Header>
         <S.Input
           maxLength={20}
@@ -174,7 +181,7 @@ const SkinSelectModal: React.FC<Props> = ({
           onChange={(event) => setSearchKey(event.target.value)}
         />
         {!hideCloseButton && (
-          <S.CloseButton size="small" onClick={onCloseModal}>
+          <S.CloseButton size="small" onClick={onClose}>
             <div className="ex left" />
             <div className="ex right" />
           </S.CloseButton>

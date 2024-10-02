@@ -47,6 +47,28 @@ export const Container = styled.div<{ open: boolean }>`
       : { visibility: 'hidden', opacity: 0 }}
 `
 
+export const SkinButton = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  border-radius: 5px;
+  padding: 8px 16px;
+  gap: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  &:hover {
+    background-color: #434956;
+  }
+
+  .skin-img {
+  }
+  .skin-text {
+    font-weight: bold;
+    color: #e1e1e1;
+  }
+`
+
 export const Header = styled.div`
   display: flex;
   width: 100%;
