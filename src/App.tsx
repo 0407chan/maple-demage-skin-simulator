@@ -15,7 +15,7 @@ import { useGetWzVersion } from './api/damage-skin'
 import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
-import { DamageType, DamageWrapperType, ItemDto } from './type/damage-skin'
+import { DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
 
 const LOCAL_STORAGE_KEY = 'damageSkinState';
@@ -99,33 +99,37 @@ const App: React.FC = () => {
 
   const handleAttack = () => {
     ReactGA.event(GA_EVENTS.ATTACK_MUSHROOM)
-    const newDamageWrapper: DamageWrapperType = {
-      id: uuid(),
-      damageList: []
-    }
-    const newDamageList: DamageType[] = []
-    let totalHeight = 0
-    for (let index = 0; index < (state.setting.numberAttack || 0); index++) {
-      const newDamage: DamageType = {
+
+    // 데미지 목록 생성
+    const newDamageList = Array.from({ length: state.setting.numberAttack || 0 }, (_, index) => {
+      const isCritical = Math.random() * 100 < (state.setting.criticalRate || 0);
+      return {
         id: uuid(),
         skinNumber: state.skinNumber,
         level: index,
-        marginBottom: totalHeight,
         damage: getRandomInt({
           min: state.setting.minDamage || 0,
           max: state.setting.maxDamage || 0
         }),
-        isCritical: Math.random() * 100 < (state.setting.criticalRate || 0)
-      }
-      totalHeight += newDamage.isCritical ? criticalHeight : normalHeight
-      newDamageList.push(newDamage)
-    }
+        isCritical
+      };
+    });
+
+    // marginBottom 값 계산
+    let totalHeight = 0;
+    const damageListWithMargin = newDamageList.map(damage => {
+      const currentMargin = totalHeight;
+      totalHeight += damage.isCritical ? criticalHeight : normalHeight;
+      return { ...damage, marginBottom: currentMargin };
+    });
+
+    // 상태 업데이트
     setState(prevState => ({
       ...prevState,
       isAttacked: true,
       damageWrapperList: [
         ...prevState.damageWrapperList,
-        { ...newDamageWrapper, damageList: newDamageList }
+        { id: uuid(), damageList: damageListWithMargin }
       ]
     }));
   }
@@ -199,7 +203,7 @@ const App: React.FC = () => {
   }, [preloadDamageSkinImages]);
 
   return (
-    <S.Container>
+    <>
       <SettingModal
         setting={state.setting}
         setSetting={(newSetting: Setting) => setState(prevState => ({ ...prevState, setting: newSetting }))}
@@ -230,7 +234,7 @@ const App: React.FC = () => {
           aria-label="주황 버섯 공격하기"
         />
       </S.Body>
-    </S.Container>
+    </>
   )
 }
 
