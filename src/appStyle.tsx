@@ -10,11 +10,6 @@ export const Body = styled.div`
   height: 100%;
 `
 
-export const Text = styled.span`
-  color: #eeeeee;
-  font-size: 18px;
-  font-weight: bold;
-`
 
 export const OrangeMushroom = styled.img`
   cursor: pointer;
