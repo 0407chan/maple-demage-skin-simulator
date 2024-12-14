@@ -1,6 +1,6 @@
 {
   "index.css": {
-    "file": "assets/index-d895d111.css",
+    "file": "assets/index-1c77e46a.css",
     "src": "index.css"
   },
   "index.html": {
@@ -8,9 +8,9 @@
       "assets/stand-fddffa30.gif"
     ],
     "css": [
-      "assets/index-d895d111.css"
+      "assets/index-1c77e46a.css"
     ],
-    "file": "assets/index-7e99befc.js",
+    "file": "assets/index-40661afd.js",
     "isEntry": true,
     "src": "index.html"
   },
