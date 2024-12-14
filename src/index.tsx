@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import 'antd/dist/antd.css'
+import { ConfigProvider } from 'antd'
+import { antdTheme } from 'config/antd-theme'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RecoilRoot } from 'recoil'
@@ -22,7 +23,9 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
-        <App />
+        <ConfigProvider theme={antdTheme}>
+          <App />
+        </ConfigProvider>
       </RecoilRoot>
     </QueryClientProvider>
   </React.StrictMode>

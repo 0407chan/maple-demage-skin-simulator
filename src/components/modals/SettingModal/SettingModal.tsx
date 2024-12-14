@@ -1,6 +1,6 @@
+import { Button } from 'antd'
 import GreenButton from 'components/GreenButton'
 import Horizontal from 'components/Horizontal'
-import MapleButton from 'components/MapleButton'
 import MapleInput from 'components/MapleInput'
 import useBoolean from 'hooks/useBoolean'
 import useWindowSize from 'hooks/useWindowSize'
@@ -17,20 +17,22 @@ type Props = {
   setting: Setting
   setSetting: (newSetting: Setting) => void
 }
-const SettingModal: React.FC<Props> = ({
-  setting,
-  setSetting
-}) => {
+const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
 
   const { isMobile } = useWindowSize()
   return (
     <>
-      <GreenButton style={{
-        position: 'absolute',
-        top: 20,
-        right: 20
-      }} onClick={onOpen}>세팅</GreenButton>
+      <GreenButton
+        style={{
+          position: 'absolute',
+          top: 20,
+          right: 20
+        }}
+        onClick={onOpen}
+      >
+        세팅
+      </GreenButton>
       {isMobile() && <S.BackBoard open={open} onClick={onClose} />}
       <S.Container open={open}>
         <S.Header>SETTING</S.Header>
@@ -161,8 +163,9 @@ const SettingModal: React.FC<Props> = ({
                     })
                   }}
                 />
-                <MapleButton
+                <Button
                   style={{ padding: '4px 8px' }}
+                  type="primary"
                   disabled={
                     setting.criticalRate === undefined ||
                     setting.criticalRate >= 100
@@ -185,7 +188,7 @@ const SettingModal: React.FC<Props> = ({
                   }}
                 >
                   +10
-                </MapleButton>
+                </Button>
               </Horizontal>
             </Horizontal>
           </S.Content>
@@ -237,8 +240,9 @@ const SettingModal: React.FC<Props> = ({
                     })
                   }}
                 />
-                <MapleButton
+                <Button
                   style={{ padding: '4px 8px' }}
+                  type="primary"
                   disabled={!setting.numberAttack || setting.numberAttack >= 10}
                   onClick={() =>
                     setSetting({
@@ -251,7 +255,7 @@ const SettingModal: React.FC<Props> = ({
                   }
                 >
                   +1
-                </MapleButton>
+                </Button>
               </Horizontal>
             </Horizontal>
           </S.Content>
