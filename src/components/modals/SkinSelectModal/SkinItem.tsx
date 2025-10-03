@@ -1,7 +1,7 @@
 import React from 'react'
 import Highlighter from 'react-highlight-words'
 import { ItemDto } from 'type/damage-skin'
-import * as S from './style'
+import styles from './style.module.scss'
 
 type SkinItemProps = {
   skin: ItemDto
@@ -17,27 +17,27 @@ export const SkinItem: React.FC<SkinItemProps> = ({
   onSelect
 }) => {
   return (
-    <S.SkinItem
+    <div
       key={skin.id}
-      className={currentSkin?.id === skin.id ? 'current-skin' : ''}
+      className={`${styles.skinItem} ${currentSkin?.id === skin.id ? styles.currentSkin : ''}`}
       onClick={() => onSelect(skin)}
     >
       <img
-        className="skin-img"
+        className={styles.skinImg}
         src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
         alt={skin.name}
       />
       <span
-        className={`skin-text ${currentSkin?.id === skin.id ? 'current-skin-text' : ''}`}
+        className={`${styles.skinText} ${currentSkin?.id === skin.id ? styles.currentSkinText : ''}`}
       >
         <Highlighter
           autoEscape
           caseSensitive
-          highlightClassName="highlight"
+          highlightClassName={styles.highlight}
           searchWords={[searchKey]}
           textToHighlight={skin.name ?? ''}
         />
       </span>
-    </S.SkinItem>
+    </div>
   )
 }

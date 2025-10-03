@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { ItemDto } from 'type/damage-skin'
 import { SkinItem } from './SkinItem'
-import * as S from './style'
+import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
 import { Spin } from 'antd'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { imageCacheState } from 'atoms/imageCache'
 import { wzVersionState } from 'atoms/wzVersion'
+import { Button, Divider, Input } from 'antd'
 
 type SkinSelectModalProps = {
   currentSkin?: ItemDto
@@ -139,24 +140,26 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   return (
     <>
       {currentSkin && (
-        <S.SkinButton
+        <div
+          className={styles.skinButton}
           style={{ position: 'absolute', top: 8, left: 0 }}
           onClick={onOpen}
         >
           <img
-            className="skin-img"
+            className={styles.skinImg}
             src={`https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`}
             alt={currentSkin.name}
           />
-          <span className="skin-text">{currentSkin.name}</span>
-        </S.SkinButton>
+          <span className={styles.skinText}>{currentSkin.name}</span>
+        </div>
       )}
 
-      <S.BackBoard open={open} onClick={onClose} />
+      <div className={`${styles.backBoard} ${open ? styles.open : ''}`} onClick={onClose} />
       <Spin spinning={isLoading}>
-        <S.Container open={open}>
-          <S.Header>데미지 스킨 선택</S.Header>
-          <S.Input
+        <div className={`${styles.container} ${open ? styles.open : ''}`}>
+          <div className={styles.header}>데미지 스킨 선택</div>
+          <Input
+            className={styles.input}
             maxLength={20}
             value={searchKey}
             placeholder="검색"
@@ -164,10 +167,10 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           />
 
           {!hideCloseButton && (
-            <S.CloseButton size="small" onClick={onClose}>
+            <Button size="small" className={styles.closeButton} onClick={onClose}>
               <div className="ex left" />
               <div className="ex right" />
-            </S.CloseButton>
+            </Button>
           )}
 
           {currentSkin && (
@@ -179,11 +182,11 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                 searchKey={searchKey}
                 onSelect={handleSkinSelect}
               />
-              <S.Divider />
+              <Divider className={styles.divider} />
             </>
           )}
 
-          <S.Body>
+          <div className={styles.body}>
             {getFilteredSkins(currentItemList).length > 0 ? (
               getFilteredSkins(currentItemList).map((skin) => (
                 <SkinItem
@@ -195,10 +198,10 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                 />
               ))
             ) : (
-              <S.InfoText>[{searchKey}] 스킨이 없습니다.</S.InfoText>
+              <span className={styles.infoText}>[{searchKey}] 스킨이 없습니다.</span>
             )}
-          </S.Body>
-        </S.Container>
+          </div>
+        </div>
       </Spin>
     </>
   )
