@@ -1,7 +1,7 @@
 import {
   useQuery,
-  UseQueryOptions,
-  UseQueryResult
+  UseQueryResult,
+  keepPreviousData
 } from '@tanstack/react-query'
 import axios from 'axios'
 import {
@@ -50,8 +50,9 @@ export const getDamageSkinAll = async (
 export const useGetDamageSkinAll = (
   version: number
 ): UseQueryResult<GetDamageSkinResponse, unknown> => {
-  return useQuery(['getDamageSkinAll', version], async () => {
-    return getDamageSkinAll(version)
+  return useQuery({
+    queryKey: ['getDamageSkinAll', version],
+    queryFn: () => getDamageSkinAll(version)
   })
 }
 
@@ -70,25 +71,24 @@ export const getItemList = async (
 export const useGetItemList = (
   query: GetItemListQuery
 ): UseQueryResult<ItemDto[], unknown> => {
-  return useQuery(
-    ['getItemList', query],
-    async () => {
-      return getItemList(query)
-    },
-    { retry: false, refetchOnWindowFocus: false, keepPreviousData: true }
-  )
+  return useQuery({
+    queryKey: ['getItemList', query],
+    queryFn: () => getItemList(query),
+    retry: false,
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData
+  })
 }
 export const getWzVersion = async (): Promise<WzType[]> => {
   const result = await axios.get('https://maplestory.io/api/wz')
   return result.data
 }
 
-export const useGetWzVersion = ({
-  options
-}: {
-  options?: UseQueryOptions<WzType[], unknown, WzType[], string[]>
-}): UseQueryResult<WzType[], unknown> => {
-  return useQuery(['getWzVersion'], getWzVersion, options)
+export const useGetWzVersion = (): UseQueryResult<WzType[], unknown> => {
+  return useQuery({
+    queryKey: ['getWzVersion'],
+    queryFn: getWzVersion
+  })
 }
 
 // export const useGetItemList = (

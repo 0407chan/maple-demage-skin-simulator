@@ -76,21 +76,21 @@ const App: React.FC = () => {
 
   const [_, setWzVersion] = useRecoilState(wzVersionState)
 
-  useGetWzVersion({
-    options: {
-      onSuccess(data) {
-        const version = data
-          .filter((item) => item.region === REGION)
-          .at(-1)?.mapleVersionId
+  const { data: wzVersionData } = useGetWzVersion()
 
-        console.log(`current version: ${REGION}`, version)
+  useEffect(() => {
+    if (wzVersionData) {
+      const version = wzVersionData
+        .filter((item) => item.region === "KMST")
+        .at(-1)?.mapleVersionId
 
-        if (version !== undefined) {
-          setWzVersion({ version: Number(version), region: REGION })
-        }
+      console.log(`current version: KMST`, version)
+
+      if (version !== undefined) {
+        setWzVersion({ version: Number(version), region: "KMST" })
       }
     }
-  })
+  }, [wzVersionData])
 
   useEffect(() => {
     localStorage.setItem(
