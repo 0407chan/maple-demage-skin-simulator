@@ -15,7 +15,6 @@ import {
 import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
-import { useCallback } from 'react'
 import { getRandomInt } from 'utils/number'
 import { useGetWzVersion } from './api/damage-skin'
 import { wzVersionState } from './atoms/wzVersion'
@@ -187,40 +186,6 @@ const App: React.FC = () => {
       normalHeight
     }))
   }, [criticalHeight, normalHeight])
-
-  const preloadDamageSkinImages = useCallback(() => {
-    const imageUrls = [
-      ...Array(10)
-        .fill(0)
-        .flatMap((_, index) => [
-          `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-${index}.png`,
-          `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri0-${index}.png`,
-          `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed1-${index}.png`,
-          `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoRed0-${index}.png`
-        ]),
-      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCri1-effect3.png`,
-      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-3.png`,
-      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoCri0-4.png`,
-      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-3.png`,
-      `./images/export/Effect-DamageSkin.img-${state.skinNumber}-NoCustom-NoRed0-4.png`
-    ]
-
-    const img = new Image()
-    let index = 0
-
-    const loadNextImage = () => {
-      if (index < imageUrls.length) {
-        img.onload = img.onerror = loadNextImage
-        img.src = imageUrls[index++]
-      }
-    }
-
-    loadNextImage()
-  }, [state.skinNumber])
-
-  useEffect(() => {
-    preloadDamageSkinImages()
-  }, [preloadDamageSkinImages])
 
   return (
     <>
