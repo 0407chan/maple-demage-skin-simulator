@@ -18,11 +18,12 @@ import standImage from 'images/stand.gif'
 import { useCallback } from 'react'
 import { getRandomInt } from 'utils/number'
 import { useGetWzVersion } from './api/damage-skin'
-import * as S from './appStyle'
 import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
+import styles from './App.module.scss'
+import clsx from 'clsx'
 
 const LOCAL_STORAGE_KEY = 'damageSkinState'
 
@@ -236,8 +237,7 @@ const App: React.FC = () => {
         }
         onConfirm={(newId: number) => onSetSkinNumber(newId)}
       />
-      <S.Body className="no-drag">
-        <div style={{ height: '30%' }} />
+      <div className={clsx(styles.Body, "no-drag")}>
         {state.damageWrapperList.map((item) => (
           <DamageWrapper
             key={item.id}
@@ -246,7 +246,8 @@ const App: React.FC = () => {
             currentSkin={state.currentSkin}
           />
         ))}
-        <S.OrangeMushroom
+        <img
+          className={styles.OrangeMushroom}
           draggable="false"
           src={state.isAttacked ? hitImage : standImage}
           alt="주황 버섯 공격하기"
@@ -256,7 +257,7 @@ const App: React.FC = () => {
           role="button"
           aria-label="주황 버섯 공격하기"
         />
-      </S.Body>
+      </div>
     </>
   )
 }
