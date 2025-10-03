@@ -1,21 +1,25 @@
 {
-  "index.css": {
-    "file": "assets/index-1c77e46a.css",
-    "src": "index.css"
-  },
-  "index.html": {
-    "assets": [
-      "assets/stand-fddffa30.gif"
-    ],
-    "css": [
-      "assets/index-1c77e46a.css"
-    ],
-    "file": "assets/index-4bafdbb1.js",
-    "isEntry": true,
-    "src": "index.html"
-  },
-  "src/images/stand.gif": {
-    "file": "assets/stand-fddffa30.gif",
-    "src": "src/images/stand.gif"
-  }
+  "short_name": "React App",
+  "name": "Create React App Sample",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
