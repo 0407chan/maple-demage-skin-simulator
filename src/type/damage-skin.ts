@@ -35,8 +35,8 @@ export type DamageType = {
 }
 
 export type GetItemListQuery = {
-  version: number
-  region: RegionType
+  version?: number
+  region?: RegionType
   startPosition?: number
   count?: number
   overallCategoryFilter?: string

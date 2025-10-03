@@ -4,6 +4,7 @@ import * as S from './style'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
 import { imageCacheState } from 'atoms/imageCache'
+import { formatDamageString } from './util'
 
 type Props = {
   damageItem: DamageType
@@ -67,77 +68,37 @@ const ApiImage: React.FC<{
 const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   const wzVersion = useRecoilValue(wzVersionState)
 
-  // API URL 생성 함수들
-  const getSkin1Image = (num: number) => {
-    let newNum = num
-    if (currentSkin?.name.includes('럭키세븐')) {
-      newNum = 0
-    }
-
-    if (damageItem.isCritical) {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoCri1/${newNum}`
-    } else {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoRed1/${newNum}`
-    }
+  // wzVersion이 없으면 렌더링 안 함
+  if (!wzVersion.version || !wzVersion.region) {
+    return null
   }
 
-  const getSkin0Image = (num: number) => {
-    let newNum = num
-    if (currentSkin?.name.includes('럭키세븐')) {
-      newNum = 0
-    }
+  // 헬퍼 함수들
+  const getBaseUrl = () => {
+    return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}`
+  }
 
-    if (damageItem.isCritical) {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoCri0/${newNum}`
-    } else {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoRed0/${newNum}`
-    }
+  const getCriticalType = () => (damageItem.isCritical ? 'NoCri' : 'NoRed')
 
+  const normalizeLuckySeven = (num: number) => {
+    return currentSkin?.name.includes('럭키세븐') ? 0 : num
   }
 
   const isUnit = () => currentSkin?.name.includes('유닛')
 
+  // API URL 생성 함수들
+  const getSkinImage = (num: number, type: 0 | 1) => {
+    const normalizedNum = normalizeLuckySeven(num)
+    return `${getBaseUrl()}/${getCriticalType()}${type}/${normalizedNum}`
+  }
+
   const getUnit = (unit: '만' | '억') => {
     const unitNum = unit === '만' ? 3 : 4
-
-    if (damageItem.isCritical) {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoCustom/NoCri1/${unitNum}`
-    } else {
-      return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoCustom/NoRed1/${unitNum}`
-    }
-
+    return `${getBaseUrl()}/NoCustom/${getCriticalType()}1/${unitNum}`
   }
 
   const getCriticalImage = () => {
-    return `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${damageItem.skinNumber}/NoCri1/effect3`
-  }
-
-  const getDamageString = () => {
-    if (isUnit()) {
-      const numString = `${damageItem.damage}`
-      let result = ''
-      if (numString.length <= 12 && numString.length > 8) {
-        result += `${numString.slice(-12, -8)}억`
-        if (Number(numString.slice(-8, -4)) > 0) {
-          result += `${numString.slice(-8, -4)}만`
-        }
-        if (Number(numString.slice(-4)) > 0) {
-          result += `${numString.slice(-4)}`
-        }
-      }
-      // 만
-      else if (numString.length <= 8 && numString.length > 4) {
-        result += `${numString.slice(-8, -4)}만`
-        if (Number(numString.slice(-4)) > 0) {
-          result += `${numString.slice(-4)}`
-        }
-      } else {
-        result += `${numString.slice(-4)}`
-      }
-      return result
-    } else {
-      return `${damageItem.damage}`
-    }
+    return `${getBaseUrl()}/NoCri1/effect3`
   }
 
   return (
@@ -153,7 +114,7 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
           <ApiImage apiUrl={getCriticalImage()} alt="critical-img" />
         </S.CriEffect>
       )}
-      {getDamageString()
+      {formatDamageString(damageItem.damage, isUnit() ?? false)
         .split('')
         .map((num, index) => (
           <ApiImage
@@ -161,9 +122,7 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
             apiUrl={
               num === '만' || num === '억'
                 ? getUnit(num as '만' | '억')
-                : index === 0
-                  ? getSkin1Image(Number(num))
-                  : getSkin0Image(Number(num))
+                : getSkinImage(Number(num), index === 0 ? 1 : 0)
             }
             style={{
               width: 'fit-content',

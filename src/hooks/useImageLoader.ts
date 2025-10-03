@@ -27,6 +27,11 @@ export const useImageLoader = (skinNumber: number): ImageDimensions => {
   })
 
   useEffect(() => {
+    // wzVersion이 없으면 실행 안 함
+    if (!wzVersion.version || !wzVersion.region) {
+      return
+    }
+
     const criImg: HTMLImageElement = new Image()
     const normalImg: HTMLImageElement = new Image()
 

@@ -74,9 +74,8 @@ export const useGetItemList = (
   return useQuery({
     queryKey: ['getItemList', query],
     queryFn: () => getItemList(query),
-    retry: false,
-    refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
+    enabled: query.version !== undefined && query.region !== undefined
   })
 }
 export const getWzVersion = async (): Promise<WzType[]> => {

@@ -44,6 +44,11 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
 
   // 스킨 이미지 프리로드 함수
   const preloadSkinImages = async (skinNumber: number) => {
+    // wzVersion이 없으면 실행 안 함
+    if (!wzVersion.version || !wzVersion.region) {
+      return
+    }
+
     const baseUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}`
 
     const urls: string[] = []
