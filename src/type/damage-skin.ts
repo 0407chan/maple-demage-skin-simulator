@@ -1,4 +1,14 @@
 export type SkinType = 'NoCri0' | 'NoCri1' | 'NoRed0' | 'NoRed1'
+export type RegionType =
+  | 'KMS'
+  | 'TMS'
+  | 'THMS'
+  | 'TMS'
+  | 'JMS'
+  | 'SEA'
+  | 'KMST'
+  | 'CMS'
+  | 'CMST'
 export type GetDamageSkinQuery = {
   skinNumber?: number
   skinType: SkinType
@@ -26,6 +36,7 @@ export type DamageType = {
 
 export type GetItemListQuery = {
   version: number
+  region: RegionType
   startPosition?: number
   count?: number
   overallCategoryFilter?: string

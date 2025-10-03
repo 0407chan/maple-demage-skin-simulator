@@ -8,12 +8,14 @@ export const useSkinList = () => {
 
   const latestDamageSkinItemListQuery = useGetItemList({
     searchFor: '데미지 스킨',
-    version: wzVersion
+    version: wzVersion.version,
+    region: wzVersion.region
   })
 
   const currentDamageSkinItemListQuery = useGetItemList({
     searchFor: '데미지 스킨',
-    version: 355
+    version: 355,
+    region: 'KMS'
   })
 
   const getFilteredLists = () => {

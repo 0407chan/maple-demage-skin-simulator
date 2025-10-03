@@ -86,7 +86,7 @@ const App: React.FC = () => {
         console.log(`current version: ${REGION}`, version)
 
         if (version !== undefined) {
-          setWzVersion(Number(version))
+          setWzVersion({ version: Number(version), region: REGION })
         }
       }
     }

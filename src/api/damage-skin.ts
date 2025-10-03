@@ -59,7 +59,7 @@ export const getItemList = async (
   query: GetItemListQuery
 ): Promise<ItemDto[]> => {
   const result = await axios.get(
-    `https://maplestory.io/api/KMS/${query.version}/item`,
+    `https://maplestory.io/api/${query.region}/${query.version}/item`,
     {
       params: query
     }
