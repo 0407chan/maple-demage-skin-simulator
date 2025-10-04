@@ -62,8 +62,8 @@ export const MappingTool: React.FC = () => {
   const { currentItemList, newSkinItemList, isLoading } = useSkinList()
   const wzVersion = useRecoilValue(wzVersionState)
   const { data: damageSkinData } = useGetDamageSkinAll(
-    wzVersion?.version || 353,
-    wzVersion?.region || 'KMS'
+    wzVersion?.version,
+    wzVersion?.region
   )
 
   const [selectedItem, setSelectedItem] = useState<ItemDto | null>(null)
@@ -116,7 +116,7 @@ export const MappingTool: React.FC = () => {
   })
 
   const filteredIndices =
-    damageSkinData?.children.filter((index) => {
+    (damageSkinData?.children.filter((index) => {
       const mappedSet = getMappedIndexSet()
       const isMapped = mappedSet.has(Number(index))
 
@@ -129,7 +129,7 @@ export const MappingTool: React.FC = () => {
         return !isMapped
       }
       return true
-    }) || []
+    }) || []).sort((a, b) => Number(a) - Number(b))
 
   const handleAddMapping = () => {
     if (!selectedItem || !selectedIndex) return

@@ -9,6 +9,7 @@ import { MappingTool } from './pages/MappingTool'
 import './styles/globals.scss'
 import { useGetWzVersion } from './api/damage-skin'
 import { wzVersionState } from './atoms/wzVersion'
+import { RegionType } from 'type/wz'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,14 +27,15 @@ const Router: React.FC = () => {
 
   useEffect(() => {
     if (wzVersionData) {
+      const region: RegionType = "KMS"
       const version = wzVersionData
-        .filter((item) => item.region === "KMST")
+        .filter((item) => item.region === region)
         .at(-1)?.mapleVersionId
 
-      console.log(`current version: KMST`, version)
+      console.log(`current version: ${region}`, version)
 
       if (version !== undefined) {
-        setWzVersion({ version: Number(version), region: "KMST" })
+        setWzVersion({ version: Number(version), region: region })
       }
     }
   }, [wzVersionData, setWzVersion])
