@@ -106,6 +106,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
 
   // currentSkin 변경 시에도 프리로드 (새로고침 후에도 동작)
   useEffect(() => {
+    console.log('currentSkin', currentSkin)
     if (currentSkin) {
       const skinNumber = SkinMap[currentSkin.id]
       if (skinNumber) {

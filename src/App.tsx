@@ -1,6 +1,5 @@
 import React, { KeyboardEvent, useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
-import { useRecoilState } from 'recoil'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
 import SettingModal from 'components/modals/SettingModal'
@@ -16,8 +15,6 @@ import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { getRandomInt } from 'utils/number'
-import { useGetWzVersion } from './api/damage-skin'
-import { wzVersionState } from './atoms/wzVersion'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Setting } from './type/setting'
@@ -73,24 +70,6 @@ const App: React.FC = () => {
   })
 
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber)
-
-  const [_, setWzVersion] = useRecoilState(wzVersionState)
-
-  const { data: wzVersionData } = useGetWzVersion()
-
-  useEffect(() => {
-    if (wzVersionData) {
-      const version = wzVersionData
-        .filter((item) => item.region === "KMST")
-        .at(-1)?.mapleVersionId
-
-      console.log(`current version: KMST`, version)
-
-      if (version !== undefined) {
-        setWzVersion({ version: Number(version), region: "KMST" })
-      }
-    }
-  }, [wzVersionData])
 
   useEffect(() => {
     localStorage.setItem(
@@ -202,6 +181,23 @@ const App: React.FC = () => {
         }
         onConfirm={(newId: number) => onSetSkinNumber(newId)}
       />
+      <a
+        href="#mapping"
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          padding: '10px 20px',
+          background: '#1890ff',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '4px',
+          fontSize: '14px',
+          zIndex: 1000
+        }}
+      >
+        매핑 도구
+      </a>
       <div className={clsx(styles.Body, "no-drag")}>
         {state.damageWrapperList.map((item) => (
           <DamageWrapper

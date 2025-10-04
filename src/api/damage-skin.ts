@@ -7,7 +7,8 @@ import axios from 'axios'
 import {
   GetDamageSkinResponse,
   GetItemListQuery,
-  ItemDto
+  ItemDto,
+  RegionType
 } from 'type/damage-skin'
 import { WzType } from 'type/wz'
 
@@ -39,20 +40,22 @@ import { WzType } from 'type/wz'
 // }
 
 export const getDamageSkinAll = async (
-  version: number
+  version: number,
+  region: RegionType
 ): Promise<GetDamageSkinResponse> => {
   const result = await axios.get(
-    `https://maplestory.io/api/wz/KMS/${version}/Effect/DamageSkin.img`
+    `https://maplestory.io/api/wz/${region}/${version}/Effect/DamageSkin.img`
   )
   return result.data
 }
 
 export const useGetDamageSkinAll = (
-  version: number
+  version: number,
+  region: RegionType
 ): UseQueryResult<GetDamageSkinResponse, unknown> => {
   return useQuery({
-    queryKey: ['getDamageSkinAll', version],
-    queryFn: () => getDamageSkinAll(version)
+    queryKey: ['getDamageSkinAll', version, region],
+    queryFn: () => getDamageSkinAll(version, region)
   })
 }
 

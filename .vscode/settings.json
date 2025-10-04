@@ -1,4 +1,6 @@
 {
-    "git.ignoreLimitWarning": true,
-    "prettier.configPath": ".prettierrc.json"
+  "git.ignoreLimitWarning": true,
+  "prettier.configPath": ".prettierrc.json",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false
 }
