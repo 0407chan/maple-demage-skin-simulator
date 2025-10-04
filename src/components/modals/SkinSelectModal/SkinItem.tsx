@@ -2,6 +2,8 @@ import React from 'react'
 import Highlighter from 'react-highlight-words'
 import { ItemDto } from 'type/damage-skin'
 import styles from './style.module.scss'
+import { useRecoilValue } from 'recoil'
+import { wzVersionState } from 'atoms/wzVersion'
 
 type SkinItemProps = {
   skin: ItemDto
@@ -16,6 +18,7 @@ export const SkinItem: React.FC<SkinItemProps> = ({
   searchKey,
   onSelect
 }) => {
+  const wzVersion = useRecoilValue(wzVersionState)
   return (
     <div
       key={skin.id}
@@ -24,7 +27,7 @@ export const SkinItem: React.FC<SkinItemProps> = ({
     >
       <img
         className={styles.skinImg}
-        src={`https://maplestory.io/api/KMS/356/item/${skin.id}/icon`}
+        src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${skin.id}/icon`}
         alt={skin.name}
       />
       <span

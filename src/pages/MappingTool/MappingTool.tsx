@@ -5,8 +5,8 @@ import { SkinMap } from 'constants/damageSkinMapper'
 import { ItemDto } from 'type/damage-skin'
 import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
-import { Flex, Typography, Button, List, Card, Segmented, Tag, Space, ConfigProvider, theme } from 'antd'
-import { ArrowRightOutlined, CopyOutlined, CloseOutlined } from '@ant-design/icons'
+import { Flex, Typography, Button, List, Card, Segmented, Tag, Space, ConfigProvider, theme, Switch } from 'antd'
+import { ArrowRightOutlined, CopyOutlined, CloseOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -19,7 +19,9 @@ const ImageWithBase64: React.FC<{
   url: string
   alt: string
   className?: string
-}> = ({ url, alt, className }) => {
+  onSuccess?: () => void
+  onError?: () => void
+}> = ({ url, alt, className, onSuccess, onError }) => {
   const [imageSrc, setImageSrc] = useState<string>('')
 
   useEffect(() => {
@@ -29,12 +31,17 @@ const ImageWithBase64: React.FC<{
         const data = await response.json()
         if (data.value) {
           setImageSrc(`data:image/png;base64,${data.value}`)
+          onSuccess?.()
+        } else {
+          onError?.()
         }
       } catch (error) {
         console.error('Failed to fetch image:', error)
+        onError?.()
       }
     }
     fetchImage()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
 
   if (!imageSrc) return null
@@ -64,20 +71,43 @@ export const MappingTool: React.FC = () => {
   const [mappings, setMappings] = useState<MappingItem[]>([])
   const [filter, setFilter] = useState<'all' | 'unmapped' | 'new'>('unmapped')
   const [indexFilter, setIndexFilter] = useState<'all' | 'unmapped'>('unmapped')
+  const [unitStatus, setUnitStatus] = useState<Record<string, boolean>>({})
+  const [hideMappedItems, setHideMappedItems] = useState<boolean>(false)
+  const [hideMappedIndices, setHideMappedIndices] = useState<boolean>(false)
 
   const allItems = [...currentItemList, ...newSkinItemList]
 
-  const getMappedIndex = (itemId: number) => {
+  const getMappedIndex = (itemId: number): number[] | undefined => {
+    // 먼저 현재 세션의 매핑 확인
+    const sessionMapping = mappings.find(m => m.itemId === itemId)
+    if (sessionMapping) {
+      return [Number(sessionMapping.skinIndex)]
+    }
+    // 없으면 기존 SkinMap 확인
     return SkinMap[itemId]
   }
 
   const getMappedIndexSet = () => {
-    return new Set(Object.values(SkinMap))
+    // 기존 SkinMap의 값들 (배열이므로 flat 처리)
+    const mapped = new Set<number>()
+    Object.values(SkinMap).forEach(indices => {
+      indices.forEach(index => mapped.add(index))
+    })
+    // 현재 세션의 매핑도 추가
+    mappings.forEach(m => mapped.add(Number(m.skinIndex)))
+    return mapped
   }
 
   const filteredItems = allItems.filter((item) => {
+    const isMapped = getMappedIndex(item.id) !== undefined
+
+    // hideMappedItems가 true면 매핑된 아이템 제거
+    if (hideMappedItems && isMapped) {
+      return false
+    }
+
     if (filter === 'unmapped') {
-      return getMappedIndex(item.id) === undefined
+      return !isMapped
     }
     if (filter === 'new') {
       return newSkinItemList.some((newItem) => newItem.id === item.id)
@@ -87,9 +117,16 @@ export const MappingTool: React.FC = () => {
 
   const filteredIndices =
     damageSkinData?.children.filter((index) => {
+      const mappedSet = getMappedIndexSet()
+      const isMapped = mappedSet.has(Number(index))
+
+      // hideMappedIndices가 true면 매핑된 인덱스 제거
+      if (hideMappedIndices && isMapped) {
+        return false
+      }
+
       if (indexFilter === 'unmapped') {
-        const mappedSet = getMappedIndexSet()
-        return !mappedSet.has(Number(index))
+        return !isMapped
       }
       return true
     }) || []
@@ -142,7 +179,7 @@ export const MappingTool: React.FC = () => {
 
   return (
     <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}>
-      <Flex vertical gap={24} style={{ padding: 24, minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+      <Flex vertical gap={24} style={{ padding: 16, height: '100vh', overflowY: "scroll", backgroundColor: '#f5f5f5' }}>
         {/* Header */}
         <Flex justify="space-between" align="center">
           <Title level={1} style={{ margin: 0 }}>
@@ -160,15 +197,23 @@ export const MappingTool: React.FC = () => {
               <Title level={3} style={{ margin: 0 }}>
                 아이템 리스트 ({filteredItems.length})
               </Title>
-              <Segmented
-                options={[
-                  { label: '전체', value: 'all' },
-                  { label: '미매핑', value: 'unmapped' },
-                  { label: '신규', value: 'new' }
-                ]}
-                value={filter}
-                onChange={(value) => setFilter(value as 'all' | 'unmapped' | 'new')}
-              />
+              <Flex gap={12} align="center">
+                <Switch
+                  checkedChildren="매핑 가리기"
+                  unCheckedChildren="매핑 표시"
+                  checked={hideMappedItems}
+                  onChange={setHideMappedItems}
+                />
+                <Segmented
+                  options={[
+                    { label: '전체', value: 'all' },
+                    { label: '미매핑', value: 'unmapped' },
+                    { label: '신규', value: 'new' }
+                  ]}
+                  value={filter}
+                  onChange={(value) => setFilter(value as 'all' | 'unmapped' | 'new')}
+                />
+              </Flex>
             </Flex>
 
             <List
@@ -181,15 +226,18 @@ export const MappingTool: React.FC = () => {
                 const isNew = newSkinItemList.some(
                   (newItem) => newItem.id === item.id
                 )
+                const isMapped = mappedIndex !== undefined
 
                 return (
                   <List.Item>
                     <Card
-                      hoverable
-                      onClick={() => setSelectedItem(item)}
+                      hoverable={!isMapped}
+                      onClick={() => !isMapped && setSelectedItem(item)}
                       style={{
                         border: isSelected ? '2px solid #1890ff' : undefined,
-                        backgroundColor: isSelected ? '#e6f7ff' : undefined
+                        backgroundColor: isSelected ? '#e6f7ff' : isMapped ? '#f5f5f5' : undefined,
+                        opacity: isMapped ? 0.6 : 1,
+                        cursor: isMapped ? 'not-allowed' : 'pointer'
                       }}
                     >
                       <Flex gap={12} align="center">
@@ -202,13 +250,14 @@ export const MappingTool: React.FC = () => {
                           <Flex gap={8} align="center">
                             <Text strong>{item.name}</Text>
                             {isNew && <Tag color="green">NEW</Tag>}
+                            {isMapped && <Tag color="default">매핑됨</Tag>}
                           </Flex>
                           <Text type="secondary" style={{ fontSize: 12 }}>
                             ID: {item.id}
                           </Text>
                           {mappedIndex && (
                             <Text type="success" style={{ fontSize: 12 }}>
-                              매핑됨: {mappedIndex}
+                              매핑됨: {mappedIndex.join(', ')}
                             </Text>
                           )}
                         </Flex>
@@ -264,16 +313,24 @@ export const MappingTool: React.FC = () => {
               <Title level={3} style={{ margin: 0 }}>
                 데미지 스킨 인덱스 ({filteredIndices.length})
               </Title>
-              <Segmented
-                options={[
-                  { label: '전체', value: 'all' },
-                  { label: '미매핑', value: 'unmapped' }
-                ]}
-                value={indexFilter}
-                onChange={(value) =>
-                  setIndexFilter(value as 'all' | 'unmapped')
-                }
-              />
+              <Flex gap={12} align="center">
+                <Switch
+                  checkedChildren="매핑 가리기"
+                  unCheckedChildren="매핑 표시"
+                  checked={hideMappedIndices}
+                  onChange={setHideMappedIndices}
+                />
+                <Segmented
+                  options={[
+                    { label: '전체', value: 'all' },
+                    { label: '미매핑', value: 'unmapped' }
+                  ]}
+                  value={indexFilter}
+                  onChange={(value) =>
+                    setIndexFilter(value as 'all' | 'unmapped')
+                  }
+                />
+              </Flex>
             </Flex>
 
             <List
@@ -282,50 +339,74 @@ export const MappingTool: React.FC = () => {
               grid={{ gutter: 8, column: 1 }}
               renderItem={(index) => {
                 const isSelected = selectedIndex === index
+                const mappedSet = getMappedIndexSet()
+                const isMapped = mappedSet.has(Number(index))
 
                 return (
                   <List.Item>
                     <Card
-                      hoverable
+                      hoverable={!isMapped}
                       styles={{
                         body: {
                           padding: 0
                         }
                       }}
-                      onClick={() => setSelectedIndex(index)}
+                      onClick={() => !isMapped && setSelectedIndex(index)}
                       style={{
                         border: isSelected ? '2px solid #1890ff' : undefined,
-                        backgroundColor: isSelected ? '#e6f7ff' : undefined
+                        backgroundColor: isSelected ? '#e6f7ff' : isMapped ? '#f5f5f5' : undefined,
+                        opacity: isMapped ? 0.6 : 1,
+                        cursor: isMapped ? 'not-allowed' : 'pointer'
                       }}
                     >
                       <Flex vertical gap={8} align="center">
                         <div style={{ height: 60, display: 'flex', alignItems: 'center' }}>
                           <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoRed0/0`}
+                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoRed0/7`}
                             alt={`Skin ${index}`}
                           />
                           <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoRed1/0`}
+                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoRed1/7`}
                             alt={`Skin ${index}`}
                           />
                           <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCustom/NoCri0/4`}
+                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCri0/7`}
                             alt={`Skin ${index}`}
                           />
                           <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCri0/0`}
+                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCri1/7`}
                             alt={`Skin ${index}`}
                           />
-                          <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCri1/0`}
-                            alt={`Skin ${index}`}
-                          />
-                          <ImageWithBase64
-                            url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCustom/NoCri0/3`}
-                            alt={`Skin ${index}`}
-                          />
+                          {/* Unit 체크용 이미지 (숨김) */}
+                          <div style={{ display: 'none' }}>
+                            <ImageWithBase64
+                              url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCustom/NoCri0/3`}
+                              alt={`Unit check ${index}`}
+                              onSuccess={() => {
+                                setUnitStatus(prev => ({ ...prev, [index]: true }))
+                              }}
+                              onError={() => {
+                                setUnitStatus(prev => ({ ...prev, [index]: false }))
+                              }}
+                            />
+                          </div>
+
+                          {unitStatus[index] && <>
+                            <ImageWithBase64
+                              url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCustom/NoCri0/3`}
+                              alt={`Unit check ${index}`}
+                            />
+                            <ImageWithBase64
+                              url={`https://maplestory.io/api/wz/${wzVersion?.region || 'KMS'}/${wzVersion?.version || 353}/Effect/DamageSkin.img/${index}/NoCustom/NoCri0/4`}
+                              alt={`Unit check ${index}`}
+                            />
+                          </>}
                         </div>
-                        <Text>Index: {index}</Text>
+                        <Flex gap={8} align="center">
+                          <Text>Index: {index}</Text>
+                          {unitStatus[index] && <Tag color="blue">UNIT</Tag>}
+                          {isMapped && <Tag color="default">매핑됨</Tag>}
+                        </Flex>
                       </Flex>
                     </Card>
                   </List.Item>

@@ -6,7 +6,7 @@ import { ItemDto } from 'type/damage-skin'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
-import { Spin } from 'antd'
+import { Segmented, Spin } from 'antd'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { imageCacheState } from 'atoms/imageCache'
 import { wzVersionState } from 'atoms/wzVersion'
@@ -42,6 +42,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   const { currentItemList, newSkinItemList, isLoading } = useSkinList()
   const [imageCache, setImageCache] = useRecoilState(imageCacheState)
   const wzVersion = useRecoilValue(wzVersionState)
+  const [filter, setFilter] = useState<'all' | 'unit' | 'action'>('all')
 
   // 스킨 이미지 프리로드 함수
   const preloadSkinImages = async (skinNumber: number) => {
@@ -72,7 +73,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     urls.push(`${baseUrl}/NoCustom/NoRed1/4`)
 
     // 캐시에 없는 것만 로드
-    const urlsToLoad = urls.filter(url => !imageCache[url])
+    const urlsToLoad = urls.filter((url) => !imageCache[url])
 
     // 백그라운드에서 비동기로 로드
     Promise.all(
@@ -96,9 +97,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       if (defaultSkin) {
         setCurrentSkin(defaultSkin)
         // 기본 스킨 이미지 프리로드
-        const skinNumber = SkinMap[defaultSkin.id]
-        if (skinNumber) {
-          preloadSkinImages(skinNumber)
+        const skinNumbers = SkinMap[defaultSkin.id]
+        if (skinNumbers && skinNumbers.length > 0) {
+          preloadSkinImages(skinNumbers[0])
         }
       }
     }
@@ -108,9 +109,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   useEffect(() => {
     console.log('currentSkin', currentSkin)
     if (currentSkin) {
-      const skinNumber = SkinMap[currentSkin.id]
-      if (skinNumber) {
-        preloadSkinImages(skinNumber)
+      const skinNumbers = SkinMap[currentSkin.id]
+      if (skinNumbers && skinNumbers.length > 0) {
+        preloadSkinImages(skinNumbers[0])
       }
     }
   }, [currentSkin?.id])
@@ -123,19 +124,33 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       value: 1
     })
     setCurrentSkin(skin)
-    onConfirm(SkinMap[skin.id])
-
-    // 백그라운드에서 이미지 프리로드
-    preloadSkinImages(SkinMap[skin.id])
+    const skinNumbers = SkinMap[skin.id]
+    if (skinNumbers && skinNumbers.length > 0) {
+      onConfirm(skinNumbers[0])
+      // 백그라운드에서 이미지 프리로드
+      preloadSkinImages(skinNumbers[0])
+    }
 
     onClose()
   }
 
   const getFilteredSkins = (items: ItemDto[]) => {
-    if (!searchKey) return items
+    if (!searchKey) return items.filter((item) => {
+      if (filter === 'unit') {
+        return item.name.includes('유닛')
+      }
+      return true
+    })
+
+
     return items.filter((item) =>
       item.name.toLowerCase().includes(searchKey.toLowerCase())
-    )
+    ).filter((item) => {
+      if (filter === 'unit') {
+        return item.name.includes('유닛')
+      }
+      return true
+    })
   }
 
   return (
@@ -148,14 +163,17 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
         >
           <img
             className={styles.skinImg}
-            src={`https://maplestory.io/api/KMS/356/item/${currentSkin.id}/icon`}
+            src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${currentSkin.id}/icon`}
             alt={currentSkin.name}
           />
           <span className={styles.skinText}>{currentSkin.name}</span>
         </div>
       )}
 
-      <div className={`${styles.backBoard} ${open ? styles.open : ''}`} onClick={onClose} />
+      <div
+        className={`${styles.backBoard} ${open ? styles.open : ''}`}
+        onClick={onClose}
+      />
       <Spin spinning={isLoading}>
         <div className={`${styles.container} ${open ? styles.open : ''}`}>
           <div className={styles.header}>데미지 스킨 선택</div>
@@ -168,7 +186,11 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           />
 
           {!hideCloseButton && (
-            <Button size="small" className={styles.closeButton} onClick={onClose}>
+            <Button
+              size="small"
+              className={styles.closeButton}
+              onClick={onClose}
+            >
               <div className="ex left" />
               <div className="ex right" />
             </Button>
@@ -187,6 +209,15 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
             </>
           )}
 
+          <Segmented
+            options={[
+              { label: '전체', value: 'all' },
+              { label: '유닛', value: 'unit' },
+              { label: '액션', value: 'action' }
+            ]}
+            value={filter}
+            onChange={(value) => setFilter(value as 'all' | 'unit' | 'action')}
+          />
           <div className={styles.body}>
             {getFilteredSkins(currentItemList).length > 0 ? (
               getFilteredSkins(currentItemList).map((skin) => (
@@ -199,7 +230,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                 />
               ))
             ) : (
-              <span className={styles.infoText}>[{searchKey}] 스킨이 없습니다.</span>
+              <span className={styles.infoText}>
+                [{searchKey}] 스킨이 없습니다.
+              </span>
             )}
           </div>
         </div>

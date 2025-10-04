@@ -1,41 +1,33 @@
 import { useGetItemList } from 'api/damage-skin'
 import { wzVersionState } from 'atoms/wzVersion'
 import { useRecoilState } from 'recoil'
-import { filterSkinItems } from './util'
+import { SkinMap } from 'constants/damageSkinMapper'
+import { useEffect } from 'react'
 
 export const useSkinList = () => {
   const [wzVersion] = useRecoilState(wzVersionState)
 
-  const latestDamageSkinItemListQuery = useGetItemList({
+  const damageSkinItemListQuery = useGetItemList({
     searchFor: '데미지 스킨',
     version: wzVersion?.version,
     region: wzVersion?.region
   })
 
-  const currentDamageSkinItemListQuery = useGetItemList({
-    searchFor: '데미지 스킨',
-    version: 355,
-    region: 'KMS'
-  })
-
   const getFilteredLists = () => {
-    if (
-      !currentDamageSkinItemListQuery.data ||
-      !latestDamageSkinItemListQuery.data
-    ) {
+    if (!damageSkinItemListQuery.data) {
       return { currentItemList: [], newSkinItemList: [] }
     }
 
-    const currentItemList = filterSkinItems(
-      currentDamageSkinItemListQuery.data
-    ).sort((a, b) => a.id - b.id)
+    const allItems = damageSkinItemListQuery.data.sort((a, b) => a.id - b.id)
 
-    const latestItemList = filterSkinItems(
-      latestDamageSkinItemListQuery.data
-    ).sort((a, b) => a.id - b.id)
+    // SkinMap에 존재하는 아이템들
+    const currentItemList = allItems.filter(
+      (item) => SkinMap[item.id] !== undefined
+    )
 
-    const newSkinItemList = latestItemList.filter(
-      (item) => !currentItemList.find((current) => current.id === item.id)
+    // SkinMap에 존재하지 않는 아이템들 (새 스킨)
+    const newSkinItemList = allItems.filter(
+      (item) => SkinMap[item.id] === undefined
     )
 
     return { currentItemList, newSkinItemList }
@@ -43,8 +35,6 @@ export const useSkinList = () => {
 
   return {
     ...getFilteredLists(),
-    isLoading:
-      currentDamageSkinItemListQuery.isLoading ||
-      latestDamageSkinItemListQuery.isLoading
+    isLoading: damageSkinItemListQuery.isLoading
   }
 }

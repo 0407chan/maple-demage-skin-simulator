@@ -187,8 +187,8 @@ const App: React.FC = () => {
           style={{
             position: 'fixed',
             top: '20px',
-            right: '20px',
-            padding: '10px 20px',
+            right: '80px',
+            padding: '4px 8px',
             background: '#1890ff',
             color: 'white',
             textDecoration: 'none',
