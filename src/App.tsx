@@ -181,23 +181,25 @@ const App: React.FC = () => {
         }
         onConfirm={(newId: number) => onSetSkinNumber(newId)}
       />
-      <a
-        href="#mapping"
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          padding: '10px 20px',
-          background: '#1890ff',
-          color: 'white',
-          textDecoration: 'none',
-          borderRadius: '4px',
-          fontSize: '14px',
-          zIndex: 1000
-        }}
-      >
-        매핑 도구
-      </a>
+      {import.meta.env.DEV && (
+        <a
+          href="#mapping"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '10px 20px',
+            background: '#1890ff',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '4px',
+            fontSize: '14px',
+            zIndex: 1000
+          }}
+        >
+          매핑 도구
+        </a>
+      )}
       <div className={clsx(styles.Body, "no-drag")}>
         {state.damageWrapperList.map((item) => (
           <DamageWrapper

@@ -47,7 +47,7 @@ const Router: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  if (currentPath === '#mapping') {
+  if (currentPath === '#mapping' && import.meta.env.DEV) {
     return <MappingTool />
   }
 
