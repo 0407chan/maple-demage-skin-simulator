@@ -24,6 +24,7 @@ import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { useRecoilValue } from 'recoil'
 import { getDamageAnchorTop, getDamageSpawnBottom } from 'utils/damageSpawn'
+import { getDamageSkinFaviconUrl, updateFavicon } from 'utils/favicon'
 import {
   cacheImageMetrics,
   getCachedImageMetrics,
@@ -295,6 +296,24 @@ const App: React.FC = () => {
       console.warn('설정을 저장하지 못했습니다.', error)
     }
   }, [state.skinNumber, state.currentSkin, state.currentMonster, state.setting])
+
+  useEffect(() => {
+    if (
+      !state.currentSkin ||
+      wzVersion.version === undefined ||
+      wzVersion.region === undefined
+    ) {
+      return
+    }
+
+    updateFavicon(
+      getDamageSkinFaviconUrl(
+        state.currentSkin.id,
+        wzVersion.version,
+        wzVersion.region
+      )
+    )
+  }, [state.currentSkin, wzVersion.region, wzVersion.version])
 
   const onSetSkinNumber = (newId: number) => {
     setState((prevState) => ({
