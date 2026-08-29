@@ -1,6 +1,8 @@
 export const REGION = 'KMST'
 export const DEFAULT_SKIN_NUMBER = 287
 export const ATTACK_ANIMATION_DURATION = 1000 // ms
+export const DEATH_ANIMATION_DURATION = 1200 // ms
+export const RESPAWN_ANIMATION_DURATION = 800 // ms
 
 export const DEFAULT_MONSTER = {
   id: 1210102,

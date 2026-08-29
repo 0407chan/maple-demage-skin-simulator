@@ -14,9 +14,11 @@ import SettingModal from 'components/modals/SettingModal'
 import { SkinSelectModal } from 'components/modals/SkinSelectModal'
 import {
   ATTACK_ANIMATION_DURATION,
+  DEATH_ANIMATION_DURATION,
   DEFAULT_MONSTER,
   DEFAULT_SETTINGS,
   DEFAULT_SKIN_NUMBER,
+  RESPAWN_ANIMATION_DURATION,
   SETTING_LIMITS
 } from 'constants/app_constants'
 import { useImageLoader } from 'hooks/useImageLoader'
@@ -26,13 +28,22 @@ import { useRecoilValue } from 'recoil'
 import { getDamageAnchorTop, getDamageSpawnBottom } from 'utils/damageSpawn'
 import { getDamageSkinFaviconUrl, updateFavicon } from 'utils/favicon'
 import {
+  getGifAnimationAssetFromUrl,
+  getOneShotGifPlaybackDuration
+} from 'utils/gifAnimation'
+import { GifAnimationOpaqueMetrics } from 'utils/gifFrameMetrics'
+import {
   cacheImageMetrics,
   getCachedImageMetrics,
   preloadImages
 } from 'utils/imagePreloader'
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
-import { getMonsterImageBottomOffset } from 'utils/monsterImageAlignment'
-import { getRandomInt } from 'utils/number'
+import { getMonsterImageAlignment } from 'utils/monsterImageAlignment'
+import {
+  getMonsterHealthPercent,
+  getMonsterMaxHealth
+} from 'utils/monsterHealth'
+import { getRandomInt, numberWithCommas } from 'utils/number'
 import { trackMonsterAttacked } from 'utils/analytics'
 import { SkinMap } from 'constants/damageSkinMapper'
 import DamageWrapper from './components/DamageWrapper'
@@ -45,30 +56,43 @@ import clsx from 'clsx'
 
 const LOCAL_STORAGE_KEY = 'damageSkinState'
 
+type MonsterStatus = 'alive' | 'dying' | 'respawning'
+
 export interface AppState {
   skinNumber: number
   damageWrapperList: DamageWrapperType[]
   isAttacked: boolean
+  monsterHealth: number
+  monsterStatus: MonsterStatus
   currentSkin?: ItemDto
   currentMonster: Monster
   currentBackground?: MapleMap
   setting: Setting
 }
 
-const createDefaultState = (): AppState => ({
-  skinNumber: DEFAULT_SKIN_NUMBER,
-  damageWrapperList: [],
-  isAttacked: false,
-  currentSkin: undefined,
-  currentMonster: DEFAULT_MONSTER,
-  currentBackground: undefined,
-  setting: {
+const createDefaultState = (): AppState => {
+  const setting = {
     numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
     maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
     minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
     criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
   }
-})
+
+  return {
+    skinNumber: DEFAULT_SKIN_NUMBER,
+    damageWrapperList: [],
+    isAttacked: false,
+    monsterHealth: getMonsterMaxHealth({
+      ...setting,
+      isBoss: DEFAULT_MONSTER.isBoss
+    }),
+    monsterStatus: 'alive',
+    currentSkin: undefined,
+    currentMonster: DEFAULT_MONSTER,
+    currentBackground: undefined,
+    setting
+  }
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
@@ -167,6 +191,24 @@ const loadInitialState = (): AppState => {
       )
     )
 
+    const currentMonster = getStoredMonster(parsedState.currentMonster)
+    const setting = {
+      numberAttack: getBoundedNumber(
+        parsedSetting.numberAttack,
+        DEFAULT_SETTINGS.NUMBER_ATTACK,
+        SETTING_LIMITS.MIN_NUMBER_ATTACK,
+        SETTING_LIMITS.MAX_NUMBER_ATTACK
+      ),
+      maxDamage,
+      minDamage,
+      criticalRate: getBoundedNumber(
+        parsedSetting.criticalRate,
+        DEFAULT_SETTINGS.CRITICAL_RATE,
+        SETTING_LIMITS.MIN_CRITICAL_RATE,
+        SETTING_LIMITS.MAX_CRITICAL_RATE
+      )
+    }
+
     return {
       skinNumber: getBoundedNumber(
         parsedState.skinNumber,
@@ -176,25 +218,15 @@ const loadInitialState = (): AppState => {
       ),
       damageWrapperList: [],
       isAttacked: false,
+      monsterHealth: getMonsterMaxHealth({
+        ...setting,
+        isBoss: currentMonster.isBoss
+      }),
+      monsterStatus: 'alive',
       currentSkin: getStoredSkin(parsedState.currentSkin),
-      currentMonster: getStoredMonster(parsedState.currentMonster),
+      currentMonster,
       currentBackground: getStoredBackground(parsedState.currentBackground),
-      setting: {
-        numberAttack: getBoundedNumber(
-          parsedSetting.numberAttack,
-          DEFAULT_SETTINGS.NUMBER_ATTACK,
-          SETTING_LIMITS.MIN_NUMBER_ATTACK,
-          SETTING_LIMITS.MAX_NUMBER_ATTACK
-        ),
-        maxDamage,
-        minDamage,
-        criticalRate: getBoundedNumber(
-          parsedSetting.criticalRate,
-          DEFAULT_SETTINGS.CRITICAL_RATE,
-          SETTING_LIMITS.MIN_CRITICAL_RATE,
-          SETTING_LIMITS.MAX_CRITICAL_RATE
-        )
-      }
+      setting
     }
   } catch {
     return defaultState
@@ -205,6 +237,15 @@ const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
   const [, setMonsterMetricsRevision] = useState(0)
   const [monsterFootY, setMonsterFootY] = useState<number>()
+  const [deathPlaybackDuration, setDeathPlaybackDuration] = useState(
+    DEATH_ANIMATION_DURATION
+  )
+  const [deathPlaybackImage, setDeathPlaybackImage] = useState<string>()
+  const [deathAnimationOpaqueMetrics, setDeathAnimationOpaqueMetrics] =
+    useState<GifAnimationOpaqueMetrics>()
+  const deathPlaybackDurationRef = useRef(DEATH_ANIMATION_DURATION)
+  const deathAnimationBlobRef = useRef<Blob | undefined>(undefined)
+  const deathPlaybackImageRef = useRef<string | undefined>(undefined)
   const bodyRef = useRef<HTMLDivElement>(null)
   const monsterButtonRef = useRef<HTMLButtonElement>(null)
   const monsterImageRef = useRef<HTMLImageElement>(null)
@@ -226,6 +267,10 @@ const App: React.FC = () => {
   const hitAnimation = getPrimaryMonsterAnimation(
     currentMonsterDetail?.framebooks,
     'hit'
+  )
+  const deathAnimation = getPrimaryMonsterAnimation(
+    currentMonsterDetail?.framebooks,
+    'death'
   )
   const remoteIdleMonsterImage =
     wzVersion.version !== undefined &&
@@ -249,9 +294,26 @@ const App: React.FC = () => {
           wzVersion.region
         )
       : undefined
-  const remoteMonsterImage = state.isAttacked
-    ? (remoteHitMonsterImage ?? remoteIdleMonsterImage)
-    : remoteIdleMonsterImage
+  const remoteDeathMonsterImage =
+    wzVersion.version !== undefined &&
+    wzVersion.region !== undefined &&
+    deathAnimation
+      ? getMonsterAnimationUrl(
+          state.currentMonster.id,
+          deathAnimation,
+          wzVersion.version,
+          wzVersion.region
+        )
+      : undefined
+  const remoteMonsterImage =
+    state.monsterStatus === 'dying'
+      ? (deathPlaybackImage ??
+        remoteDeathMonsterImage ??
+        remoteHitMonsterImage ??
+        remoteIdleMonsterImage)
+      : state.isAttacked
+        ? (remoteHitMonsterImage ?? remoteIdleMonsterImage)
+        : remoteIdleMonsterImage
   const remoteMonsterIcon =
     wzVersion.version !== undefined && wzVersion.region !== undefined
       ? getMonsterIconUrl(
@@ -276,17 +338,34 @@ const App: React.FC = () => {
     ? monsterFallbackImage
     : (remoteMonsterImage ?? monsterFallbackImage)
   const idleMonsterImage = remoteIdleMonsterImage ?? idleMonsterFallback
-  const monsterImageBottomOffset = monsterImageFailed
-    ? 0
-    : getMonsterImageBottomOffset({
+  const monsterMetricsImage =
+    !monsterImageFailed && deathPlaybackImage && remoteDeathMonsterImage
+      ? remoteDeathMonsterImage
+      : monsterImage
+  const maxMonsterHealth = getMonsterMaxHealth({
+    ...state.setting,
+    isBoss: state.currentMonster.isBoss
+  })
+  const monsterHealthPercent = getMonsterHealthPercent(
+    state.monsterHealth,
+    maxMonsterHealth
+  )
+  const monsterHealthLabel = `${numberWithCommas(state.monsterHealth)} / ${numberWithCommas(maxMonsterHealth)}`
+  const monsterImageAlignment = monsterImageFailed
+    ? { bottomOffset: 0, horizontalOffset: 0 }
+    : getMonsterImageAlignment({
         idleMetrics: getCachedImageMetrics(idleMonsterImage),
-        activeMetrics: getCachedImageMetrics(monsterImage),
+        activeMetrics: getCachedImageMetrics(monsterMetricsImage),
+        activeAnimationMetrics:
+          state.monsterStatus === 'dying'
+            ? deathAnimationOpaqueMetrics
+            : undefined,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight
       })
 
   const updateMonsterFootY = useCallback(() => {
-    if (state.isAttacked) return
+    if (state.isAttacked || state.monsterStatus !== 'alive') return
 
     const bodyRect = bodyRef.current?.getBoundingClientRect()
     const image = monsterImageRef.current
@@ -305,7 +384,7 @@ const App: React.FC = () => {
         ? nextFootY
         : current
     )
-  }, [idleMonsterImage, state.isAttacked])
+  }, [idleMonsterImage, state.isAttacked, state.monsterStatus])
 
   useEffect(() => {
     setMonsterImageFailed(false)
@@ -314,7 +393,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const animationUrls = [
       remoteIdleMonsterImage,
-      remoteHitMonsterImage
+      remoteHitMonsterImage,
+      remoteDeathMonsterImage
     ].filter((url): url is string => url !== undefined)
     if (animationUrls.length === 0) return
 
@@ -326,7 +406,68 @@ const App: React.FC = () => {
     return () => {
       cancelled = true
     }
-  }, [remoteHitMonsterImage, remoteIdleMonsterImage])
+  }, [remoteDeathMonsterImage, remoteHitMonsterImage, remoteIdleMonsterImage])
+
+  useEffect(() => {
+    let cancelled = false
+    deathAnimationBlobRef.current = undefined
+    setDeathAnimationOpaqueMetrics(undefined)
+    deathPlaybackDurationRef.current = DEATH_ANIMATION_DURATION
+    setDeathPlaybackDuration(DEATH_ANIMATION_DURATION)
+
+    if (!remoteDeathMonsterImage) return
+
+    void getGifAnimationAssetFromUrl(remoteDeathMonsterImage).then((asset) => {
+      if (cancelled || !asset) return
+
+      deathAnimationBlobRef.current = asset.blob
+      setDeathAnimationOpaqueMetrics(asset.opaqueMetrics)
+      const playbackDuration = getOneShotGifPlaybackDuration(
+        asset.durationMs,
+        DEATH_ANIMATION_DURATION
+      )
+      deathPlaybackDurationRef.current = playbackDuration
+      setDeathPlaybackDuration(playbackDuration)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [remoteDeathMonsterImage])
+
+  const clearDeathPlaybackImage = useCallback(() => {
+    if (deathPlaybackImageRef.current) {
+      URL.revokeObjectURL(deathPlaybackImageRef.current)
+      deathPlaybackImageRef.current = undefined
+    }
+    setDeathPlaybackImage(undefined)
+  }, [])
+
+  useEffect(() => {
+    if (state.monsterStatus !== 'dying') clearDeathPlaybackImage()
+  }, [clearDeathPlaybackImage, state.monsterStatus])
+
+  useEffect(
+    () => () => {
+      if (deathPlaybackImageRef.current) {
+        URL.revokeObjectURL(deathPlaybackImageRef.current)
+      }
+    },
+    []
+  )
+
+  const startDeathPlaybackImage = () => {
+    const deathAnimationBlob = deathAnimationBlobRef.current
+    if (!deathAnimationBlob) return
+
+    if (deathPlaybackImageRef.current) {
+      URL.revokeObjectURL(deathPlaybackImageRef.current)
+    }
+
+    const playbackImage = URL.createObjectURL(deathAnimationBlob)
+    deathPlaybackImageRef.current = playbackImage
+    setDeathPlaybackImage(playbackImage)
+  }
 
   useEffect(() => {
     updateMonsterFootY()
@@ -384,7 +525,7 @@ const App: React.FC = () => {
   }
 
   const captureIdleMonsterTopOffset = () => {
-    if (state.isAttacked) return
+    if (state.isAttacked || state.monsterStatus !== 'alive') return
 
     const buttonRect = monsterButtonRef.current?.getBoundingClientRect()
     const imageRect = monsterImageRef.current?.getBoundingClientRect()
@@ -408,6 +549,8 @@ const App: React.FC = () => {
   }
 
   const handleAttack = () => {
+    if (state.monsterStatus !== 'alive') return
+
     trackMonsterAttacked({
       monster: state.currentMonster,
       skin: state.currentSkin,
@@ -473,20 +616,33 @@ const App: React.FC = () => {
       totalHeight += damage.isCritical ? criticalHeight : normalHeight
       return { ...damage, marginBottom: currentMargin }
     })
+    const totalDamage = newDamageList.reduce(
+      (sum, damage) => sum + damage.damage,
+      0
+    )
+    if (totalDamage >= state.monsterHealth) startDeathPlaybackImage()
 
     // 상태 업데이트
-    setState((prevState) => ({
-      ...prevState,
-      isAttacked: true,
-      damageWrapperList: [
-        ...prevState.damageWrapperList,
-        { id: uuid(), damageList: damageListWithMargin, spawnBottom }
-      ]
-    }))
+    setState((prevState) => {
+      if (prevState.monsterStatus !== 'alive') return prevState
+
+      const monsterHealth = Math.max(0, prevState.monsterHealth - totalDamage)
+
+      return {
+        ...prevState,
+        isAttacked: true,
+        monsterHealth,
+        monsterStatus: monsterHealth === 0 ? 'dying' : 'alive',
+        damageWrapperList: [
+          ...prevState.damageWrapperList,
+          { id: uuid(), damageList: damageListWithMargin, spawnBottom }
+        ]
+      }
+    })
   }
 
   useEffect(() => {
-    if (state.isAttacked) {
+    if (state.isAttacked && state.monsterStatus === 'alive') {
       const timer = setTimeout(() => {
         setState((prevState) => ({ ...prevState, isAttacked: false }))
       }, ATTACK_ANIMATION_DURATION)
@@ -496,14 +652,58 @@ const App: React.FC = () => {
         clearTimeout(timer)
       }
     }
-  }, [state.isAttacked])
+  }, [state.isAttacked, state.monsterStatus])
+
+  useEffect(() => {
+    if (state.monsterStatus === 'dying') {
+      const timer = window.setTimeout(() => {
+        setState((prevState) => {
+          if (prevState.monsterStatus !== 'dying') return prevState
+
+          return {
+            ...prevState,
+            isAttacked: false,
+            monsterHealth: getMonsterMaxHealth({
+              ...prevState.setting,
+              isBoss: prevState.currentMonster.isBoss
+            }),
+            monsterStatus: 'respawning'
+          }
+        })
+      }, deathPlaybackDurationRef.current)
+
+      return () => window.clearTimeout(timer)
+    }
+
+    if (state.monsterStatus === 'respawning') {
+      const timer = window.setTimeout(() => {
+        setState((prevState) =>
+          prevState.monsterStatus === 'respawning'
+            ? { ...prevState, monsterStatus: 'alive' }
+            : prevState
+        )
+      }, RESPAWN_ANIMATION_DURATION)
+
+      return () => window.clearTimeout(timer)
+    }
+  }, [state.monsterStatus])
 
   return (
     <>
       <SettingModal
         setting={state.setting}
         setSetting={(newSetting: Setting) =>
-          setState((prevState) => ({ ...prevState, setting: newSetting }))
+          setState((prevState) => ({
+            ...prevState,
+            setting: newSetting,
+            damageWrapperList: [],
+            isAttacked: false,
+            monsterHealth: getMonsterMaxHealth({
+              ...newSetting,
+              isBoss: prevState.currentMonster.isBoss
+            }),
+            monsterStatus: 'alive'
+          }))
         }
       />
       <SkinSelectModal
@@ -520,6 +720,11 @@ const App: React.FC = () => {
             ...prevState,
             currentMonster: monster,
             isAttacked: false,
+            monsterHealth: getMonsterMaxHealth({
+              ...prevState.setting,
+              isBoss: monster.isBoss
+            }),
+            monsterStatus: 'alive',
             damageWrapperList: []
           }))
         }
@@ -571,29 +776,81 @@ const App: React.FC = () => {
             currentSkin={state.currentSkin}
           />
         ))}
-        <button
-          ref={monsterButtonRef}
-          type="button"
-          className={styles.MonsterButton}
-          onClick={handleAttack}
-          aria-label={`${state.currentMonster.name} 공격하기`}
-        >
-          <img
-            ref={monsterImageRef}
-            className={styles.MonsterImage}
-            crossOrigin={
-              !monsterImageFailed && remoteMonsterImage
-                ? 'anonymous'
-                : undefined
+        <div className={styles.MonsterActor}>
+          <div
+            className={styles.MonsterHealth}
+            role="progressbar"
+            aria-label={`${state.currentMonster.name} 체력`}
+            aria-valuemin={0}
+            aria-valuemax={maxMonsterHealth}
+            aria-valuenow={state.monsterHealth}
+            aria-valuetext={monsterHealthLabel}
+          >
+            <div className={styles.MonsterHealthMeta} aria-hidden="true">
+              <span>{monsterHealthLabel}</span>
+            </div>
+            <div className={styles.MonsterHealthTrack} aria-hidden="true">
+              <span
+                className={clsx(styles.MonsterHealthFill, {
+                  [styles.MonsterHealthFillLow]:
+                    monsterHealthPercent <= 25 &&
+                    state.monsterStatus === 'alive'
+                })}
+                style={{ width: `${monsterHealthPercent}%` }}
+              />
+            </div>
+          </div>
+          <button
+            ref={monsterButtonRef}
+            type="button"
+            className={clsx(styles.MonsterButton, {
+              [styles.MonsterButtonDying]: state.monsterStatus === 'dying',
+              [styles.MonsterButtonRespawning]:
+                state.monsterStatus === 'respawning'
+            })}
+            disabled={state.monsterStatus !== 'alive'}
+            onClick={handleAttack}
+            style={
+              {
+                '--monster-death-duration': `${deathPlaybackDuration}ms`
+              } as React.CSSProperties
             }
-            draggable="false"
-            src={monsterImage}
-            style={{ marginBottom: `${-monsterImageBottomOffset}px` }}
-            onLoad={handleMonsterImageLoad}
-            onError={() => setMonsterImageFailed(true)}
-            alt=""
-          />
-        </button>
+            aria-label={
+              state.monsterStatus === 'alive'
+                ? `${state.currentMonster.name} 공격하기`
+                : state.monsterStatus === 'dying'
+                  ? `${state.currentMonster.name} 쓰러지는 중`
+                  : `${state.currentMonster.name} 다시 나타나는 중`
+            }
+          >
+            <img
+              ref={monsterImageRef}
+              className={styles.MonsterImage}
+              crossOrigin={
+                !monsterImageFailed && remoteMonsterImage
+                  ? 'anonymous'
+                  : undefined
+              }
+              draggable="false"
+              src={monsterImage}
+              style={{
+                height: monsterImageAlignment.renderedHeight,
+                marginBottom: `${-monsterImageAlignment.bottomOffset}px`,
+                maxHeight: monsterImageAlignment.renderedHeight
+                  ? 'none'
+                  : undefined,
+                maxWidth: monsterImageAlignment.renderedWidth
+                  ? 'none'
+                  : undefined,
+                transform: `translateX(${monsterImageAlignment.horizontalOffset}px)`,
+                width: monsterImageAlignment.renderedWidth
+              }}
+              onLoad={handleMonsterImageLoad}
+              onError={() => setMonsterImageFailed(true)}
+              alt=""
+            />
+          </button>
+        </div>
       </div>
     </>
   )

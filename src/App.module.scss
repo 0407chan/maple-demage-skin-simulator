@@ -11,9 +11,17 @@
   background-color: #282c34;
 }
 
-.MonsterButton {
+.MonsterActor {
   position: absolute;
   bottom: max(96px, 10vh);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.MonsterButton {
   display: flex;
   min-width: 44px;
   min-height: 44px;
@@ -24,10 +32,113 @@
   border: 0;
   background: transparent;
 
+  &:disabled {
+    cursor: default;
+  }
+
   &:focus-visible {
     outline: 2px solid #ffcc5f;
     outline-offset: 4px;
     border-radius: 6px;
+  }
+}
+
+.MonsterHealth {
+  z-index: 1;
+  width: clamp(160px, 32vw, 230px);
+  margin-bottom: 10px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  pointer-events: none;
+  text-shadow:
+    -1px -1px 0 rgba(0, 0, 0, 0.9),
+    1px -1px 0 rgba(0, 0, 0, 0.9),
+    -1px 1px 0 rgba(0, 0, 0, 0.9),
+    1px 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.MonsterHealthMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0 2px 3px;
+  white-space: nowrap;
+}
+
+.MonsterHealthTrack {
+  height: 7px;
+  padding: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 18, 22, 0.92);
+  border-radius: 3px;
+  background: rgba(35, 29, 34, 0.9);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.36),
+    inset 0 1px 2px rgba(0, 0, 0, 0.64);
+}
+
+.MonsterHealthFill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ff7e85 0%, #e7263f 58%, #b90f2c 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  transition:
+    width 240ms ease-out,
+    background 180ms ease;
+}
+
+.MonsterHealthFillLow {
+  background: linear-gradient(180deg, #ffd36b 0%, #f28c28 62%, #c64d1d 100%);
+}
+
+.MonsterButtonDying {
+  animation: monster-death var(--monster-death-duration, 1200ms) ease-in
+    forwards;
+
+  .MonsterImage {
+    transition:
+      width 90ms ease-out,
+      height 90ms ease-out,
+      margin-bottom 90ms ease-out,
+      transform 90ms ease-out;
+  }
+}
+
+.MonsterButtonRespawning {
+  animation: monster-respawn 800ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+@keyframes monster-death {
+  0% {
+    opacity: 1;
+  }
+
+  68% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes monster-respawn {
+  0% {
+    opacity: 0;
+    filter: brightness(1.8);
+  }
+
+  70% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+
+  100% {
+    opacity: 1;
+    filter: brightness(1);
   }
 }
 
@@ -39,8 +150,19 @@
 }
 
 @media screen and (max-width: 640px) {
-  .MonsterButton {
+  .MonsterActor {
     bottom: max(112px, calc(env(safe-area-inset-bottom, 0px) + 80px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .MonsterButtonDying,
+  .MonsterButtonRespawning {
+    animation-duration: 1ms;
+  }
+
+  .MonsterHealthFill {
+    transition: none;
   }
 }
 

@@ -14,8 +14,12 @@ import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
 import { Monster } from 'type/monster'
 import { trackMonsterSelected, trackSelectorOpened } from 'utils/analytics'
+import { getGifAnimationDurationFromUrl } from 'utils/gifAnimation'
 import { preloadImages } from 'utils/imagePreloader'
-import { getMonsterAnimationsToPreload } from 'utils/monsterAnimation'
+import {
+  getMonsterAnimationsToPreload,
+  getPrimaryMonsterAnimation
+} from 'utils/monsterAnimation'
 import styles from './style.module.scss'
 
 type MonsterSelectModalProps = {
@@ -118,8 +122,20 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
       ).map((animation) =>
         getMonsterAnimationUrl(monster.id, animation, version, region)
       )
+      const deathAnimation = getPrimaryMonsterAnimation(
+        detail.framebooks,
+        'death'
+      )
+      const deathAnimationUrl = deathAnimation
+        ? getMonsterAnimationUrl(monster.id, deathAnimation, version, region)
+        : undefined
 
-      await preloadImages(animationUrls)
+      await Promise.all([
+        preloadImages(animationUrls),
+        deathAnimationUrl
+          ? getGifAnimationDurationFromUrl(deathAnimationUrl)
+          : Promise.resolve(undefined)
+      ])
     } catch (error) {
       console.warn('몬스터 애니메이션을 미리 불러오지 못했습니다.', error)
     }
