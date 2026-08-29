@@ -1,17 +1,15 @@
+import { wzVersionState } from 'atoms/wzVersion'
 import { SkinMap } from 'constants/damageSkinMapper'
 import useBoolean from 'hooks/useBoolean'
+import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactGA from 'react-ga4'
+import { useRecoilValue } from 'recoil'
 import { ItemDto } from 'type/damage-skin'
+import { preloadBase64Images } from 'utils/base64ImageCache'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
-import { Segmented, Spin } from 'antd'
-import { useRecoilValue } from 'recoil'
-import { wzVersionState } from 'atoms/wzVersion'
-import { Button, Divider, Input } from 'antd'
-import { preloadBase64Images } from 'utils/base64ImageCache'
-import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 
 type SkinSelectModalProps = {
   currentSkin?: ItemDto
@@ -19,6 +17,14 @@ type SkinSelectModalProps = {
   setCurrentSkin: (skin?: ItemDto) => void
   hideCloseButton?: boolean
 }
+
+type SkinFilter = 'all' | 'unit' | 'action'
+
+const FILTER_OPTIONS: Array<{ label: string; value: SkinFilter }> = [
+  { label: '전체', value: 'all' },
+  { label: '유닛', value: 'unit' },
+  { label: '액션', value: 'action' }
+]
 
 const getSkinImageUrls = (baseUrl: string) => {
   const urls: string[] = []
@@ -54,7 +60,10 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   const [searchKey, setSearchKey] = useState('')
   const { currentItemList, isLoading } = useSkinList()
   const wzVersion = useRecoilValue(wzVersionState)
-  const [filter, setFilter] = useState<'all' | 'unit' | 'action'>('all')
+  const [filter, setFilter] = useState<SkinFilter>('all')
+
+  const getItemIconUrl = (skin: ItemDto) =>
+    `https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${skin.id}/icon`
 
   const preloadSkinImages = useCallback(
     (skinNumber: number) => {
@@ -66,7 +75,6 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     [wzVersion.region, wzVersion.version]
   )
 
-  // 기본 스킨 설정
   useEffect(() => {
     if (!currentSkin && currentItemList.length > 0) {
       const defaultSkin = currentItemList.find((item) =>
@@ -78,7 +86,6 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     }
   }, [currentItemList, currentSkin, setCurrentSkin])
 
-  // currentSkin 변경 시에도 프리로드 (새로고침 후에도 동작)
   useEffect(() => {
     if (currentSkin) {
       const skinNumbers = SkinMap[currentSkin.id]
@@ -127,17 +134,29 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           ref={triggerRef}
           type="button"
           className={styles.skinButton}
-          style={{ position: 'absolute', top: 8, left: 0 }}
           onClick={onOpen}
+          aria-label={`데미지 스킨 선택: ${currentSkin.name}`}
           aria-haspopup="dialog"
           aria-expanded={open}
         >
-          <img
-            className={styles.skinImg}
-            src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${currentSkin.id}/icon`}
-            alt=""
-          />
-          <span className={styles.skinText}>{currentSkin.name}</span>
+          <span className={styles.triggerIconFrame} aria-hidden="true">
+            <img
+              className={styles.skinImg}
+              src={getItemIconUrl(currentSkin)}
+              alt=""
+            />
+          </span>
+          <span className={styles.triggerCopy}>
+            <span className={styles.triggerLabel}>DAMAGE SKIN</span>
+            <span className={styles.skinText}>{currentSkin.name}</span>
+          </span>
+          <svg
+            className={styles.triggerChevron}
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path d="m6.5 8 3.5 3.5L13.5 8" />
+          </svg>
         </button>
       )}
 
@@ -146,82 +165,145 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
         onClick={onClose}
         aria-hidden="true"
       />
-      <Spin spinning={isLoading}>
-        <div
-          ref={dialogRef}
-          className={`${styles.container} ${open ? styles.open : ''}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="skin-dialog-title"
-          aria-hidden={!open}
-          tabIndex={-1}
-        >
-          <div id="skin-dialog-title" className={styles.header}>
-            데미지 스킨 선택
+      <div
+        ref={dialogRef}
+        className={`${styles.container} ${open ? styles.open : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="skin-dialog-title"
+        aria-describedby="skin-dialog-description"
+        aria-hidden={!open}
+        tabIndex={-1}
+      >
+        <div className={styles.sheetHandle} aria-hidden="true" />
+
+        <header className={styles.header}>
+          <div className={styles.headerCopy}>
+            <span className={styles.eyebrow}>SKIN LIBRARY</span>
+            <h2 id="skin-dialog-title" className={styles.dialogTitle}>
+              데미지 스킨 선택
+            </h2>
+            <p id="skin-dialog-description" className={styles.description}>
+              원하는 스킨을 검색하고 바로 적용해 보세요.
+            </p>
           </div>
-          <Input
-            id="skin-search"
-            className={styles.input}
-            maxLength={20}
-            value={searchKey}
-            placeholder="검색"
-            aria-label="데미지 스킨 검색"
-            onChange={(e) => setSearchKey(e.target.value)}
-          />
 
           {!hideCloseButton && (
-            <Button
-              size="small"
+            <button
+              type="button"
               className={styles.closeButton}
               onClick={onClose}
               aria-label="데미지 스킨 선택 닫기"
             >
-              <div className="ex left" />
-              <div className="ex right" />
-            </Button>
+              <span aria-hidden="true" />
+            </button>
           )}
+        </header>
 
-          {currentSkin && (
-            <>
-              <div style={{ color: '#eeeeee' }}>현재 스킨</div>
+        <div className={styles.controls}>
+          <div className={styles.searchField}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m20 20-4.5-4.5m2.5-5A7.5 7.5 0 1 1 3 10.5a7.5 7.5 0 0 1 15 0Z" />
+            </svg>
+            <input
+              id="skin-search"
+              type="search"
+              className={styles.input}
+              maxLength={20}
+              value={searchKey}
+              placeholder="스킨 이름 검색"
+              aria-label="데미지 스킨 검색"
+              onChange={(event) => setSearchKey(event.target.value)}
+            />
+            {searchKey && (
+              <button
+                type="button"
+                className={styles.clearButton}
+                aria-label="검색어 지우기"
+                onClick={() => setSearchKey('')}
+              >
+                <span aria-hidden="true" />
+              </button>
+            )}
+          </div>
+
+          <div
+            className={styles.filterGroup}
+            role="group"
+            aria-label="스킨 유형 필터"
+          >
+            {FILTER_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={`${styles.filterButton} ${filter === option.value ? styles.activeFilter : ''}`}
+                aria-pressed={filter === option.value}
+                onClick={() => setFilter(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {currentSkin && (
+          <div className={styles.currentCard}>
+            <span className={styles.currentIconFrame} aria-hidden="true">
+              <img
+                className={styles.skinImg}
+                src={getItemIconUrl(currentSkin)}
+                alt=""
+              />
+            </span>
+            <span className={styles.currentCopy}>
+              <span className={styles.currentLabel}>현재 적용 중</span>
+              <strong className={styles.currentName}>{currentSkin.name}</strong>
+            </span>
+            <span className={styles.appliedBadge}>
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="m5 10 3 3 7-7" />
+              </svg>
+              적용됨
+            </span>
+          </div>
+        )}
+
+        <div className={styles.listHeader}>
+          <span>스킨 목록</span>
+          <span className={styles.resultCount} aria-live="polite">
+            {isLoading ? '불러오는 중' : `${filteredSkins.length}개`}
+          </span>
+        </div>
+
+        <div className={styles.body}>
+          {isLoading ? (
+            <div className={styles.loadingState} role="status">
+              <span className={styles.spinner} aria-hidden="true" />
+              스킨을 불러오고 있어요.
+            </div>
+          ) : filteredSkins.length > 0 ? (
+            filteredSkins.map((skin) => (
               <SkinItem
-                skin={currentSkin}
+                key={skin.id}
+                skin={skin}
                 currentSkin={currentSkin}
                 searchKey={searchKey}
                 onSelect={handleSkinSelect}
               />
-              <Divider className={styles.divider} />
-            </>
-          )}
-
-          <Segmented
-            options={[
-              { label: '전체', value: 'all' },
-              { label: '유닛', value: 'unit' },
-              { label: '액션', value: 'action' }
-            ]}
-            value={filter}
-            onChange={(value) => setFilter(value as 'all' | 'unit' | 'action')}
-          />
-          <div className={styles.body}>
-            {filteredSkins.length > 0 ? (
-              filteredSkins.map((skin) => (
-                <SkinItem
-                  key={skin.id}
-                  skin={skin}
-                  currentSkin={currentSkin}
-                  searchKey={searchKey}
-                  onSelect={handleSkinSelect}
-                />
-              ))
-            ) : (
-              <span className={styles.infoText}>
-                [{searchKey}] 스킨이 없습니다.
+            ))
+          ) : (
+            <div className={styles.emptyState} role="status">
+              <span className={styles.emptyIcon} aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="m20 20-4.5-4.5m2.5-5A7.5 7.5 0 1 1 3 10.5a7.5 7.5 0 0 1 15 0Z" />
+                </svg>
               </span>
-            )}
-          </div>
+              <strong>검색 결과가 없어요.</strong>
+              <span>다른 이름이나 필터로 다시 찾아보세요.</span>
+            </div>
+          )}
         </div>
-      </Spin>
+      </div>
     </>
   )
 }
