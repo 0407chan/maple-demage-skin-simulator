@@ -40,6 +40,7 @@ import {
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
 import { getMonsterImageAlignment } from 'utils/monsterImageAlignment'
 import {
+  getMonsterHealthAfterAttack,
   getMonsterHealthPercent,
   getMonsterMaxHealth
 } from 'utils/monsterHealth'
@@ -75,7 +76,8 @@ const createDefaultState = (): AppState => {
     numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
     maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
     minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
-    criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
+    criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE,
+    monsterInvincible: DEFAULT_SETTINGS.MONSTER_INVINCIBLE
   }
 
   return {
@@ -206,7 +208,11 @@ const loadInitialState = (): AppState => {
         DEFAULT_SETTINGS.CRITICAL_RATE,
         SETTING_LIMITS.MIN_CRITICAL_RATE,
         SETTING_LIMITS.MAX_CRITICAL_RATE
-      )
+      ),
+      monsterInvincible:
+        typeof parsedSetting.monsterInvincible === 'boolean'
+          ? parsedSetting.monsterInvincible
+          : DEFAULT_SETTINGS.MONSTER_INVINCIBLE
     }
 
     return {
@@ -620,19 +626,31 @@ const App: React.FC = () => {
       (sum, damage) => sum + damage.damage,
       0
     )
-    if (totalDamage >= state.monsterHealth) startDeathPlaybackImage()
+    if (
+      state.setting.monsterInvincible === false &&
+      totalDamage >= state.monsterHealth
+    ) {
+      startDeathPlaybackImage()
+    }
 
     // 상태 업데이트
     setState((prevState) => {
       if (prevState.monsterStatus !== 'alive') return prevState
 
-      const monsterHealth = Math.max(0, prevState.monsterHealth - totalDamage)
+      const monsterHealth = getMonsterHealthAfterAttack(
+        prevState.monsterHealth,
+        totalDamage,
+        prevState.setting.monsterInvincible !== false
+      )
 
       return {
         ...prevState,
         isAttacked: true,
         monsterHealth,
-        monsterStatus: monsterHealth === 0 ? 'dying' : 'alive',
+        monsterStatus:
+          prevState.setting.monsterInvincible === false && monsterHealth === 0
+            ? 'dying'
+            : 'alive',
         damageWrapperList: [
           ...prevState.damageWrapperList,
           { id: uuid(), damageList: damageListWithMargin, spawnBottom }

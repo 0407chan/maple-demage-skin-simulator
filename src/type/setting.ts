@@ -3,4 +3,5 @@ export type Setting = {
   minDamage?: number
   criticalRate?: number
   numberAttack?: number
+  monsterInvincible?: boolean
 }

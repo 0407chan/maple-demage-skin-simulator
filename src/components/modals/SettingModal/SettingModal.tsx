@@ -116,6 +116,13 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
     })
   }
 
+  const updateMonsterInvincible = (monsterInvincible: boolean) => {
+    setSetting({
+      ...setting,
+      monsterInvincible
+    })
+  }
+
   const decreaseCriticalRate = () => {
     const currentValue = setting.criticalRate ?? 0
     setSetting({
@@ -374,6 +381,39 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
               </S.Stepper>
             </S.ControlCard>
           </S.ControlGrid>
+
+          <S.InvincibleCard htmlFor="monster-invincible">
+            <S.SectionHeading>
+              <S.SectionIcon data-tone="blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2.5 20 6v5.3c0 4.8-3.1 8.8-8 10.2-4.9-1.4-8-5.4-8-10.2V6l8-3.5Zm0 4.1-4.5 2v2.7c0 2.8 1.6 5.2 4.5 6.4 2.9-1.2 4.5-3.6 4.5-6.4V8.6l-4.5-2Z" />
+                </svg>
+              </S.SectionIcon>
+              <S.SectionCopy>
+                <S.SectionTitle>몬스터 무적모드</S.SectionTitle>
+                <S.SectionDescription>
+                  체력 감소와 처치·리스폰을 막습니다.
+                </S.SectionDescription>
+              </S.SectionCopy>
+            </S.SectionHeading>
+
+            <S.ToggleControl>
+              <S.ToggleInput
+                id="monster-invincible"
+                type="checkbox"
+                checked={setting.monsterInvincible !== false}
+                onChange={(event) =>
+                  updateMonsterInvincible(event.target.checked)
+                }
+              />
+              <S.ToggleTrack aria-hidden="true">
+                <S.ToggleThumb />
+              </S.ToggleTrack>
+              <S.ToggleState aria-hidden="true">
+                {setting.monsterInvincible !== false ? 'ON' : 'OFF'}
+              </S.ToggleState>
+            </S.ToggleControl>
+          </S.InvincibleCard>
 
           <S.AutoSaveNotice>
             <S.StatusDot aria-hidden="true" />

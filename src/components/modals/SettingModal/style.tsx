@@ -374,6 +374,12 @@ export const SectionIcon = styled.span`
     background: rgba(93, 217, 173, 0.1);
     color: #67ddb4;
   }
+
+  &[data-tone='blue'] {
+    border-color: rgba(105, 174, 255, 0.22);
+    background: rgba(105, 174, 255, 0.1);
+    color: #78b8ff;
+  }
 `
 
 export const SectionCopy = styled.div`
@@ -555,6 +561,96 @@ export const Unit = styled.span`
   font-weight: 700;
   pointer-events: none;
   transform: translateY(-50%);
+`
+
+export const InvincibleCard = styled.label`
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+
+  @media screen and (max-width: 520px) {
+    align-items: flex-start;
+    padding: 16px;
+  }
+`
+
+export const ToggleControl = styled.span`
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+`
+
+export const ToggleTrack = styled.span`
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(9, 12, 18, 0.72);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+`
+
+export const ToggleThumb = styled.span`
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #737d8d;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition:
+    background 160ms ease,
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+`
+
+export const ToggleInput = styled.input`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  &:checked + ${ToggleTrack} {
+    border-color: rgba(105, 174, 255, 0.46);
+    background: rgba(75, 145, 255, 0.38);
+    box-shadow: 0 0 0 3px rgba(75, 145, 255, 0.08);
+  }
+
+  &:checked + ${ToggleTrack} ${ToggleThumb} {
+    background: #dcecff;
+    transform: translateX(20px);
+  }
+
+  &:focus-visible + ${ToggleTrack} {
+    outline: 3px solid rgba(105, 174, 255, 0.3);
+    outline-offset: 3px;
+  }
+`
+
+export const ToggleState = styled.span`
+  width: 24px;
+  color: #788394;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-align: center;
 `
 
 export const AutoSaveNotice = styled.div`

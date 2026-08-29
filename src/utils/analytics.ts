@@ -167,7 +167,8 @@ const SETTING_FIELD_NAMES: Record<keyof Setting, string> = {
   minDamage: '최소_데미지',
   maxDamage: '최대_데미지',
   criticalRate: '크리티컬_확률',
-  numberAttack: '공격_타수'
+  numberAttack: '공격_타수',
+  monsterInvincible: '몬스터_무적_모드'
 }
 
 export const getChangedSettingFields = (
@@ -190,7 +191,8 @@ export const trackDamageSettingChanged = (
     minimum_damage: setting.minDamage,
     maximum_damage: setting.maxDamage,
     critical_rate: setting.criticalRate,
-    attack_count: setting.numberAttack
+    attack_count: setting.numberAttack,
+    monster_invincible: setting.monsterInvincible === false ? '아니오' : '예'
   })
 }
 
@@ -224,6 +226,7 @@ export const trackMonsterAttacked = ({
     maximum_damage: setting.maxDamage,
     critical_rate: setting.criticalRate,
     attack_count: setting.numberAttack,
+    monster_invincible: setting.monsterInvincible === false ? '아니오' : '예',
     ...getWzParameters({ region, version })
   })
 }

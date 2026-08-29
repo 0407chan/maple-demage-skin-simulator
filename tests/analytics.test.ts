@@ -49,15 +49,17 @@ describe('GA4 이벤트 체계', () => {
           minDamage: 100,
           maxDamage: 1000,
           criticalRate: 60,
-          numberAttack: 5
+          numberAttack: 5,
+          monsterInvincible: true
         },
         {
           minDamage: 200,
           maxDamage: 1000,
           criticalRate: 70,
-          numberAttack: 5
+          numberAttack: 5,
+          monsterInvincible: false
         }
       )
-    ).toEqual(['최소_데미지', '크리티컬_확률'])
+    ).toEqual(['최소_데미지', '크리티컬_확률', '몬스터_무적_모드'])
   })
 })

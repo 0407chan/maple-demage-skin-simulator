@@ -29,3 +29,12 @@ export const getMonsterHealthPercent = (
   currentHealth: number,
   maxHealth: number
 ) => Math.min(100, Math.max(0, (currentHealth / Math.max(1, maxHealth)) * 100))
+
+export const getMonsterHealthAfterAttack = (
+  currentHealth: number,
+  totalDamage: number,
+  monsterInvincible: boolean
+) =>
+  monsterInvincible
+    ? currentHealth
+    : Math.max(0, currentHealth - Math.max(0, totalDamage))
