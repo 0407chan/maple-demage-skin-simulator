@@ -24,7 +24,13 @@ import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { useRecoilValue } from 'recoil'
 import { getDamageAnchorTop, getDamageSpawnBottom } from 'utils/damageSpawn'
+import {
+  cacheImageMetrics,
+  getCachedImageMetrics,
+  preloadImages
+} from 'utils/imagePreloader'
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
+import { getMonsterImageBottomOffset } from 'utils/monsterImageAlignment'
 import { getRandomInt } from 'utils/number'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
@@ -172,6 +178,7 @@ const loadInitialState = (): AppState => {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
+  const [, setMonsterMetricsRevision] = useState(0)
   const monsterButtonRef = useRef<HTMLButtonElement>(null)
   const monsterImageRef = useRef<HTMLImageElement>(null)
   const idleMonsterTopOffsetRef = useRef<{
@@ -194,20 +201,31 @@ const App: React.FC = () => {
     currentMonsterDetail?.framebooks,
     'hit'
   )
-  const activeAnimation = state.isAttacked
-    ? (hitAnimation ?? idleAnimation)
-    : idleAnimation
-  const remoteMonsterImage =
+  const remoteIdleMonsterImage =
     wzVersion.version !== undefined &&
     wzVersion.region !== undefined &&
-    activeAnimation
+    idleAnimation
       ? getMonsterAnimationUrl(
           state.currentMonster.id,
-          activeAnimation,
+          idleAnimation,
           wzVersion.version,
           wzVersion.region
         )
       : undefined
+  const remoteHitMonsterImage =
+    wzVersion.version !== undefined &&
+    wzVersion.region !== undefined &&
+    hitAnimation
+      ? getMonsterAnimationUrl(
+          state.currentMonster.id,
+          hitAnimation,
+          wzVersion.version,
+          wzVersion.region
+        )
+      : undefined
+  const remoteMonsterImage = state.isAttacked
+    ? (remoteHitMonsterImage ?? remoteIdleMonsterImage)
+    : remoteIdleMonsterImage
   const remoteMonsterIcon =
     wzVersion.version !== undefined && wzVersion.region !== undefined
       ? getMonsterIconUrl(
@@ -216,19 +234,51 @@ const App: React.FC = () => {
           wzVersion.region
         )
       : undefined
-  const localMonsterFallback = state.isAttacked ? hitImage : standImage
-  const monsterFallbackImage =
+  const idleMonsterFallback =
     state.currentMonster.id === DEFAULT_MONSTER.id
-      ? localMonsterFallback
-      : (remoteMonsterIcon ?? localMonsterFallback)
+      ? standImage
+      : (remoteMonsterIcon ?? standImage)
+  const hitMonsterFallback =
+    state.currentMonster.id === DEFAULT_MONSTER.id
+      ? hitImage
+      : (remoteMonsterIcon ?? hitImage)
+  const monsterFallbackImage = state.isAttacked
+    ? hitMonsterFallback
+    : idleMonsterFallback
   const [monsterImageFailed, setMonsterImageFailed] = useState(false)
   const monsterImage = monsterImageFailed
     ? monsterFallbackImage
     : (remoteMonsterImage ?? monsterFallbackImage)
+  const idleMonsterImage = remoteIdleMonsterImage ?? idleMonsterFallback
+  const monsterImageBottomOffset = monsterImageFailed
+    ? 0
+    : getMonsterImageBottomOffset({
+        idleMetrics: getCachedImageMetrics(idleMonsterImage),
+        activeMetrics: getCachedImageMetrics(monsterImage),
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight
+      })
 
   useEffect(() => {
     setMonsterImageFailed(false)
   }, [remoteMonsterImage, monsterFallbackImage])
+
+  useEffect(() => {
+    const animationUrls = [
+      remoteIdleMonsterImage,
+      remoteHitMonsterImage
+    ].filter((url): url is string => url !== undefined)
+    if (animationUrls.length === 0) return
+
+    let cancelled = false
+    void preloadImages(animationUrls).then(() => {
+      if (!cancelled) setMonsterMetricsRevision((revision) => revision + 1)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [remoteHitMonsterImage, remoteIdleMonsterImage])
 
   useEffect(() => {
     try {
@@ -265,6 +315,16 @@ const App: React.FC = () => {
       monsterId: state.currentMonster.id,
       topOffset: buttonRect.bottom - imageRect.top
     }
+  }
+
+  const handleMonsterImageLoad = () => {
+    const image = monsterImageRef.current
+    if (image) {
+      cacheImageMetrics(monsterImage, image)
+      setMonsterMetricsRevision((revision) => revision + 1)
+    }
+
+    captureIdleMonsterTopOffset()
   }
 
   const handleAttack = () => {
@@ -420,9 +480,15 @@ const App: React.FC = () => {
           <img
             ref={monsterImageRef}
             className={styles.MonsterImage}
+            crossOrigin={
+              !monsterImageFailed && remoteMonsterImage
+                ? 'anonymous'
+                : undefined
+            }
             draggable="false"
             src={monsterImage}
-            onLoad={captureIdleMonsterTopOffset}
+            style={{ marginBottom: `${-monsterImageBottomOffset}px` }}
+            onLoad={handleMonsterImageLoad}
             onError={() => setMonsterImageFailed(true)}
             alt=""
           />

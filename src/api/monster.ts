@@ -80,4 +80,4 @@ export const getMonsterAnimationUrl = (
   version: number,
   region: RegionType
 ) =>
-  `${API_BASE_URL}/${region}/${version}/mob/${monsterId}/render/${encodeURIComponent(animation)}`
+  `${API_BASE_URL}/${region}/${version}/mob/${monsterId}/render/${encodeURIComponent(animation)}?cors=1`

@@ -1,8 +1,22 @@
+import {
+  ImageOpaqueMetrics,
+  measureImageOpaqueMetrics
+} from './monsterImageAlignment'
+
 const MAX_CACHE_ENTRIES = 80
 const IMAGE_LOAD_TIMEOUT_MS = 10000
 
 const imageCache = new Map<string, HTMLImageElement>()
+const imageMetricsCache = new Map<string, ImageOpaqueMetrics>()
 const pendingRequests = new Map<string, Promise<void>>()
+
+export const getCachedImageMetrics = (url: string) => imageMetricsCache.get(url)
+
+export const cacheImageMetrics = (url: string, image: HTMLImageElement) => {
+  const metrics = measureImageOpaqueMetrics(image)
+  if (metrics) imageMetricsCache.set(url, metrics)
+  return metrics
+}
 
 const readCachedImage = (url: string) => {
   const cachedImage = imageCache.get(url)
@@ -16,16 +30,22 @@ const readCachedImage = (url: string) => {
 const cacheImage = (url: string, image: HTMLImageElement) => {
   imageCache.delete(url)
   imageCache.set(url, image)
+  cacheImageMetrics(url, image)
 
   while (imageCache.size > MAX_CACHE_ENTRIES) {
     const oldestUrl = imageCache.keys().next().value
     if (oldestUrl === undefined) break
     imageCache.delete(oldestUrl)
+    imageMetricsCache.delete(oldestUrl)
   }
 }
 
 export const preloadImage = (url: string): Promise<void> => {
-  if (readCachedImage(url)) return Promise.resolve()
+  const cachedImage = readCachedImage(url)
+  if (cachedImage) {
+    if (!getCachedImageMetrics(url)) cacheImageMetrics(url, cachedImage)
+    return Promise.resolve()
+  }
 
   const pendingRequest = pendingRequests.get(url)
   if (pendingRequest) return pendingRequest
@@ -36,6 +56,7 @@ export const preloadImage = (url: string): Promise<void> => {
       image.src = ''
       reject(new Error(`이미지 요청 시간 초과: ${url}`))
     }, IMAGE_LOAD_TIMEOUT_MS)
+    image.crossOrigin = 'anonymous'
     image.decoding = 'async'
     image.onload = () => {
       window.clearTimeout(timeout)

@@ -11,8 +11,11 @@
 .MonsterButton {
   position: absolute;
   bottom: max(96px, 10vh);
+  display: flex;
   min-width: 44px;
   min-height: 44px;
+  align-items: flex-end;
+  justify-content: center;
   padding: 0;
   cursor: pointer;
   border: 0;
@@ -30,6 +33,12 @@
   max-width: min(360px, 72vw);
   max-height: min(340px, 55vh);
   object-fit: contain;
+}
+
+@media screen and (max-width: 640px) {
+  .MonsterButton {
+    bottom: max(112px, calc(env(safe-area-inset-bottom, 0px) + 80px));
+  }
 }
 
 body {
