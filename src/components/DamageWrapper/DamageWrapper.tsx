@@ -21,14 +21,22 @@ const DamageWrapper: React.FC<Props> = ({
   // 일정 시간 지난후 dom 제거
   useEffect(() => {
     setTimeout(() => {
-      setState((prev) => ({ ...prev, damageWrapperList: prev.damageWrapperList.filter((item) => item.id !== damageWrapper.id) }))
+      setState((prev) => ({
+        ...prev,
+        damageWrapperList: prev.damageWrapperList.filter(
+          (item) => item.id !== damageWrapper.id
+        )
+      }))
       setVisible(false)
     }, timer)
   }, [])
 
   if (!visible) return null
   return (
-    <S.Container>
+    <S.Container
+      $spawnBottom={damageWrapper.spawnBottom}
+      data-damage-wrapper="true"
+    >
       <Horizontal style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
         {damageWrapper.damageList.map((item) => (
           <DamageSkin

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
-export const Container = styled.div`
+export const Container = styled.div<{ $spawnBottom: number }>`
   display: flex;
   position: absolute;
-  bottom: calc(20% + 80px);
+  bottom: ${({ $spawnBottom }) => `${$spawnBottom}px`};
 `

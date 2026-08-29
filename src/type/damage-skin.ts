@@ -24,6 +24,7 @@ export type GetDamageSkinResponse = {
 export type DamageWrapperType = {
   id: string
   damageList: DamageType[]
+  spawnBottom: number
 }
 export type DamageType = {
   id: string

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
@@ -23,6 +23,7 @@ import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { useRecoilValue } from 'recoil'
+import { getDamageAnchorTop, getDamageSpawnBottom } from 'utils/damageSpawn'
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
 import { getRandomInt } from 'utils/number'
 import DamageWrapper from './components/DamageWrapper'
@@ -171,6 +172,12 @@ const loadInitialState = (): AppState => {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
+  const monsterButtonRef = useRef<HTMLButtonElement>(null)
+  const monsterImageRef = useRef<HTMLImageElement>(null)
+  const idleMonsterTopOffsetRef = useRef<{
+    monsterId: number
+    topOffset: number
+  } | null>(null)
   const wzVersion = useRecoilValue(wzVersionState)
   const { data: currentMonsterDetail } = useGetMonsterDetail(
     state.currentMonster.id,
@@ -247,8 +254,48 @@ const App: React.FC = () => {
     }))
   }
 
+  const captureIdleMonsterTopOffset = () => {
+    if (state.isAttacked) return
+
+    const buttonRect = monsterButtonRef.current?.getBoundingClientRect()
+    const imageRect = monsterImageRef.current?.getBoundingClientRect()
+    if (!buttonRect || !imageRect) return
+
+    idleMonsterTopOffsetRef.current = {
+      monsterId: state.currentMonster.id,
+      topOffset: buttonRect.bottom - imageRect.top
+    }
+  }
+
   const handleAttack = () => {
     ReactGA.event(GA_EVENTS.ATTACK_MONSTER)
+
+    const monsterButtonRect = monsterButtonRef.current?.getBoundingClientRect()
+    const monsterImageRect = monsterImageRef.current?.getBoundingClientRect()
+    const idleMonsterTopOffset =
+      idleMonsterTopOffsetRef.current?.monsterId === state.currentMonster.id
+        ? idleMonsterTopOffsetRef.current.topOffset
+        : undefined
+    const monsterTop =
+      monsterButtonRect && monsterImageRect
+        ? getDamageAnchorTop({
+            monsterAnchorBottom: monsterButtonRect.bottom,
+            currentMonsterTop: monsterImageRect.top,
+            idleMonsterTopOffset
+          })
+        : window.innerHeight * 0.6
+
+    if (!state.isAttacked && monsterButtonRect && monsterImageRect) {
+      idleMonsterTopOffsetRef.current = {
+        monsterId: state.currentMonster.id,
+        topOffset: monsterButtonRect.bottom - monsterImageRect.top
+      }
+    }
+
+    const spawnBottom = getDamageSpawnBottom({
+      viewportHeight: window.innerHeight,
+      monsterTop
+    })
 
     // 데미지 목록 생성
     const newDamageList = Array.from(
@@ -283,7 +330,7 @@ const App: React.FC = () => {
       isAttacked: true,
       damageWrapperList: [
         ...prevState.damageWrapperList,
-        { id: uuid(), damageList: damageListWithMargin }
+        { id: uuid(), damageList: damageListWithMargin, spawnBottom }
       ]
     }))
   }
@@ -364,15 +411,18 @@ const App: React.FC = () => {
           />
         ))}
         <button
+          ref={monsterButtonRef}
           type="button"
           className={styles.MonsterButton}
           onClick={handleAttack}
           aria-label={`${state.currentMonster.name} 공격하기`}
         >
           <img
+            ref={monsterImageRef}
             className={styles.MonsterImage}
             draggable="false"
             src={monsterImage}
+            onLoad={captureIdleMonsterTopOffset}
             onError={() => setMonsterImageFailed(true)}
             alt=""
           />

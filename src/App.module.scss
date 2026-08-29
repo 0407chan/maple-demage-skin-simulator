@@ -10,7 +10,7 @@
 
 .MonsterButton {
   position: absolute;
-  bottom: 20%;
+  bottom: max(96px, 10vh);
   min-width: 44px;
   min-height: 44px;
   padding: 0;
