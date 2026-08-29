@@ -8,6 +8,16 @@ export const matchesSkinFilter = (item: ItemDto, filter: SkinFilter) => {
   return true
 }
 
+export const uniqueSkinItemsByName = (items: ItemDto[]) => {
+  const names = new Set<string>()
+
+  return items.filter((item) => {
+    if (names.has(item.name)) return false
+    names.add(item.name)
+    return true
+  })
+}
+
 export const filterSkinItems = (itemList: ItemDto[]): ItemDto[] => {
   let result: ItemDto[] = []
 

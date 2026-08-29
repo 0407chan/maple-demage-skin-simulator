@@ -3,6 +3,7 @@ import { wzVersionState } from 'atoms/wzVersion'
 import { useRecoilState } from 'recoil'
 import { SkinMap } from 'constants/damageSkinMapper'
 import { useMemo } from 'react'
+import { uniqueSkinItemsByName } from './util'
 
 export const useSkinList = () => {
   const [wzVersion] = useRecoilState(wzVersionState)
@@ -23,8 +24,8 @@ export const useSkinList = () => {
     )
 
     // SkinMap에 존재하는 아이템들
-    const currentItemList = allItems.filter(
-      (item) => SkinMap[item.id] !== undefined
+    const currentItemList = uniqueSkinItemsByName(
+      allItems.filter((item) => SkinMap[item.id] !== undefined)
     )
 
     // SkinMap에 존재하지 않는 아이템들 (새 스킨)

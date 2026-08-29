@@ -19,7 +19,7 @@ export const SkinItem: React.FC<SkinItemProps> = ({
   onSelect
 }) => {
   const wzVersion = useRecoilValue(wzVersionState)
-  const isCurrent = currentSkin?.id === skin.id
+  const isCurrent = currentSkin?.name === skin.name
 
   return (
     <button

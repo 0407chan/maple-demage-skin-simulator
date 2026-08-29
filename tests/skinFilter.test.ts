@@ -1,9 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { matchesSkinFilter } from '../src/components/modals/SkinSelectModal/util'
+import {
+  matchesSkinFilter,
+  uniqueSkinItemsByName
+} from '../src/components/modals/SkinSelectModal/util'
 import { ItemDto } from '../src/type/damage-skin'
 
-const createItem = (name: string): ItemDto => ({
-  id: 1,
+const createItem = (name: string, id = 1): ItemDto => ({
+  id,
   name,
   desc: '',
   isCash: false,
@@ -33,5 +36,17 @@ describe('damage skin type filter', () => {
     const item = createItem('삼원색 데미지 스킨 (유닛)')
     expect(matchesSkinFilter(item, 'unit')).toBe(true)
     expect(matchesSkinFilter(item, 'all')).toBe(true)
+  })
+
+  test('같은 이름의 매핑 아이템은 첫 항목 하나만 남긴다', () => {
+    const items = [
+      createItem('네온 액션 데미지 스킨 (유닛)', 2635781),
+      createItem('네온 액션 데미지 스킨 (유닛)', 2635782),
+      createItem('트로피 액션 데미지 스킨', 2635967)
+    ]
+
+    expect(uniqueSkinItemsByName(items).map((item) => item.id)).toEqual([
+      2635781, 2635967
+    ])
   })
 })
