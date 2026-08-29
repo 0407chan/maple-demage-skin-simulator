@@ -10,10 +10,10 @@ import { wzVersionState } from 'atoms/wzVersion'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import ReactGA from 'react-ga4'
 import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
 import { Monster } from 'type/monster'
+import { trackMonsterSelected, trackSelectorOpened } from 'utils/analytics'
 import { preloadImages } from 'utils/imagePreloader'
 import { getMonsterAnimationsToPreload } from 'utils/monsterAnimation'
 import styles from './style.module.scss'
@@ -84,19 +84,23 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
   const handleSelect = async (monster: Monster) => {
     if (preparingRef.current) return
 
-    ReactGA.event({
-      category: 'button_click',
-      action: 'select_monster',
-      label: monster.name,
-      value: monster.id
-    })
-
     const version = wzVersion.version
     const region = wzVersion.region
+    const finishSelection = () => {
+      onSelect(monster)
+      trackMonsterSelected({
+        monster,
+        previousMonster: currentMonster,
+        searchTerm: debouncedSearchKey,
+        searchResultCount: monsters.length,
+        region,
+        version
+      })
+      onClose()
+    }
 
     if (version === undefined || region === undefined) {
-      onSelect(monster)
-      onClose()
+      finishSelection()
       return
     }
 
@@ -120,10 +124,20 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
       console.warn('몬스터 애니메이션을 미리 불러오지 못했습니다.', error)
     }
 
-    onSelect(monster)
     preparingRef.current = false
     setPreparingMonster(undefined)
-    onClose()
+    finishSelection()
+  }
+
+  const handleOpen = () => {
+    trackSelectorOpened({
+      selectorType: '몬스터',
+      currentItemId: currentMonster.id,
+      currentItemName: currentMonster.name,
+      region: wzVersion.region,
+      version: wzVersion.version
+    })
+    onOpen()
   }
 
   const isSearchPending = searchKey.trim() !== debouncedSearchKey || isFetching
@@ -136,7 +150,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
         ref={triggerRef}
         type="button"
         className={styles.triggerButton}
-        onClick={onOpen}
+        onClick={handleOpen}
         aria-label={`몬스터 변경: 현재 ${currentMonster.name}`}
         aria-haspopup="dialog"
         aria-expanded={open}

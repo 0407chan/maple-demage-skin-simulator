@@ -27,3 +27,7 @@ bun i     // to install package
 
 bun dev // to start ploject on local
 ```
+
+## Google Analytics
+
+몬스터·데미지 스킨·설정·공격 행동을 한국어 GA4 이벤트로 수집합니다. 이벤트 및 맞춤 측정기준 구성은 [GA4 이벤트 설계](./docs/analytics.md)를 참고하세요.

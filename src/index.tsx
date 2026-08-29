@@ -10,6 +10,7 @@ import './styles/globals.scss'
 import { useGetWzVersion } from './api/damage-skin'
 import { wzVersionState } from './atoms/wzVersion'
 import { RegionType } from 'type/wz'
+import { initializeAnalytics } from 'utils/analytics'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,8 @@ const Router: React.FC = () => {
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+
+initializeAnalytics()
 
 root.render(
   <React.StrictMode>

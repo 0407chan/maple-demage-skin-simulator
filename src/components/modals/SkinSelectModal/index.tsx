@@ -3,9 +3,13 @@ import { SkinMap } from 'constants/damageSkinMapper'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import ReactGA from 'react-ga4'
 import { useRecoilValue } from 'recoil'
 import { ItemDto } from 'type/damage-skin'
+import {
+  SkinFilterName,
+  trackDamageSkinSelected,
+  trackSelectorOpened
+} from 'utils/analytics'
 import { preloadBase64Images } from 'utils/base64ImageCache'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
@@ -25,6 +29,12 @@ const FILTER_OPTIONS: Array<{ label: string; value: SkinFilter }> = [
   { label: '유닛', value: 'unit' },
   { label: '액션', value: 'action' }
 ]
+
+const FILTER_ANALYTICS_NAMES: Record<SkinFilter, SkinFilterName> = {
+  all: '전체',
+  unit: '유닛',
+  action: '액션'
+}
 
 const getSkinImageUrls = (baseUrl: string) => {
   const urls: string[] = []
@@ -96,16 +106,21 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   }, [currentSkin, preloadSkinImages])
 
   const handleSkinSelect = (skin: ItemDto) => {
-    ReactGA.event({
-      category: 'button_click',
-      action: 'select_skin',
-      label: skin.name,
-      value: 1
-    })
     setCurrentSkin(skin)
     const skinNumbers = SkinMap[skin.id]
     if (skinNumbers && skinNumbers.length > 0) {
       onConfirm(skinNumbers[0])
+      trackDamageSkinSelected({
+        skin,
+        skinEffectId: skinNumbers[0],
+        skinVariantCount: skinNumbers.length,
+        previousSkin: currentSkin,
+        filter: FILTER_ANALYTICS_NAMES[filter],
+        searchTerm: searchKey,
+        searchResultCount: filteredSkins.length,
+        region: wzVersion.region,
+        version: wzVersion.version
+      })
     }
 
     onClose()
@@ -127,6 +142,17 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     })
   }, [currentItemList, filter, searchKey])
 
+  const handleOpen = () => {
+    trackSelectorOpened({
+      selectorType: '데미지_스킨',
+      currentItemId: currentSkin?.id,
+      currentItemName: currentSkin?.name,
+      region: wzVersion.region,
+      version: wzVersion.version
+    })
+    onOpen()
+  }
+
   return (
     <>
       {currentSkin && (
@@ -134,7 +160,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           ref={triggerRef}
           type="button"
           className={styles.skinButton}
-          onClick={onOpen}
+          onClick={handleOpen}
           aria-label={`데미지 스킨 선택: ${currentSkin.name}`}
           aria-haspopup="dialog"
           aria-expanded={open}

@@ -1,8 +1,9 @@
 import { SETTING_LIMITS } from 'constants/app_constants'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
-import React from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Setting } from 'type/setting'
+import { trackDamageSettingChanged } from 'utils/analytics'
 import { numberWithCommas } from 'utils/number'
 import * as S from './style'
 
@@ -15,10 +16,34 @@ const digitsOnly = (value: string) =>
   value.replace(/[^0-9]/g, '').replaceAll(',', '')
 
 const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
-  const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
+  const [open, { setTrue: openDialog, setFalse: closeDialog }] =
+    useBoolean(false)
+  const initialSettingRef = useRef<Setting | undefined>(undefined)
+  const currentSettingRef = useRef(setting)
+
+  useEffect(() => {
+    currentSettingRef.current = setting
+  }, [setting])
+
+  const handleOpen = useCallback(() => {
+    initialSettingRef.current = { ...currentSettingRef.current }
+    openDialog()
+  }, [openDialog])
+
+  const handleClose = useCallback(() => {
+    if (initialSettingRef.current) {
+      trackDamageSettingChanged(
+        initialSettingRef.current,
+        currentSettingRef.current
+      )
+    }
+    initialSettingRef.current = undefined
+    closeDialog()
+  }, [closeDialog])
+
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
-    onClose,
+    handleClose,
     '#max-damage'
   )
 
@@ -138,7 +163,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
       <S.TriggerButton
         ref={triggerRef}
         type="button"
-        onClick={onOpen}
+        onClick={handleOpen}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
@@ -150,7 +175,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
         세팅
       </S.TriggerButton>
 
-      <S.BackBoard $open={open} onClick={onClose} aria-hidden="true" />
+      <S.BackBoard $open={open} onClick={handleClose} aria-hidden="true" />
       <S.Container
         ref={dialogRef}
         $open={open}
@@ -170,7 +195,11 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
               전투 수치를 조정하고 결과를 바로 확인해 보세요.
             </S.Description>
           </S.HeaderCopy>
-          <S.CloseButton type="button" onClick={onClose} aria-label="설정 닫기">
+          <S.CloseButton
+            type="button"
+            onClick={handleClose}
+            aria-label="설정 닫기"
+          >
             <span aria-hidden="true" />
           </S.CloseButton>
         </S.Header>

@@ -29,11 +29,3 @@ export const SETTING_LIMITS = {
 export const API_ENDPOINTS = {
   WZ_VERSION: '/api/wz-version'
 }
-
-export const GA_EVENTS = {
-  ATTACK_MONSTER: {
-    category: 'button_click',
-    action: 'attack_monster',
-    value: 1
-  }
-}

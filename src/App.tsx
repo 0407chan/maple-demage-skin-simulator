@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import ReactGA from 'react-ga4'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
 import {
@@ -16,7 +15,6 @@ import {
   DEFAULT_MONSTER,
   DEFAULT_SETTINGS,
   DEFAULT_SKIN_NUMBER,
-  GA_EVENTS,
   SETTING_LIMITS
 } from 'constants/app_constants'
 import { useImageLoader } from 'hooks/useImageLoader'
@@ -33,6 +31,8 @@ import {
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
 import { getMonsterImageBottomOffset } from 'utils/monsterImageAlignment'
 import { getRandomInt } from 'utils/number'
+import { trackMonsterAttacked } from 'utils/analytics'
+import { SkinMap } from 'constants/damageSkinMapper'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
 import { Monster } from './type/monster'
@@ -347,7 +347,17 @@ const App: React.FC = () => {
   }
 
   const handleAttack = () => {
-    ReactGA.event(GA_EVENTS.ATTACK_MONSTER)
+    trackMonsterAttacked({
+      monster: state.currentMonster,
+      skin: state.currentSkin,
+      skinEffectId: state.skinNumber,
+      skinVariantCount: state.currentSkin
+        ? (SkinMap[state.currentSkin.id]?.length ?? 0)
+        : 0,
+      setting: state.setting,
+      region: wzVersion.region,
+      version: wzVersion.version
+    })
 
     const monsterButtonRect = monsterButtonRef.current?.getBoundingClientRect()
     const monsterImageRect = monsterImageRef.current?.getBoundingClientRect()
@@ -426,14 +436,6 @@ const App: React.FC = () => {
       }
     }
   }, [state.isAttacked])
-
-  const initReactGA = () => {
-    ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID || '')
-  }
-
-  useEffect(() => {
-    initReactGA()
-  }, [])
 
   return (
     <>
