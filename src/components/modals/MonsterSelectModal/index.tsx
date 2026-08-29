@@ -1,25 +1,13 @@
-import { useQueryClient } from '@tanstack/react-query'
-import {
-  getMonsterAnimationUrl,
-  getMonsterDetail,
-  getMonsterDetailQueryKey,
-  getMonsterIconUrl,
-  useGetMonsterList
-} from 'api/monster'
+import { getMonsterIconUrl, useGetMonsterList } from 'api/monster'
 import { wzVersionState } from 'atoms/wzVersion'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
 import { Monster } from 'type/monster'
 import { trackMonsterSelected, trackSelectorOpened } from 'utils/analytics'
-import { getGifAnimationDurationFromUrl } from 'utils/gifAnimation'
-import { preloadImages } from 'utils/imagePreloader'
-import {
-  getMonsterAnimationsToPreload,
-  getPrimaryMonsterAnimation
-} from 'utils/monsterAnimation'
+import { getUniqueByName } from 'utils/uniqueByName'
 import styles from './style.module.scss'
 
 type MonsterSelectModalProps = {
@@ -27,25 +15,19 @@ type MonsterSelectModalProps = {
   onSelect: (monster: Monster) => void
 }
 
-const SEARCH_DEBOUNCE_MS = 300
-const RESULT_COUNT = 60
+const SEARCH_DEBOUNCE_MS = 150
+const RESULT_COUNT = 200
 
 export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
   currentMonster,
   onSelect
 }) => {
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
-  const preparingRef = useRef(false)
-  const [preparingMonster, setPreparingMonster] = useState<Monster>()
-  const handleClose = useCallback(() => {
-    if (!preparingRef.current) onClose()
-  }, [onClose])
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
-    handleClose,
+    onClose,
     '#monster-search'
   )
-  const queryClient = useQueryClient()
   const wzVersion = useRecoilValue(wzVersionState)
   const [searchKey, setSearchKey] = useState('')
   const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
@@ -70,12 +52,16 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
     [debouncedSearchKey, wzVersion.region, wzVersion.version]
   )
   const {
-    data: monsters = [],
+    data: monsterResults = [],
     isError,
     isFetching,
     isLoading,
     refetch
-  } = useGetMonsterList(query, open)
+  } = useGetMonsterList(query, open || debouncedSearchKey.length === 0)
+  const monsters = useMemo(
+    () => getUniqueByName(monsterResults),
+    [monsterResults]
+  )
 
   const getIconUrl = (monster: Monster) => {
     if (wzVersion.version === undefined || wzVersion.region === undefined) {
@@ -85,64 +71,19 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
     return getMonsterIconUrl(monster.id, wzVersion.version, wzVersion.region)
   }
 
-  const handleSelect = async (monster: Monster) => {
-    if (preparingRef.current) return
-
+  const handleSelect = (monster: Monster) => {
     const version = wzVersion.version
     const region = wzVersion.region
-    const finishSelection = () => {
-      onSelect(monster)
-      trackMonsterSelected({
-        monster,
-        previousMonster: currentMonster,
-        searchTerm: debouncedSearchKey,
-        searchResultCount: monsters.length,
-        region,
-        version
-      })
-      onClose()
-    }
-
-    if (version === undefined || region === undefined) {
-      finishSelection()
-      return
-    }
-
-    preparingRef.current = true
-    setPreparingMonster(monster)
-
-    try {
-      const detail = await queryClient.fetchQuery({
-        queryKey: getMonsterDetailQueryKey(monster.id, version, region),
-        queryFn: () => getMonsterDetail(monster.id, version, region),
-        staleTime: 1000 * 60 * 60
-      })
-      const animationUrls = getMonsterAnimationsToPreload(
-        detail.framebooks
-      ).map((animation) =>
-        getMonsterAnimationUrl(monster.id, animation, version, region)
-      )
-      const deathAnimation = getPrimaryMonsterAnimation(
-        detail.framebooks,
-        'death'
-      )
-      const deathAnimationUrl = deathAnimation
-        ? getMonsterAnimationUrl(monster.id, deathAnimation, version, region)
-        : undefined
-
-      await Promise.all([
-        preloadImages(animationUrls),
-        deathAnimationUrl
-          ? getGifAnimationDurationFromUrl(deathAnimationUrl)
-          : Promise.resolve(undefined)
-      ])
-    } catch (error) {
-      console.warn('몬스터 애니메이션을 미리 불러오지 못했습니다.', error)
-    }
-
-    preparingRef.current = false
-    setPreparingMonster(undefined)
-    finishSelection()
+    onSelect(monster)
+    trackMonsterSelected({
+      monster,
+      previousMonster: currentMonster,
+      searchTerm: debouncedSearchKey,
+      searchResultCount: monsters.length,
+      region,
+      version
+    })
+    onClose()
   }
 
   const handleOpen = () => {
@@ -156,7 +97,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
     onOpen()
   }
 
-  const isSearchPending = searchKey.trim() !== debouncedSearchKey || isFetching
+  const isSearchPending = searchKey.trim() !== debouncedSearchKey
   const isVersionReady =
     wzVersion.version !== undefined && wzVersion.region !== undefined
 
@@ -191,7 +132,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
 
       <div
         className={`${styles.backdrop} ${open ? styles.open : ''}`}
-        onClick={handleClose}
+        onClick={onClose}
         aria-hidden="true"
       />
       <div
@@ -219,8 +160,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           <button
             type="button"
             className={styles.closeButton}
-            onClick={handleClose}
-            disabled={preparingMonster !== undefined}
+            onClick={onClose}
             aria-label="몬스터 변경 닫기"
           >
             <span aria-hidden="true" />
@@ -254,11 +194,9 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
             )}
           </div>
           <p className={styles.searchHint} aria-live="polite">
-            {preparingMonster
-              ? `${preparingMonster.name} 애니메이션을 준비하는 중이에요.`
-              : isSearchPending
-                ? '몬스터를 찾는 중이에요.'
-                : `검색 결과 ${monsters.length}개`}
+            {isSearchPending || isFetching
+              ? '몬스터를 찾는 중이에요.'
+              : `검색 결과 ${monsters.length}개`}
           </p>
         </div>
 
@@ -299,17 +237,14 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           ) : (
             monsters.map((monster) => {
               const isCurrent = monster.id === currentMonster.id
-              const isPreparing = monster.id === preparingMonster?.id
 
               return (
                 <button
                   key={monster.id}
                   type="button"
                   className={`${styles.monsterItem} ${isCurrent ? styles.currentMonster : ''}`}
-                  onClick={() => void handleSelect(monster)}
+                  onClick={() => handleSelect(monster)}
                   aria-pressed={isCurrent}
-                  aria-busy={isPreparing}
-                  disabled={preparingMonster !== undefined}
                 >
                   <span className={styles.itemIconFrame} aria-hidden="true">
                     {getIconUrl(monster) && (
@@ -333,9 +268,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
                   {monster.isBoss && (
                     <span className={styles.bossBadge}>BOSS</span>
                   )}
-                  {isPreparing ? (
-                    <span className={styles.itemSpinner} aria-hidden="true" />
-                  ) : isCurrent ? (
+                  {isCurrent ? (
                     <svg
                       className={styles.selectedIcon}
                       viewBox="0 0 20 20"

@@ -88,7 +88,10 @@ const loadBackgroundEntry = async (
   version: number,
   region: RegionType
 ): Promise<MapBaseBackground | undefined> => {
-  const [backgroundSet, imageNumber, type, x, y, alpha, flip, front, animated] =
+  const front = await readValue(`${entryUrl}/front`)
+  if (readBoolean(front)) return undefined
+
+  const [backgroundSet, imageNumber, type, x, y, alpha, flip, animated] =
     await Promise.all([
       readValue(`${entryUrl}/bS`),
       readValue(`${entryUrl}/no`),
@@ -97,14 +100,12 @@ const loadBackgroundEntry = async (
       readValue(`${entryUrl}/y`),
       readValue(`${entryUrl}/a`),
       readValue(`${entryUrl}/f`),
-      readValue(`${entryUrl}/front`),
       readValue(`${entryUrl}/ani`)
     ])
 
   if (
     typeof backgroundSet !== 'string' ||
-    (typeof imageNumber !== 'number' && typeof imageNumber !== 'string') ||
-    readBoolean(front)
+    (typeof imageNumber !== 'number' && typeof imageNumber !== 'string')
   ) {
     return undefined
   }

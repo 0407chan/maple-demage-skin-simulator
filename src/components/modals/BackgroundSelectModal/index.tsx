@@ -1,12 +1,12 @@
-import { getMapIconUrl, getMapRenderUrl, useGetMapList } from 'api/map'
+import { getMapIconUrl, useGetMapList } from 'api/map'
 import { wzVersionState } from 'atoms/wzVersion'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import useBoolean from 'hooks/useBoolean'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
 import { MapleMap } from 'type/map'
-import { loadMapBaseBackground, measureMapGround } from 'utils/mapScene'
+import { getUniqueByName } from 'utils/uniqueByName'
 import styles from './style.module.scss'
 
 type BackgroundSelectModalProps = {
@@ -14,8 +14,8 @@ type BackgroundSelectModalProps = {
   onSelect: (background?: MapleMap) => void
 }
 
-const SEARCH_DEBOUNCE_MS = 300
-const RESULT_COUNT = 60
+const SEARCH_DEBOUNCE_MS = 150
+const RESULT_COUNT = 200
 
 const LandscapeIcon: React.FC = () => (
   <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -30,18 +30,13 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
   onSelect
 }) => {
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
-  const preparingRef = useRef(false)
-  const [preparingBackground, setPreparingBackground] = useState<MapleMap>()
   const [searchKey, setSearchKey] = useState('')
   const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
   const wzVersion = useRecoilValue(wzVersionState)
 
-  const handleClose = useCallback(() => {
-    if (!preparingRef.current) onClose()
-  }, [onClose])
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
-    handleClose,
+    onClose,
     '#background-search'
   )
 
@@ -65,12 +60,13 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
     [debouncedSearchKey, wzVersion.region, wzVersion.version]
   )
   const {
-    data: maps = [],
+    data: mapResults = [],
     isError,
     isFetching,
     isLoading,
     refetch
-  } = useGetMapList(query, open)
+  } = useGetMapList(query, open || debouncedSearchKey.length === 0)
+  const maps = useMemo(() => getUniqueByName(mapResults), [mapResults])
 
   const getIconUrl = (map: MapleMap) => {
     if (wzVersion.version === undefined || wzVersion.region === undefined) {
@@ -80,44 +76,17 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
     return getMapIconUrl(map.id, wzVersion.version, wzVersion.region)
   }
 
-  const handleSelect = async (map: MapleMap) => {
-    if (preparingRef.current) return
-
-    const version = wzVersion.version
-    const region = wzVersion.region
-    if (version === undefined || region === undefined) {
-      onSelect(map)
-      onClose()
-      return
-    }
-
-    preparingRef.current = true
-    setPreparingBackground(map)
-
-    const preloadResults = await Promise.allSettled([
-      loadMapBaseBackground(map.id, version, region),
-      measureMapGround(getMapRenderUrl(map.id, version, region))
-    ])
-    const failedPreloads = preloadResults.filter(
-      (result) => result.status === 'rejected'
-    )
-    if (failedPreloads.length > 0) {
-      console.warn('맵 배경 일부를 미리 불러오지 못했습니다.', failedPreloads)
-    }
-
-    preparingRef.current = false
-    setPreparingBackground(undefined)
+  const handleSelect = (map: MapleMap) => {
     onSelect(map)
     onClose()
   }
 
   const handleReset = () => {
-    if (preparingRef.current) return
     onSelect(undefined)
     onClose()
   }
 
-  const isSearchPending = searchKey.trim() !== debouncedSearchKey || isFetching
+  const isSearchPending = searchKey.trim() !== debouncedSearchKey
   const isVersionReady =
     wzVersion.version !== undefined && wzVersion.region !== undefined
   const currentName = currentBackground?.name ?? '기본 배경'
@@ -158,7 +127,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
 
       <div
         className={`${styles.backdrop} ${open ? styles.open : ''}`}
-        onClick={handleClose}
+        onClick={onClose}
         aria-hidden="true"
       />
       <div
@@ -189,8 +158,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           <button
             type="button"
             className={styles.closeButton}
-            onClick={handleClose}
-            disabled={preparingBackground !== undefined}
+            onClick={onClose}
             aria-label="배경 변경 닫기"
           >
             <span aria-hidden="true" />
@@ -224,11 +192,9 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
             )}
           </div>
           <p className={styles.searchHint} aria-live="polite">
-            {preparingBackground
-              ? `${preparingBackground.name} 배경을 준비하는 중이에요.`
-              : isSearchPending
-                ? '맵을 찾는 중이에요.'
-                : `검색 결과 ${maps.length}개`}
+            {isSearchPending || isFetching
+              ? '맵을 찾는 중이에요.'
+              : `검색 결과 ${maps.length}개`}
           </p>
         </div>
 
@@ -253,7 +219,6 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
             type="button"
             className={`${styles.resetButton} ${!currentBackground ? styles.selectedReset : ''}`}
             onClick={handleReset}
-            disabled={preparingBackground !== undefined}
             aria-pressed={!currentBackground}
           >
             <LandscapeIcon />
@@ -293,7 +258,6 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           ) : (
             maps.map((map) => {
               const isCurrent = map.id === currentBackground?.id
-              const isPreparing = map.id === preparingBackground?.id
               const iconUrl = getIconUrl(map)
 
               return (
@@ -301,10 +265,8 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                   key={map.id}
                   type="button"
                   className={`${styles.mapItem} ${isCurrent ? styles.currentMap : ''}`}
-                  onClick={() => void handleSelect(map)}
+                  onClick={() => handleSelect(map)}
                   aria-pressed={isCurrent}
-                  aria-busy={isPreparing}
-                  disabled={preparingBackground !== undefined}
                 >
                   <span className={styles.itemIconFrame} aria-hidden="true">
                     {iconUrl ? (
@@ -325,9 +287,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                     </strong>
                     <span>{map.streetName || `맵 #${map.id}`}</span>
                   </span>
-                  {isPreparing ? (
-                    <span className={styles.itemSpinner} aria-hidden="true" />
-                  ) : isCurrent ? (
+                  {isCurrent ? (
                     <svg
                       className={styles.selectedIcon}
                       viewBox="0 0 20 20"
