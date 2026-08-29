@@ -1,0 +1,29 @@
+.scene,
+.baseBackground,
+.baseTopFill,
+.foreground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.baseTopFill {
+  right: 0;
+  bottom: auto;
+  left: 0;
+}
+
+.scene {
+  z-index: 0;
+  overflow: hidden;
+}
+
+.foreground {
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: auto;
+  max-width: none;
+  height: auto;
+  max-height: none;
+}

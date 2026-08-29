@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
 import {
@@ -7,6 +7,8 @@ import {
   useGetMonsterDetail
 } from 'api/monster'
 import { wzVersionState } from 'atoms/wzVersion'
+import { BackgroundSelectModal } from 'components/modals/BackgroundSelectModal'
+import MapScene from 'components/MapScene'
 import { MonsterSelectModal } from 'components/modals/MonsterSelectModal'
 import SettingModal from 'components/modals/SettingModal'
 import { SkinSelectModal } from 'components/modals/SkinSelectModal'
@@ -35,6 +37,7 @@ import { trackMonsterAttacked } from 'utils/analytics'
 import { SkinMap } from 'constants/damageSkinMapper'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
+import { MapleMap } from './type/map'
 import { Monster } from './type/monster'
 import { Setting } from './type/setting'
 import styles from './App.module.scss'
@@ -48,6 +51,7 @@ export interface AppState {
   isAttacked: boolean
   currentSkin?: ItemDto
   currentMonster: Monster
+  currentBackground?: MapleMap
   setting: Setting
 }
 
@@ -57,6 +61,7 @@ const createDefaultState = (): AppState => ({
   isAttacked: false,
   currentSkin: undefined,
   currentMonster: DEFAULT_MONSTER,
+  currentBackground: undefined,
   setting: {
     numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
     maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
@@ -115,6 +120,24 @@ const getStoredMonster = (value: unknown): Monster => {
   }
 }
 
+const getStoredBackground = (value: unknown): MapleMap | undefined => {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'number' ||
+    !Number.isSafeInteger(value.id) ||
+    typeof value.name !== 'string' ||
+    typeof value.streetName !== 'string'
+  ) {
+    return undefined
+  }
+
+  return {
+    id: value.id,
+    name: value.name,
+    streetName: value.streetName
+  }
+}
+
 const loadInitialState = (): AppState => {
   const defaultState = createDefaultState()
 
@@ -155,6 +178,7 @@ const loadInitialState = (): AppState => {
       isAttacked: false,
       currentSkin: getStoredSkin(parsedState.currentSkin),
       currentMonster: getStoredMonster(parsedState.currentMonster),
+      currentBackground: getStoredBackground(parsedState.currentBackground),
       setting: {
         numberAttack: getBoundedNumber(
           parsedSetting.numberAttack,
@@ -180,6 +204,8 @@ const loadInitialState = (): AppState => {
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
   const [, setMonsterMetricsRevision] = useState(0)
+  const [monsterFootY, setMonsterFootY] = useState<number>()
+  const bodyRef = useRef<HTMLDivElement>(null)
   const monsterButtonRef = useRef<HTMLButtonElement>(null)
   const monsterImageRef = useRef<HTMLImageElement>(null)
   const idleMonsterTopOffsetRef = useRef<{
@@ -192,7 +218,6 @@ const App: React.FC = () => {
     wzVersion.version,
     wzVersion.region
   )
-
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber)
   const idleAnimation = getPrimaryMonsterAnimation(
     currentMonsterDetail?.framebooks,
@@ -260,6 +285,28 @@ const App: React.FC = () => {
         viewportHeight: window.innerHeight
       })
 
+  const updateMonsterFootY = useCallback(() => {
+    if (state.isAttacked) return
+
+    const bodyRect = bodyRef.current?.getBoundingClientRect()
+    const image = monsterImageRef.current
+    const imageRect = image?.getBoundingClientRect()
+    if (!bodyRect || !image || !imageRect) return
+
+    const metrics = getCachedImageMetrics(idleMonsterImage)
+    const renderedTransparentBottom = metrics
+      ? metrics.transparentBottom * (imageRect.height / metrics.naturalHeight)
+      : 0
+    const nextFootY =
+      imageRect.bottom - bodyRect.top - renderedTransparentBottom
+
+    setMonsterFootY((current) =>
+      current === undefined || Math.abs(current - nextFootY) >= 0.5
+        ? nextFootY
+        : current
+    )
+  }, [idleMonsterImage, state.isAttacked])
+
   useEffect(() => {
     setMonsterImageFailed(false)
   }, [remoteMonsterImage, monsterFallbackImage])
@@ -282,6 +329,12 @@ const App: React.FC = () => {
   }, [remoteHitMonsterImage, remoteIdleMonsterImage])
 
   useEffect(() => {
+    updateMonsterFootY()
+    window.addEventListener('resize', updateMonsterFootY)
+    return () => window.removeEventListener('resize', updateMonsterFootY)
+  }, [updateMonsterFootY])
+
+  useEffect(() => {
     try {
       localStorage.setItem(
         LOCAL_STORAGE_KEY,
@@ -289,13 +342,20 @@ const App: React.FC = () => {
           skinNumber: state.skinNumber,
           currentSkin: state.currentSkin,
           currentMonster: state.currentMonster,
+          currentBackground: state.currentBackground,
           setting: state.setting
         })
       )
     } catch (error) {
       console.warn('설정을 저장하지 못했습니다.', error)
     }
-  }, [state.skinNumber, state.currentSkin, state.currentMonster, state.setting])
+  }, [
+    state.skinNumber,
+    state.currentSkin,
+    state.currentMonster,
+    state.currentBackground,
+    state.setting
+  ])
 
   useEffect(() => {
     if (
@@ -344,6 +404,7 @@ const App: React.FC = () => {
     }
 
     captureIdleMonsterTopOffset()
+    updateMonsterFootY()
   }
 
   const handleAttack = () => {
@@ -463,6 +524,15 @@ const App: React.FC = () => {
           }))
         }
       />
+      <BackgroundSelectModal
+        currentBackground={state.currentBackground}
+        onSelect={(background) =>
+          setState((prevState) => ({
+            ...prevState,
+            currentBackground: background
+          }))
+        }
+      />
       {import.meta.env.DEV && (
         <a
           href="#mapping"
@@ -482,7 +552,17 @@ const App: React.FC = () => {
           매핑 도구
         </a>
       )}
-      <div className={clsx(styles.Body, 'no-drag')}>
+      <div ref={bodyRef} className={clsx(styles.Body, 'no-drag')}>
+        {state.currentBackground &&
+          wzVersion.version !== undefined &&
+          wzVersion.region !== undefined && (
+            <MapScene
+              mapId={state.currentBackground.id}
+              monsterFootY={monsterFootY}
+              version={wzVersion.version}
+              region={wzVersion.region}
+            />
+          )}
         {state.damageWrapperList.map((item) => (
           <DamageWrapper
             key={item.id}
