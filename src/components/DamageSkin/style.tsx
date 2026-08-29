@@ -36,5 +36,18 @@ export const Container = styled.div<{ $stop?: boolean; $delay?: number }>`
 `
 
 export const CriEffect = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  z-index: -1;
+  pointer-events: none;
+`
+
+export const Digit = styled.span`
   display: flex;
+  position: relative;
+  flex: 0 0 auto;
+  align-items: center;
 `

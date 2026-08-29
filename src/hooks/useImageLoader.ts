@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
-import { loadBase64Image } from 'utils/base64ImageCache'
+import {
+  getWzSequenceBounds,
+  loadWzImageSequence
+} from 'utils/wzImageAnimation'
 
 interface ImageDimensions {
   criticalHeight: number
@@ -12,14 +15,6 @@ const DEFAULT_DIMENSIONS: ImageDimensions = {
   criticalHeight: 60,
   normalHeight: 50
 }
-
-const getImageHeight = (src: string) =>
-  new Promise<number>((resolve, reject) => {
-    const image = new Image()
-    image.onload = () => resolve(image.height)
-    image.onerror = () => reject(new Error('이미지 크기를 읽지 못했습니다.'))
-    image.src = src
-  })
 
 export const useImageLoader = (skinNumber: number): ImageDimensions => {
   const wzVersion = useRecoilValue(wzVersionState)
@@ -38,18 +33,14 @@ export const useImageLoader = (skinNumber: number): ImageDimensions => {
     let cancelled = false
     setDimensions(DEFAULT_DIMENSIONS)
 
-    Promise.all([loadBase64Image(criUrl), loadBase64Image(normalUrl)])
-      .then(([criticalImage, normalImage]) =>
-        Promise.all([
-          getImageHeight(criticalImage),
-          getImageHeight(normalImage)
-        ])
-      )
-      .then(([criticalHeight, normalHeight]) => {
+    Promise.all([loadWzImageSequence(criUrl), loadWzImageSequence(normalUrl)])
+      .then(([criticalSequence, normalSequence]) => {
         if (cancelled) return
+        const criticalHeight = getWzSequenceBounds(criticalSequence).height
+        const normalHeight = getWzSequenceBounds(normalSequence).height
         setDimensions({
-          criticalHeight: criticalHeight - 10,
-          normalHeight: normalHeight - 5
+          criticalHeight: Math.max(1, criticalHeight - 10),
+          normalHeight: Math.max(1, normalHeight - 5)
         })
       })
       .catch(() => {

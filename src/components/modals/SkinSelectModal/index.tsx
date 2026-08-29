@@ -10,10 +10,11 @@ import {
   trackDamageSkinSelected,
   trackSelectorOpened
 } from 'utils/analytics'
-import { preloadBase64Images } from 'utils/base64ImageCache'
+import { preloadWzImageSequences } from 'utils/wzImageAnimation'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
+import { matchesSkinFilter, SkinFilter } from './util'
 
 type SkinSelectModalProps = {
   currentSkin?: ItemDto
@@ -21,8 +22,6 @@ type SkinSelectModalProps = {
   setCurrentSkin: (skin?: ItemDto) => void
   hideCloseButton?: boolean
 }
-
-type SkinFilter = 'all' | 'unit' | 'action'
 
 const FILTER_OPTIONS: Array<{ label: string; value: SkinFilter }> = [
   { label: '전체', value: 'all' },
@@ -80,7 +79,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       if (!wzVersion.version || !wzVersion.region) return Promise.resolve()
 
       const baseUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}`
-      return preloadBase64Images(getSkinImageUrls(baseUrl))
+      return preloadWzImageSequences(getSkinImageUrls(baseUrl))
     },
     [wzVersion.region, wzVersion.version]
   )
@@ -133,10 +132,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       const matchesSearch =
         normalizedSearchKey.length === 0 ||
         item.name.toLocaleLowerCase('ko-KR').includes(normalizedSearchKey)
-      const matchesFilter =
-        filter === 'all' ||
-        (filter === 'unit' && item.name.includes('유닛')) ||
-        (filter === 'action' && (SkinMap[item.id]?.length ?? 0) > 1)
+      const matchesFilter = matchesSkinFilter(item, filter)
 
       return matchesSearch && matchesFilter
     })

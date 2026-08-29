@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "bun vite",
     "build": "tsc && vite build",
+    "generate:action-skins": "python3 scripts/generate_action_skins.py --region KMS --version 389",
     "preview": "vite preview",
     "predeploy": "bun run build",
     "deploy": "gh-pages -d dist"

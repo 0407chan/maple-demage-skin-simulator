@@ -6,6 +6,7 @@
 .pnp.js
 /build
 /dist
+/.cache/action-skins
 
 # testing
 /coverage

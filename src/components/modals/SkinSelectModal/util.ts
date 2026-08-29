@@ -1,5 +1,13 @@
 import { ItemDto } from 'type/damage-skin'
 
+export type SkinFilter = 'all' | 'unit' | 'action'
+
+export const matchesSkinFilter = (item: ItemDto, filter: SkinFilter) => {
+  if (filter === 'unit') return item.name.includes('유닛')
+  if (filter === 'action') return item.name.includes('액션 데미지 스킨')
+  return true
+}
+
 export const filterSkinItems = (itemList: ItemDto[]): ItemDto[] => {
   let result: ItemDto[] = []
 
