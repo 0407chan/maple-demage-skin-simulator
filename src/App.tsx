@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
+import {
+  getMonsterAnimationUrl,
+  getMonsterIconUrl,
+  useGetMonsterDetail
+} from 'api/monster'
+import { wzVersionState } from 'atoms/wzVersion'
+import { MonsterSelectModal } from 'components/modals/MonsterSelectModal'
 import SettingModal from 'components/modals/SettingModal'
 import { SkinSelectModal } from 'components/modals/SkinSelectModal'
 import {
   ATTACK_ANIMATION_DURATION,
+  DEFAULT_MONSTER,
   DEFAULT_SETTINGS,
   DEFAULT_SKIN_NUMBER,
   GA_EVENTS,
@@ -14,9 +22,12 @@ import {
 import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
+import { useRecoilValue } from 'recoil'
+import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
 import { getRandomInt } from 'utils/number'
 import DamageWrapper from './components/DamageWrapper'
 import { DamageWrapperType, ItemDto } from './type/damage-skin'
+import { Monster } from './type/monster'
 import { Setting } from './type/setting'
 import styles from './App.module.scss'
 import clsx from 'clsx'
@@ -28,6 +39,7 @@ export interface AppState {
   damageWrapperList: DamageWrapperType[]
   isAttacked: boolean
   currentSkin?: ItemDto
+  currentMonster: Monster
   setting: Setting
 }
 
@@ -36,6 +48,7 @@ const createDefaultState = (): AppState => ({
   damageWrapperList: [],
   isAttacked: false,
   currentSkin: undefined,
+  currentMonster: DEFAULT_MONSTER,
   setting: {
     numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
     maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
@@ -70,6 +83,28 @@ const getStoredSkin = (value: unknown): ItemDto | undefined => {
   }
 
   return value as ItemDto
+}
+
+const getStoredMonster = (value: unknown): Monster => {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'number' ||
+    !Number.isSafeInteger(value.id) ||
+    typeof value.name !== 'string'
+  ) {
+    return DEFAULT_MONSTER
+  }
+
+  return {
+    id: value.id,
+    name: value.name,
+    mobType: typeof value.mobType === 'string' ? value.mobType : '',
+    level:
+      typeof value.level === 'number' && Number.isFinite(value.level)
+        ? Math.max(0, Math.trunc(value.level))
+        : 0,
+    isBoss: value.isBoss === true
+  }
 }
 
 const loadInitialState = (): AppState => {
@@ -111,6 +146,7 @@ const loadInitialState = (): AppState => {
       damageWrapperList: [],
       isAttacked: false,
       currentSkin: getStoredSkin(parsedState.currentSkin),
+      currentMonster: getStoredMonster(parsedState.currentMonster),
       setting: {
         numberAttack: getBoundedNumber(
           parsedSetting.numberAttack,
@@ -135,8 +171,57 @@ const loadInitialState = (): AppState => {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
+  const wzVersion = useRecoilValue(wzVersionState)
+  const { data: currentMonsterDetail } = useGetMonsterDetail(
+    state.currentMonster.id,
+    wzVersion.version,
+    wzVersion.region
+  )
 
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber)
+  const idleAnimation = getPrimaryMonsterAnimation(
+    currentMonsterDetail?.framebooks,
+    'idle'
+  )
+  const hitAnimation = getPrimaryMonsterAnimation(
+    currentMonsterDetail?.framebooks,
+    'hit'
+  )
+  const activeAnimation = state.isAttacked
+    ? (hitAnimation ?? idleAnimation)
+    : idleAnimation
+  const remoteMonsterImage =
+    wzVersion.version !== undefined &&
+    wzVersion.region !== undefined &&
+    activeAnimation
+      ? getMonsterAnimationUrl(
+          state.currentMonster.id,
+          activeAnimation,
+          wzVersion.version,
+          wzVersion.region
+        )
+      : undefined
+  const remoteMonsterIcon =
+    wzVersion.version !== undefined && wzVersion.region !== undefined
+      ? getMonsterIconUrl(
+          state.currentMonster.id,
+          wzVersion.version,
+          wzVersion.region
+        )
+      : undefined
+  const localMonsterFallback = state.isAttacked ? hitImage : standImage
+  const monsterFallbackImage =
+    state.currentMonster.id === DEFAULT_MONSTER.id
+      ? localMonsterFallback
+      : (remoteMonsterIcon ?? localMonsterFallback)
+  const [monsterImageFailed, setMonsterImageFailed] = useState(false)
+  const monsterImage = monsterImageFailed
+    ? monsterFallbackImage
+    : (remoteMonsterImage ?? monsterFallbackImage)
+
+  useEffect(() => {
+    setMonsterImageFailed(false)
+  }, [remoteMonsterImage, monsterFallbackImage])
 
   useEffect(() => {
     try {
@@ -145,13 +230,14 @@ const App: React.FC = () => {
         JSON.stringify({
           skinNumber: state.skinNumber,
           currentSkin: state.currentSkin,
+          currentMonster: state.currentMonster,
           setting: state.setting
         })
       )
     } catch (error) {
       console.warn('설정을 저장하지 못했습니다.', error)
     }
-  }, [state.skinNumber, state.currentSkin, state.setting])
+  }, [state.skinNumber, state.currentSkin, state.currentMonster, state.setting])
 
   const onSetSkinNumber = (newId: number) => {
     setState((prevState) => ({
@@ -162,7 +248,7 @@ const App: React.FC = () => {
   }
 
   const handleAttack = () => {
-    ReactGA.event(GA_EVENTS.ATTACK_MUSHROOM)
+    ReactGA.event(GA_EVENTS.ATTACK_MONSTER)
 
     // 데미지 목록 생성
     const newDamageList = Array.from(
@@ -238,6 +324,17 @@ const App: React.FC = () => {
         }
         onConfirm={(newId: number) => onSetSkinNumber(newId)}
       />
+      <MonsterSelectModal
+        currentMonster={state.currentMonster}
+        onSelect={(monster) =>
+          setState((prevState) => ({
+            ...prevState,
+            currentMonster: monster,
+            isAttacked: false,
+            damageWrapperList: []
+          }))
+        }
+      />
       {import.meta.env.DEV && (
         <a
           href="#mapping"
@@ -268,14 +365,15 @@ const App: React.FC = () => {
         ))}
         <button
           type="button"
-          className={styles.MushroomButton}
+          className={styles.MonsterButton}
           onClick={handleAttack}
-          aria-label="주황 버섯 공격하기"
+          aria-label={`${state.currentMonster.name} 공격하기`}
         >
           <img
-            className={styles.OrangeMushroom}
+            className={styles.MonsterImage}
             draggable="false"
-            src={state.isAttacked ? hitImage : standImage}
+            src={monsterImage}
+            onError={() => setMonsterImageFailed(true)}
             alt=""
           />
         </button>

@@ -8,7 +8,7 @@
   height: 100%;
 }
 
-.MushroomButton {
+.MonsterButton {
   position: absolute;
   bottom: 20%;
   min-width: 44px;
@@ -25,8 +25,11 @@
   }
 }
 
-.OrangeMushroom {
+.MonsterImage {
   display: block;
+  max-width: min(360px, 72vw);
+  max-height: min(340px, 55vh);
+  object-fit: contain;
 }
 
 body {
