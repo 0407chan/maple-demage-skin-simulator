@@ -759,20 +759,13 @@ const App: React.FC = () => {
       {import.meta.env.DEV && (
         <a
           href="#mapping"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '80px',
-            padding: '4px 8px',
-            background: '#1890ff',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontSize: '14px',
-            zIndex: 1000
-          }}
+          className={styles.MappingToolButton}
+          aria-label="로컬 매핑 도구 열기"
         >
-          매핑 도구
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M4.5 5.5h4v4h-4zM11.5 5.5h4v4h-4zM4.5 12.5h4v3h-4zM11.5 12.5h4v3h-4z" />
+          </svg>
+          <span>매핑 도구</span>
         </a>
       )}
       <div ref={bodyRef} className={clsx(styles.Body, 'no-drag')}>

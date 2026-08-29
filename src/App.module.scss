@@ -149,9 +149,66 @@
   object-fit: contain;
 }
 
+.MappingToolButton {
+  position: absolute;
+  top: 20px;
+  right: 112px;
+  z-index: 2;
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(33, 39, 51, 0.86);
+  box-shadow: 0 8px 24px rgba(8, 10, 15, 0.18);
+  color: #f6f8fb;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+
+  svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: #ffc857;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+  }
+
+  &:hover {
+    border-color: rgba(255, 200, 87, 0.48);
+    background: rgba(43, 50, 64, 0.96);
+    color: #f6f8fb;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(255, 200, 87, 0.34);
+    outline-offset: 3px;
+  }
+}
+
 @media screen and (max-width: 640px) {
   .MonsterActor {
     bottom: max(112px, calc(env(safe-area-inset-bottom, 0px) + 80px));
+  }
+
+  .MappingToolButton {
+    top: 14px;
+    right: 106px;
   }
 }
 
@@ -163,6 +220,24 @@
 
   .MonsterHealthFill {
     transition: none;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .MappingToolButton {
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+
+    span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 }
 

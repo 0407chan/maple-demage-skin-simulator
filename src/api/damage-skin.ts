@@ -60,6 +60,17 @@ export const useGetDamageSkinAll = (
   })
 }
 
+export const getDamageSkinMetadata = async (
+  skinIndex: string,
+  version?: number,
+  region?: RegionType
+): Promise<GetDamageSkinResponse> => {
+  const result = await axios.get(
+    `https://maplestory.io/api/wz/${region}/${version}/Effect/DamageSkin.img/${skinIndex}`
+  )
+  return result.data || { children: [] }
+}
+
 export const getItemList = async (
   query: GetItemListQuery
 ): Promise<ItemDto[]> => {
