@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { GapOptionType } from './Horizontal'
 
 type Props = {
-  gap?: number | GapOptionType
+  $gap?: number | GapOptionType
 }
 
 export const gapOption: Record<GapOptionType, number> = {
@@ -19,9 +19,9 @@ export const Container = styled.div<Props>`
   justify-content: flex-start;
   width: 100%;
 
-  ${({ gap }) => {
-    if (gap === undefined) return { gap: '16px' }
-    if (Number.isInteger(gap)) return { gap: `${gap}px` }
-    return { gap: `${gapOption[gap as GapOptionType]}px` }
+  ${({ $gap }) => {
+    if ($gap === undefined) return { gap: '16px' }
+    if (Number.isInteger($gap)) return { gap: `${$gap}px` }
+    return { gap: `${gapOption[$gap as GapOptionType]}px` }
   }}
 `

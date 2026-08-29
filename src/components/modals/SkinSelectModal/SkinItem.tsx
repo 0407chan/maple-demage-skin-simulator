@@ -20,15 +20,16 @@ export const SkinItem: React.FC<SkinItemProps> = ({
 }) => {
   const wzVersion = useRecoilValue(wzVersionState)
   return (
-    <div
-      key={skin.id}
+    <button
+      type="button"
       className={`${styles.skinItem} ${currentSkin?.id === skin.id ? styles.currentSkin : ''}`}
       onClick={() => onSelect(skin)}
+      aria-pressed={currentSkin?.id === skin.id}
     >
       <img
         className={styles.skinImg}
         src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${skin.id}/icon`}
-        alt={skin.name}
+        alt=""
       />
       <span
         className={`${styles.skinText} ${currentSkin?.id === skin.id ? styles.currentSkinText : ''}`}
@@ -41,6 +42,6 @@ export const SkinItem: React.FC<SkinItemProps> = ({
           textToHighlight={skin.name ?? ''}
         />
       </span>
-    </div>
+    </button>
   )
 }

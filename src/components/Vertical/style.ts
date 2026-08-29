@@ -3,7 +3,7 @@ import { GapOptionType } from '../Horizontal/Horizontal'
 import { gapOption } from '../Horizontal/style'
 
 type Props = {
-  gap?: number | GapOptionType
+  $gap?: number | GapOptionType
 }
 
 export const Container = styled.div<Props>`
@@ -13,9 +13,9 @@ export const Container = styled.div<Props>`
   justify-content: center;
   width: 100%;
 
-  ${({ gap }) => {
-    if (gap === undefined) return { gap: '16px' }
-    if (Number.isInteger(gap)) return { gap: `${gap}px` }
-    return { gap: `${gapOption[gap as GapOptionType]}px` }
+  ${({ $gap }) => {
+    if ($gap === undefined) return { gap: '16px' }
+    if (Number.isInteger($gap)) return { gap: `${$gap}px` }
+    return { gap: `${gapOption[$gap as GapOptionType]}px` }
   }}
 `

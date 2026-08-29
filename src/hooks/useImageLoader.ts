@@ -1,30 +1,30 @@
 import { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
+import { loadBase64Image } from 'utils/base64ImageCache'
 
 interface ImageDimensions {
   criticalHeight: number
   normalHeight: number
 }
 
-// API로부터 base64 이미지를 가져오는 함수
-const fetchBase64Image = async (url: string): Promise<string> => {
-  try {
-    const response = await fetch(url)
-    const data = await response.json()
-    return `data:image/png;base64,${data.value}`
-  } catch (error) {
-    console.error('Failed to fetch image:', error)
-    return ''
-  }
+const DEFAULT_DIMENSIONS: ImageDimensions = {
+  criticalHeight: 60,
+  normalHeight: 50
 }
+
+const getImageHeight = (src: string) =>
+  new Promise<number>((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => resolve(image.height)
+    image.onerror = () => reject(new Error('이미지 크기를 읽지 못했습니다.'))
+    image.src = src
+  })
 
 export const useImageLoader = (skinNumber: number): ImageDimensions => {
   const wzVersion = useRecoilValue(wzVersionState)
-  const [dimensions, setDimensions] = useState<ImageDimensions>({
-    criticalHeight: 60, // 기본값 설정
-    normalHeight: 50
-  })
+  const [dimensions, setDimensions] =
+    useState<ImageDimensions>(DEFAULT_DIMENSIONS)
 
   useEffect(() => {
     // wzVersion이 없으면 실행 안 함
@@ -32,50 +32,34 @@ export const useImageLoader = (skinNumber: number): ImageDimensions => {
       return
     }
 
-    const criImg: HTMLImageElement = new Image()
-    const normalImg: HTMLImageElement = new Image()
-
     const criUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}/NoCri1/1`
     const normalUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}/NoRed1/1`
 
-    let criLoaded = false
-    let normalLoaded = false
+    let cancelled = false
+    setDimensions(DEFAULT_DIMENSIONS)
 
-    fetchBase64Image(criUrl).then((base64) => {
-      if (base64) {
-        criImg.src = base64
-        criImg.onload = () => {
-          criLoaded = true
-          if (normalLoaded) {
-            setDimensions({
-              criticalHeight: criImg.height - 10,
-              normalHeight: normalImg.height - 5
-            })
-          }
-        }
-      }
-    })
-
-    fetchBase64Image(normalUrl).then((base64) => {
-      if (base64) {
-        normalImg.src = base64
-        normalImg.onload = () => {
-          normalLoaded = true
-          if (criLoaded) {
-            setDimensions({
-              criticalHeight: criImg.height - 10,
-              normalHeight: normalImg.height - 5
-            })
-          }
-        }
-      }
-    })
+    Promise.all([loadBase64Image(criUrl), loadBase64Image(normalUrl)])
+      .then(([criticalImage, normalImage]) =>
+        Promise.all([
+          getImageHeight(criticalImage),
+          getImageHeight(normalImage)
+        ])
+      )
+      .then(([criticalHeight, normalHeight]) => {
+        if (cancelled) return
+        setDimensions({
+          criticalHeight: criticalHeight - 10,
+          normalHeight: normalHeight - 5
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setDimensions(DEFAULT_DIMENSIONS)
+      })
 
     return () => {
-      criImg.onload = null
-      normalImg.onload = null
+      cancelled = true
     }
-  }, [skinNumber, wzVersion])
+  }, [skinNumber, wzVersion.region, wzVersion.version])
 
   return dimensions
 }

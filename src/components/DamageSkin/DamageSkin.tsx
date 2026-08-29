@@ -1,68 +1,58 @@
 import React, { useState, useEffect } from 'react'
 import { DamageType, ItemDto } from 'type/damage-skin'
 import * as S from './style'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
-import { imageCacheState } from 'atoms/imageCache'
 import { formatDamageString } from './util'
+import { getCachedBase64Image, loadBase64Image } from 'utils/base64ImageCache'
 
 type Props = {
   damageItem: DamageType
   currentSkin?: ItemDto
 }
 
-// API로부터 base64 이미지를 가져오는 함수
-const fetchBase64Image = async (url: string): Promise<string> => {
-  try {
-    const response = await fetch(url)
-    const data = await response.json()
-    return `data:image/png;base64,${data.value}`
-  } catch (error) {
-    console.error('Failed to fetch image:', error)
-    return ''
-  }
-}
-
-// API 이미지를 렌더링하는 컴포넌트 (컴포넌트 외부로 이동)
 const ApiImage: React.FC<{
   apiUrl: string
   style?: React.CSSProperties
-  alt: string
-}> = ({ apiUrl, style, alt }) => {
-  const [imageCache, setImageCache] = useRecoilState(imageCacheState)
-  const [localSrc, setLocalSrc] = useState<string>('')
+}> = ({ apiUrl, style }) => {
+  const [localSrc, setLocalSrc] = useState(
+    () => getCachedBase64Image(apiUrl) ?? ''
+  )
 
   useEffect(() => {
-    // 이미 캐시에 있으면 사용
-    if (imageCache[apiUrl]) {
-      if (localSrc !== imageCache[apiUrl]) {
-        setLocalSrc(imageCache[apiUrl])
-      }
+    const cachedImage = getCachedBase64Image(apiUrl)
+    if (cachedImage) {
+      setLocalSrc(cachedImage)
       return
     }
 
-    // 이미 로컬에 있으면 스킵
-    if (localSrc) return
-
-    // 캐시에 없으면 직접 로드
     let cancelled = false
-    fetchBase64Image(apiUrl).then((base64) => {
-      if (!cancelled && base64) {
-        setLocalSrc(base64)
-        setImageCache((prev) => ({ ...prev, [apiUrl]: base64 }))
-      }
-    })
+    setLocalSrc('')
+
+    loadBase64Image(apiUrl)
+      .then((base64) => {
+        if (!cancelled) setLocalSrc(base64)
+      })
+      .catch(() => {
+        if (!cancelled) setLocalSrc('')
+      })
 
     return () => {
       cancelled = true
     }
-  }, [apiUrl, imageCache, localSrc, setImageCache])
+  }, [apiUrl])
 
-  // 캐시나 로컬에 이미지가 있으면 보여줌
-  const src = imageCache[apiUrl] || localSrc
-  if (!src) return null
+  if (!localSrc) return null
 
-  return <img draggable={false} alt={alt} src={src} style={style} />
+  return (
+    <img
+      draggable={false}
+      alt=""
+      aria-hidden="true"
+      src={localSrc}
+      style={style}
+    />
+  )
 }
 
 const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
@@ -104,14 +94,16 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
   return (
     <S.Container
       className="no-drag"
-      delay={damageItem.level}
+      $delay={damageItem.level}
       style={{ bottom: damageItem.marginBottom }}
-    // stop = 멈춤
-    // stop
+      role="img"
+      aria-label={`${damageItem.isCritical ? '크리티컬 ' : ''}데미지 ${damageItem.damage.toLocaleString()}`}
+      // stop = 멈춤
+      // stop
     >
       {damageItem.isCritical && (
         <S.CriEffect>
-          <ApiImage apiUrl={getCriticalImage()} alt="critical-img" />
+          <ApiImage apiUrl={getCriticalImage()} />
         </S.CriEffect>
       )}
       {formatDamageString(damageItem.damage, isUnit() ?? false)
@@ -133,12 +125,10 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
               marginBottom: index % 2 === 0 ? 4 : 0,
               marginTop: index % 2 === 1 ? 4 : 0
             }}
-            alt={`skin-img-${num}-${index}`}
           />
         ))}
     </S.Container>
   )
 }
-
 
 export default DamageSkin

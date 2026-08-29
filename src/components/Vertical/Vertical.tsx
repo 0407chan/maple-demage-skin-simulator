@@ -10,7 +10,7 @@ type Props = {
 
 const Vertical: React.FC<Props> = ({ gap, style, children }) => {
   return (
-    <S.Container gap={gap} style={style}>
+    <S.Container $gap={gap} style={style}>
       {children}
     </S.Container>
   )

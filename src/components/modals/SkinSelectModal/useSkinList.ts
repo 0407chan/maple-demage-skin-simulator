@@ -2,7 +2,7 @@ import { useGetItemList } from 'api/damage-skin'
 import { wzVersionState } from 'atoms/wzVersion'
 import { useRecoilState } from 'recoil'
 import { SkinMap } from 'constants/damageSkinMapper'
-import { useEffect } from 'react'
+import { useMemo } from 'react'
 
 export const useSkinList = () => {
   const [wzVersion] = useRecoilState(wzVersionState)
@@ -13,12 +13,14 @@ export const useSkinList = () => {
     region: wzVersion?.region
   })
 
-  const getFilteredLists = () => {
+  const filteredLists = useMemo(() => {
     if (!damageSkinItemListQuery.data) {
       return { currentItemList: [], newSkinItemList: [] }
     }
 
-    const allItems = damageSkinItemListQuery.data.sort((a, b) => a.id - b.id)
+    const allItems = [...damageSkinItemListQuery.data].sort(
+      (a, b) => a.id - b.id
+    )
 
     // SkinMap에 존재하는 아이템들
     const currentItemList = allItems.filter(
@@ -31,10 +33,10 @@ export const useSkinList = () => {
     )
 
     return { currentItemList, newSkinItemList }
-  }
+  }, [damageSkinItemListQuery.data])
 
   return {
-    ...getFilteredLists(),
+    ...filteredLists,
     isLoading: damageSkinItemListQuery.isLoading
   }
 }

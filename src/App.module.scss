@@ -8,10 +8,25 @@
   height: 100%;
 }
 
-.OrangeMushroom {
-  cursor: pointer;
+.MushroomButton {
   position: absolute;
   bottom: 20%;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+
+  &:focus-visible {
+    outline: 2px solid #ffcc5f;
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+}
+
+.OrangeMushroom {
+  display: block;
 }
 
 body {

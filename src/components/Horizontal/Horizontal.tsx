@@ -16,7 +16,7 @@ export default function Horizontal({
   children
 }: Props): JSX.Element {
   return (
-    <S.Container gap={gap} style={style} onClick={onClick}>
+    <S.Container $gap={gap} style={style} onClick={onClick}>
       {children}
     </S.Container>
   )

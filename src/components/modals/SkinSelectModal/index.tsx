@@ -1,16 +1,17 @@
 import { SkinMap } from 'constants/damageSkinMapper'
 import useBoolean from 'hooks/useBoolean'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { ItemDto } from 'type/damage-skin'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
 import { Segmented, Spin } from 'antd'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { imageCacheState } from 'atoms/imageCache'
+import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
 import { Button, Divider, Input } from 'antd'
+import { preloadBase64Images } from 'utils/base64ImageCache'
+import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 
 type SkinSelectModalProps = {
   currentSkin?: ItemDto
@@ -19,16 +20,23 @@ type SkinSelectModalProps = {
   hideCloseButton?: boolean
 }
 
-// API로부터 base64 이미지를 가져오는 함수
-const fetchBase64Image = async (url: string): Promise<string> => {
-  try {
-    const response = await fetch(url)
-    const data = await response.json()
-    return `data:image/png;base64,${data.value}`
-  } catch (error) {
-    console.error('Failed to fetch image:', error)
-    return ''
+const getSkinImageUrls = (baseUrl: string) => {
+  const urls: string[] = []
+
+  for (let i = 0; i <= 9; i++) {
+    urls.push(`${baseUrl}/NoCri0/${i}`)
+    urls.push(`${baseUrl}/NoCri1/${i}`)
+    urls.push(`${baseUrl}/NoRed0/${i}`)
+    urls.push(`${baseUrl}/NoRed1/${i}`)
   }
+
+  urls.push(`${baseUrl}/NoCri1/effect3`)
+  urls.push(`${baseUrl}/NoCustom/NoCri1/3`)
+  urls.push(`${baseUrl}/NoCustom/NoCri1/4`)
+  urls.push(`${baseUrl}/NoCustom/NoRed1/3`)
+  urls.push(`${baseUrl}/NoCustom/NoRed1/4`)
+
+  return urls
 }
 
 export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
@@ -38,55 +46,25 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   onConfirm
 }) => {
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
+  const { dialogRef, triggerRef } = useAccessibleDialog(
+    open,
+    onClose,
+    '#skin-search'
+  )
   const [searchKey, setSearchKey] = useState('')
-  const { currentItemList, newSkinItemList, isLoading } = useSkinList()
-  const [imageCache, setImageCache] = useRecoilState(imageCacheState)
+  const { currentItemList, isLoading } = useSkinList()
   const wzVersion = useRecoilValue(wzVersionState)
   const [filter, setFilter] = useState<'all' | 'unit' | 'action'>('all')
 
-  // 스킨 이미지 프리로드 함수
-  const preloadSkinImages = async (skinNumber: number) => {
-    // wzVersion이 없으면 실행 안 함
-    if (!wzVersion.version || !wzVersion.region) {
-      return
-    }
+  const preloadSkinImages = useCallback(
+    (skinNumber: number) => {
+      if (!wzVersion.version || !wzVersion.region) return Promise.resolve()
 
-    const baseUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}`
-
-    const urls: string[] = []
-
-    // 숫자 0-9 이미지들
-    for (let i = 0; i <= 9; i++) {
-      urls.push(`${baseUrl}/NoCri0/${i}`)
-      urls.push(`${baseUrl}/NoCri1/${i}`)
-      urls.push(`${baseUrl}/NoRed0/${i}`)
-      urls.push(`${baseUrl}/NoRed1/${i}`)
-    }
-
-    // 크리티컬 이펙트
-    urls.push(`${baseUrl}/NoCri1/effect3`)
-
-    // 유닛 (만, 억)
-    urls.push(`${baseUrl}/NoCustom/NoCri1/3`)
-    urls.push(`${baseUrl}/NoCustom/NoCri1/4`)
-    urls.push(`${baseUrl}/NoCustom/NoRed1/3`)
-    urls.push(`${baseUrl}/NoCustom/NoRed1/4`)
-
-    // 캐시에 없는 것만 로드
-    const urlsToLoad = urls.filter((url) => !imageCache[url])
-
-    // 백그라운드에서 비동기로 로드
-    Promise.all(
-      urlsToLoad.map(async (url) => {
-        const base64 = await fetchBase64Image(url)
-        if (base64) {
-          setImageCache((prev) => ({ ...prev, [url]: base64 }))
-        }
-      })
-    ).catch((error) => {
-      console.error('Failed to preload images:', error)
-    })
-  }
+      const baseUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}`
+      return preloadBase64Images(getSkinImageUrls(baseUrl))
+    },
+    [wzVersion.region, wzVersion.version]
+  )
 
   // 기본 스킨 설정
   useEffect(() => {
@@ -96,25 +74,19 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       )
       if (defaultSkin) {
         setCurrentSkin(defaultSkin)
-        // 기본 스킨 이미지 프리로드
-        const skinNumbers = SkinMap[defaultSkin.id]
-        if (skinNumbers && skinNumbers.length > 0) {
-          preloadSkinImages(skinNumbers[0])
-        }
       }
     }
-  }, [currentItemList, currentSkin])
+  }, [currentItemList, currentSkin, setCurrentSkin])
 
   // currentSkin 변경 시에도 프리로드 (새로고침 후에도 동작)
   useEffect(() => {
-    console.log('currentSkin', currentSkin)
     if (currentSkin) {
       const skinNumbers = SkinMap[currentSkin.id]
       if (skinNumbers && skinNumbers.length > 0) {
-        preloadSkinImages(skinNumbers[0])
+        void preloadSkinImages(skinNumbers[0])
       }
     }
-  }, [currentSkin?.id])
+  }, [currentSkin, preloadSkinImages])
 
   const handleSkinSelect = (skin: ItemDto) => {
     ReactGA.event({
@@ -127,61 +99,73 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     const skinNumbers = SkinMap[skin.id]
     if (skinNumbers && skinNumbers.length > 0) {
       onConfirm(skinNumbers[0])
-      // 백그라운드에서 이미지 프리로드
-      preloadSkinImages(skinNumbers[0])
     }
 
     onClose()
   }
 
-  const getFilteredSkins = (items: ItemDto[]) => {
-    if (!searchKey) return items.filter((item) => {
-      if (filter === 'unit') {
-        return item.name.includes('유닛')
-      }
-      return true
-    })
+  const filteredSkins = useMemo(() => {
+    const normalizedSearchKey = searchKey.trim().toLocaleLowerCase('ko-KR')
 
+    return currentItemList.filter((item) => {
+      const matchesSearch =
+        normalizedSearchKey.length === 0 ||
+        item.name.toLocaleLowerCase('ko-KR').includes(normalizedSearchKey)
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'unit' && item.name.includes('유닛')) ||
+        (filter === 'action' && (SkinMap[item.id]?.length ?? 0) > 1)
 
-    return items.filter((item) =>
-      item.name.toLowerCase().includes(searchKey.toLowerCase())
-    ).filter((item) => {
-      if (filter === 'unit') {
-        return item.name.includes('유닛')
-      }
-      return true
+      return matchesSearch && matchesFilter
     })
-  }
+  }, [currentItemList, filter, searchKey])
 
   return (
     <>
       {currentSkin && (
-        <div
+        <button
+          ref={triggerRef}
+          type="button"
           className={styles.skinButton}
           style={{ position: 'absolute', top: 8, left: 0 }}
           onClick={onOpen}
+          aria-haspopup="dialog"
+          aria-expanded={open}
         >
           <img
             className={styles.skinImg}
             src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${currentSkin.id}/icon`}
-            alt={currentSkin.name}
+            alt=""
           />
           <span className={styles.skinText}>{currentSkin.name}</span>
-        </div>
+        </button>
       )}
 
       <div
         className={`${styles.backBoard} ${open ? styles.open : ''}`}
         onClick={onClose}
+        aria-hidden="true"
       />
       <Spin spinning={isLoading}>
-        <div className={`${styles.container} ${open ? styles.open : ''}`}>
-          <div className={styles.header}>데미지 스킨 선택</div>
+        <div
+          ref={dialogRef}
+          className={`${styles.container} ${open ? styles.open : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="skin-dialog-title"
+          aria-hidden={!open}
+          tabIndex={-1}
+        >
+          <div id="skin-dialog-title" className={styles.header}>
+            데미지 스킨 선택
+          </div>
           <Input
+            id="skin-search"
             className={styles.input}
             maxLength={20}
             value={searchKey}
             placeholder="검색"
+            aria-label="데미지 스킨 검색"
             onChange={(e) => setSearchKey(e.target.value)}
           />
 
@@ -190,6 +174,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
               size="small"
               className={styles.closeButton}
               onClick={onClose}
+              aria-label="데미지 스킨 선택 닫기"
             >
               <div className="ex left" />
               <div className="ex right" />
@@ -219,8 +204,8 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
             onChange={(value) => setFilter(value as 'all' | 'unit' | 'action')}
           />
           <div className={styles.body}>
-            {getFilteredSkins(currentItemList).length > 0 ? (
-              getFilteredSkins(currentItemList).map((skin) => (
+            {filteredSkins.length > 0 ? (
+              filteredSkins.map((skin) => (
                 <SkinItem
                   key={skin.id}
                   skin={skin}

@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactGA from 'react-ga4'
 import { v4 as uuid } from 'uuid'
 // 이미지 임포트
@@ -9,7 +9,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_SKIN_NUMBER,
   GA_EVENTS,
-  REGION
+  SETTING_LIMITS
 } from 'constants/app_constants'
 import { useImageLoader } from 'hooks/useImageLoader'
 import hitImage from 'images/hit1_0.png'
@@ -31,55 +31,126 @@ export interface AppState {
   setting: Setting
 }
 
-const App: React.FC = () => {
-  const [state, setState] = useState<AppState>(() => {
-    const savedSettings = localStorage.getItem(LOCAL_STORAGE_KEY)
-    if (savedSettings) {
-      const parsedSettings = JSON.parse(savedSettings)
-      return {
-        skinNumber: parsedSettings.skinNumber || DEFAULT_SKIN_NUMBER,
-        damageWrapperList: [],
-        isAttacked: false,
-        currentSkin: parsedSettings.currentSkin,
-        setting: {
-          numberAttack:
-            parsedSettings.setting.numberAttack ||
-            DEFAULT_SETTINGS.NUMBER_ATTACK,
-          maxDamage:
-            parsedSettings.setting.maxDamage || DEFAULT_SETTINGS.MAX_DAMAGE,
-          minDamage:
-            parsedSettings.setting.minDamage || DEFAULT_SETTINGS.MIN_DAMAGE,
-          criticalRate:
-            parsedSettings.setting.criticalRate ||
-            DEFAULT_SETTINGS.CRITICAL_RATE
-        }
-      }
-    }
+const createDefaultState = (): AppState => ({
+  skinNumber: DEFAULT_SKIN_NUMBER,
+  damageWrapperList: [],
+  isAttacked: false,
+  currentSkin: undefined,
+  setting: {
+    numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
+    maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
+    minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
+    criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
+  }
+})
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const getBoundedNumber = (
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number
+) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return fallback
+  }
+
+  return Math.min(max, Math.max(min, Math.trunc(value)))
+}
+
+const getStoredSkin = (value: unknown): ItemDto | undefined => {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'number' ||
+    typeof value.name !== 'string'
+  ) {
+    return undefined
+  }
+
+  return value as ItemDto
+}
+
+const loadInitialState = (): AppState => {
+  const defaultState = createDefaultState()
+
+  try {
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (!savedState) return defaultState
+
+    const parsedState: unknown = JSON.parse(savedState)
+    if (!isRecord(parsedState)) return defaultState
+
+    const parsedSetting = isRecord(parsedState.setting)
+      ? parsedState.setting
+      : {}
+    const maxDamage = getBoundedNumber(
+      parsedSetting.maxDamage,
+      DEFAULT_SETTINGS.MAX_DAMAGE,
+      SETTING_LIMITS.MIN_DAMAGE,
+      SETTING_LIMITS.MAX_DAMAGE
+    )
+    const minDamage = Math.min(
+      maxDamage,
+      getBoundedNumber(
+        parsedSetting.minDamage,
+        DEFAULT_SETTINGS.MIN_DAMAGE,
+        SETTING_LIMITS.MIN_DAMAGE,
+        SETTING_LIMITS.MAX_DAMAGE
+      )
+    )
+
     return {
-      skinNumber: DEFAULT_SKIN_NUMBER,
+      skinNumber: getBoundedNumber(
+        parsedState.skinNumber,
+        DEFAULT_SKIN_NUMBER,
+        1,
+        Number.MAX_SAFE_INTEGER
+      ),
       damageWrapperList: [],
       isAttacked: false,
-      currentSkin: undefined,
+      currentSkin: getStoredSkin(parsedState.currentSkin),
       setting: {
-        numberAttack: DEFAULT_SETTINGS.NUMBER_ATTACK,
-        maxDamage: DEFAULT_SETTINGS.MAX_DAMAGE,
-        minDamage: DEFAULT_SETTINGS.MIN_DAMAGE,
-        criticalRate: DEFAULT_SETTINGS.CRITICAL_RATE
+        numberAttack: getBoundedNumber(
+          parsedSetting.numberAttack,
+          DEFAULT_SETTINGS.NUMBER_ATTACK,
+          SETTING_LIMITS.MIN_NUMBER_ATTACK,
+          SETTING_LIMITS.MAX_NUMBER_ATTACK
+        ),
+        maxDamage,
+        minDamage,
+        criticalRate: getBoundedNumber(
+          parsedSetting.criticalRate,
+          DEFAULT_SETTINGS.CRITICAL_RATE,
+          SETTING_LIMITS.MIN_CRITICAL_RATE,
+          SETTING_LIMITS.MAX_CRITICAL_RATE
+        )
       }
     }
-  })
+  } catch {
+    return defaultState
+  }
+}
+
+const App: React.FC = () => {
+  const [state, setState] = useState<AppState>(loadInitialState)
 
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber)
 
   useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({
-        skinNumber: state.skinNumber,
-        currentSkin: state.currentSkin,
-        setting: state.setting
-      })
-    )
+    try {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          skinNumber: state.skinNumber,
+          currentSkin: state.currentSkin,
+          setting: state.setting
+        })
+      )
+    } catch (error) {
+      console.warn('설정을 저장하지 못했습니다.', error)
+    }
   }, [state.skinNumber, state.currentSkin, state.setting])
 
   const onSetSkinNumber = (newId: number) => {
@@ -131,12 +202,6 @@ const App: React.FC = () => {
     }))
   }
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleAttack()
-    }
-  }
-
   useEffect(() => {
     if (state.isAttacked) {
       const timer = setTimeout(() => {
@@ -157,14 +222,6 @@ const App: React.FC = () => {
   useEffect(() => {
     initReactGA()
   }, [])
-
-  useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      criticalHeight,
-      normalHeight
-    }))
-  }, [criticalHeight, normalHeight])
 
   return (
     <>
@@ -200,7 +257,7 @@ const App: React.FC = () => {
           매핑 도구
         </a>
       )}
-      <div className={clsx(styles.Body, "no-drag")}>
+      <div className={clsx(styles.Body, 'no-drag')}>
         {state.damageWrapperList.map((item) => (
           <DamageWrapper
             key={item.id}
@@ -209,17 +266,19 @@ const App: React.FC = () => {
             currentSkin={state.currentSkin}
           />
         ))}
-        <img
-          className={styles.OrangeMushroom}
-          draggable="false"
-          src={state.isAttacked ? hitImage : standImage}
-          alt="주황 버섯 공격하기"
+        <button
+          type="button"
+          className={styles.MushroomButton}
           onClick={handleAttack}
-          onKeyPress={handleKeyPress}
-          tabIndex={0}
-          role="button"
           aria-label="주황 버섯 공격하기"
-        />
+        >
+          <img
+            className={styles.OrangeMushroom}
+            draggable="false"
+            src={state.isAttacked ? hitImage : standImage}
+            alt=""
+          />
+        </button>
       </div>
     </>
   )

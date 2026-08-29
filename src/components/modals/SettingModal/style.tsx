@@ -3,11 +3,8 @@ import styled from 'styled-components'
 
 export const BackBoard = styled.div<{ open: boolean }>`
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
   z-index: 4;
   background-color: rgba(0, 0, 0, 0.3);
   ${(props) =>
@@ -17,12 +14,12 @@ export const BackBoard = styled.div<{ open: boolean }>`
 `
 export const Container = styled.div<{ open: boolean }>`
   display: flex;
-  position: absolute;
+  position: fixed;
   right: 20px;
   top: 20px;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: rgba(60, 60, 60, 0.93);
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.8);
   border-radius: 5px;
@@ -31,17 +28,31 @@ export const Container = styled.div<{ open: boolean }>`
   gap: 10px;
   opacity: 0;
   z-index: 8;
-  @media screen and (max-width: 500px) {
-    width: calc(100vw - 40px);
-    /* height: calc(100vh - 40px); */
-  }
   width: 360px;
-  height: fit-content;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100dvh - 40px);
+  box-sizing: border-box;
+  overflow: hidden;
   transition: all 0.3s ease;
   ${(props) =>
     props.open
       ? { visibility: 'visible', opacity: 1 }
       : { visibility: 'hidden', opacity: 0 }}
+
+  &:focus-visible {
+    outline: 2px solid #ffcc5f;
+    outline-offset: 2px;
+  }
+
+  @media screen and (max-width: 500px) {
+    width: calc(100vw - 40px);
+  }
+
+  @media screen and (max-height: 500px) {
+    top: 12px;
+    right: 12px;
+    max-height: calc(100dvh - 24px);
+  }
 `
 
 export const Header = styled.div`
@@ -61,10 +72,9 @@ export const Body = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  overflow-y: overlay;
   gap: 4px;
   width: 100%;
-  height: 100%;
+  height: auto;
 
   /* width */
   &::-webkit-scrollbar {
@@ -88,6 +98,16 @@ export const Body = styled.div`
   }
 `
 
+export const ScrollArea = styled.div`
+  display: flex;
+  min-height: 0;
+  width: 100%;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 2px;
+  box-sizing: border-box;
+`
+
 export const Content = styled.div`
   display: flex;
   flex-direction: column;
@@ -96,6 +116,7 @@ export const Content = styled.div`
   border-radius: 5px;
   padding: 10px;
   background-color: #454444e7;
+  box-sizing: border-box;
 `
 
 export const Footer = styled.div`
@@ -110,8 +131,8 @@ export const CloseButton = styled(OriginalButton)`
   position: absolute;
   top: 12px;
   right: 15px;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   font-weight: bold;
   justify-content: center;
   align-items: center;
@@ -181,7 +202,7 @@ export const TitleLabel = styled.div`
   font-weight: bold;
   color: #eeeeee;
 `
-export const Label = styled.div`
+export const Label = styled.label`
   display: flex;
   width: 40%;
   font-size: 0.9rem;

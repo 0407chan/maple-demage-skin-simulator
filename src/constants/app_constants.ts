@@ -9,6 +9,15 @@ export const DEFAULT_SETTINGS = {
   CRITICAL_RATE: 60
 }
 
+export const SETTING_LIMITS = {
+  MIN_DAMAGE: 1,
+  MAX_DAMAGE: 150000000000,
+  MIN_CRITICAL_RATE: 0,
+  MAX_CRITICAL_RATE: 100,
+  MIN_NUMBER_ATTACK: 1,
+  MAX_NUMBER_ATTACK: 10
+}
+
 export const API_ENDPOINTS = {
   WZ_VERSION: '/api/wz-version'
 }
