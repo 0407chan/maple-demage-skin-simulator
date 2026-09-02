@@ -9,6 +9,7 @@ import {
 import { wzVersionState } from 'atoms/wzVersion'
 import { BackgroundSelectModal } from 'components/modals/BackgroundSelectModal'
 import MapScene from 'components/MapScene'
+import type { MapMovementState } from 'components/MapScene'
 import { MonsterSelectModal } from 'components/modals/MonsterSelectModal'
 import SettingModal from 'components/modals/SettingModal'
 import { SkinSelectModal } from 'components/modals/SkinSelectModal'
@@ -38,7 +39,11 @@ import {
   preloadImages
 } from 'utils/imagePreloader'
 import { getPrimaryMonsterAnimation } from 'utils/monsterAnimation'
-import { getMonsterImageAlignment } from 'utils/monsterImageAlignment'
+import {
+  getMonsterImageAlignment,
+  getMonsterImageTransform
+} from 'utils/monsterImageAlignment'
+import type { MonsterFacingDirection } from 'utils/monsterImageAlignment'
 import {
   getMonsterHealthAfterAttack,
   getMonsterHealthPercent,
@@ -58,6 +63,11 @@ import clsx from 'clsx'
 const LOCAL_STORAGE_KEY = 'damageSkinState'
 
 type MonsterStatus = 'alive' | 'dying' | 'respawning'
+
+const IDLE_MAP_MOVEMENT: MapMovementState = {
+  horizontalDirection: 0,
+  isMoving: false
+}
 
 export interface AppState {
   skinNumber: number
@@ -241,6 +251,10 @@ const loadInitialState = (): AppState => {
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(loadInitialState)
+  const [mapMovement, setMapMovement] =
+    useState<MapMovementState>(IDLE_MAP_MOVEMENT)
+  const [monsterFacingDirection, setMonsterFacingDirection] =
+    useState<MonsterFacingDirection>('left')
   const [, setMonsterMetricsRevision] = useState(0)
   const [monsterFootY, setMonsterFootY] = useState<number>()
   const [deathPlaybackDuration, setDeathPlaybackDuration] = useState(
@@ -270,6 +284,10 @@ const App: React.FC = () => {
     currentMonsterDetail?.framebooks,
     'idle'
   )
+  const moveAnimation = getPrimaryMonsterAnimation(
+    currentMonsterDetail?.framebooks,
+    'move'
+  )
   const hitAnimation = getPrimaryMonsterAnimation(
     currentMonsterDetail?.framebooks,
     'hit'
@@ -285,6 +303,17 @@ const App: React.FC = () => {
       ? getMonsterAnimationUrl(
           state.currentMonster.id,
           idleAnimation,
+          wzVersion.version,
+          wzVersion.region
+        )
+      : undefined
+  const remoteMoveMonsterImage =
+    wzVersion.version !== undefined &&
+    wzVersion.region !== undefined &&
+    moveAnimation
+      ? getMonsterAnimationUrl(
+          state.currentMonster.id,
+          moveAnimation,
           wzVersion.version,
           wzVersion.region
         )
@@ -319,7 +348,9 @@ const App: React.FC = () => {
         remoteIdleMonsterImage)
       : state.isAttacked
         ? (remoteHitMonsterImage ?? remoteIdleMonsterImage)
-        : remoteIdleMonsterImage
+        : mapMovement.isMoving && state.monsterStatus === 'alive'
+          ? (remoteMoveMonsterImage ?? remoteIdleMonsterImage)
+          : remoteIdleMonsterImage
   const remoteMonsterIcon =
     wzVersion.version !== undefined && wzVersion.region !== undefined
       ? getMonsterIconUrl(
@@ -370,8 +401,29 @@ const App: React.FC = () => {
         viewportHeight: window.innerHeight
       })
 
+  const handleMapMovementChange = useCallback((movement: MapMovementState) => {
+    setMapMovement((current) =>
+      current.isMoving === movement.isMoving &&
+      current.horizontalDirection === movement.horizontalDirection
+        ? current
+        : movement
+    )
+
+    if (movement.horizontalDirection < 0) {
+      setMonsterFacingDirection('left')
+    } else if (movement.horizontalDirection > 0) {
+      setMonsterFacingDirection('right')
+    }
+  }, [])
+
   const updateMonsterFootY = useCallback(() => {
-    if (state.isAttacked || state.monsterStatus !== 'alive') return
+    if (
+      mapMovement.isMoving ||
+      state.isAttacked ||
+      state.monsterStatus !== 'alive'
+    ) {
+      return
+    }
 
     const bodyRect = bodyRef.current?.getBoundingClientRect()
     const image = monsterImageRef.current
@@ -390,7 +442,12 @@ const App: React.FC = () => {
         ? nextFootY
         : current
     )
-  }, [idleMonsterImage, state.isAttacked, state.monsterStatus])
+  }, [
+    idleMonsterImage,
+    mapMovement.isMoving,
+    state.isAttacked,
+    state.monsterStatus
+  ])
 
   useEffect(() => {
     setMonsterImageFailed(false)
@@ -399,6 +456,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const animationUrls = [
       remoteIdleMonsterImage,
+      remoteMoveMonsterImage,
       remoteHitMonsterImage,
       remoteDeathMonsterImage
     ].filter((url): url is string => url !== undefined)
@@ -412,7 +470,12 @@ const App: React.FC = () => {
     return () => {
       cancelled = true
     }
-  }, [remoteDeathMonsterImage, remoteHitMonsterImage, remoteIdleMonsterImage])
+  }, [
+    remoteDeathMonsterImage,
+    remoteHitMonsterImage,
+    remoteIdleMonsterImage,
+    remoteMoveMonsterImage
+  ])
 
   useEffect(() => {
     let cancelled = false
@@ -531,7 +594,13 @@ const App: React.FC = () => {
   }
 
   const captureIdleMonsterTopOffset = () => {
-    if (state.isAttacked || state.monsterStatus !== 'alive') return
+    if (
+      mapMovement.isMoving ||
+      state.isAttacked ||
+      state.monsterStatus !== 'alive'
+    ) {
+      return
+    }
 
     const buttonRect = monsterButtonRef.current?.getBoundingClientRect()
     const imageRect = monsterImageRef.current?.getBoundingClientRect()
@@ -775,6 +844,7 @@ const App: React.FC = () => {
             <MapScene
               mapId={state.currentBackground.id}
               monsterFootY={monsterFootY}
+              onMovementChange={handleMapMovementChange}
               version={wzVersion.version}
               region={wzVersion.region}
             />
@@ -842,6 +912,19 @@ const App: React.FC = () => {
                   ? 'anonymous'
                   : undefined
               }
+              data-monster-animation={
+                !monsterImageFailed && remoteMonsterImage
+                  ? state.monsterStatus === 'dying'
+                    ? (deathAnimation ?? hitAnimation ?? idleAnimation)
+                    : state.isAttacked
+                      ? (hitAnimation ?? idleAnimation)
+                      : mapMovement.isMoving
+                        ? (moveAnimation ?? idleAnimation)
+                        : idleAnimation
+                  : undefined
+              }
+              data-monster-facing={monsterFacingDirection}
+              data-monster-moving={mapMovement.isMoving ? 'true' : 'false'}
               draggable="false"
               src={monsterImage}
               style={{
@@ -853,7 +936,10 @@ const App: React.FC = () => {
                 maxWidth: monsterImageAlignment.renderedWidth
                   ? 'none'
                   : undefined,
-                transform: `translateX(${monsterImageAlignment.horizontalOffset}px)`,
+                transform: getMonsterImageTransform(
+                  monsterImageAlignment.horizontalOffset,
+                  monsterFacingDirection
+                ),
                 width: monsterImageAlignment.renderedWidth
               }}
               onLoad={handleMonsterImageLoad}

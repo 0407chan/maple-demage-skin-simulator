@@ -1,7 +1,19 @@
 import { describe, expect, test } from 'bun:test'
-import { getMonsterImageAlignment } from '../src/utils/monsterImageAlignment'
+import {
+  getMonsterImageAlignment,
+  getMonsterImageTransform
+} from '../src/utils/monsterImageAlignment'
 
 describe('monster image bottom alignment', () => {
+  test('WZ 기본 왼쪽 방향을 유지하거나 오른쪽으로 반전한다', () => {
+    expect(getMonsterImageTransform(12, 'left')).toBe(
+      'translateX(12px) scaleX(1)'
+    )
+    expect(getMonsterImageTransform(12, 'right')).toBe(
+      'translateX(-12px) scaleX(-1)'
+    )
+  })
+
   test('idle보다 하단 여백이 적은 hit 이미지를 위로 보정한다', () => {
     expect(
       getMonsterImageAlignment({

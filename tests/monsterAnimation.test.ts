@@ -14,8 +14,13 @@ describe('monster animation selection', () => {
 
   test('화면에 표시할 대기, 피격, 사망 애니메이션을 선택한다', () => {
     expect(getPrimaryMonsterAnimation(framebooks, 'idle')).toBe('stand')
+    expect(getPrimaryMonsterAnimation(framebooks, 'move')).toBe('move')
     expect(getPrimaryMonsterAnimation(framebooks, 'hit')).toBe('hit1')
     expect(getPrimaryMonsterAnimation(framebooks, 'death')).toBe('die1')
+  })
+
+  test('걷기 모션이 없으면 이동 중에도 대기 모션으로 폴백할 수 있다', () => {
+    expect(getPrimaryMonsterAnimation({ stand: 2 }, 'move')).toBeUndefined()
   })
 
   test('몬스터 선택 시 대기, 걷기, 피격, 사망 이미지를 모두 미리 불러온다', () => {

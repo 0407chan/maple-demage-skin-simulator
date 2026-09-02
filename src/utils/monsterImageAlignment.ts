@@ -98,6 +98,16 @@ export type MonsterImageAlignment = {
   renderedWidth?: number
 }
 
+export type MonsterFacingDirection = 'left' | 'right'
+
+export const getMonsterImageTransform = (
+  horizontalOffset: number,
+  facingDirection: MonsterFacingDirection
+) => {
+  const facingScale = facingDirection === 'right' ? -1 : 1
+  return `translateX(${horizontalOffset * facingScale}px) scaleX(${facingScale})`
+}
+
 const getOpaqueCenterOffset = (metrics: ImageOpaqueMetrics) => {
   const opaqueLeft = metrics.transparentLeft
   const opaqueRight = metrics.naturalWidth - 1 - metrics.transparentRight

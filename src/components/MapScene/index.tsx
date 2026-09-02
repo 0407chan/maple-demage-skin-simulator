@@ -30,9 +30,15 @@ import type {
 import { getWzAnimationPlayback } from 'utils/wzImageAnimation'
 import styles from './style.module.scss'
 
+export type MapMovementState = {
+  horizontalDirection: -1 | 0 | 1
+  isMoving: boolean
+}
+
 type Props = {
   mapId: number
   monsterFootY?: number
+  onMovementChange?: (movement: MapMovementState) => void
   region: RegionType
   version: number
 }
@@ -67,6 +73,10 @@ const INITIAL_CAMERA_BOUNDS: MapCameraBounds = {
   maxY: 0,
   minX: 0,
   minY: 0
+}
+const IDLE_MAP_MOVEMENT: MapMovementState = {
+  horizontalDirection: 0,
+  isMoving: false
 }
 
 const getBackgroundPositionX = (x: number) => {
@@ -166,6 +176,7 @@ const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
 const MapScene: React.FC<Props> = ({
   mapId,
   monsterFootY,
+  onMovementChange,
   region,
   version
 }) => {
@@ -185,6 +196,7 @@ const MapScene: React.FC<Props> = ({
     right: false,
     up: false
   })
+  const movementStateRef = useRef<MapMovementState>(IDLE_MAP_MOVEMENT)
   const animationFrameRef = useRef<number | undefined>(undefined)
   const lastAnimationTimeRef = useRef<number | undefined>(undefined)
   const requestedForegroundUrl = useMemo(
@@ -305,9 +317,27 @@ const MapScene: React.FC<Props> = ({
     []
   )
 
+  const notifyMovementChange = useCallback(
+    (isMoving: boolean, horizontalDirection: -1 | 0 | 1) => {
+      const current = movementStateRef.current
+      if (
+        current.isMoving === isMoving &&
+        current.horizontalDirection === horizontalDirection
+      ) {
+        return
+      }
+
+      const movement = { horizontalDirection, isMoving }
+      movementStateRef.current = movement
+      onMovementChange?.(movement)
+    },
+    [onMovementChange]
+  )
+
   useLayoutEffect(() => {
     updateCameraPosition(0, 0)
-  }, [mapId, updateCameraPosition])
+    notifyMovementChange(false, 0)
+  }, [mapId, notifyMovementChange, updateCameraPosition])
 
   useEffect(() => {
     const scene = sceneRef.current
@@ -385,6 +415,7 @@ const MapScene: React.FC<Props> = ({
         window.cancelAnimationFrame(animationFrameRef.current)
         animationFrameRef.current = undefined
       }
+      notifyMovementChange(false, 0)
     }
 
     const animate = (time: number) => {
@@ -403,12 +434,27 @@ const MapScene: React.FC<Props> = ({
       const previousTime = lastAnimationTimeRef.current ?? time
       const elapsedMs = Math.min(time - previousTime, MAP_CAMERA_MAX_FRAME_MS)
       lastAnimationTimeRef.current = time
+      if (elapsedMs <= 0) {
+        animationFrameRef.current = window.requestAnimationFrame(animate)
+        return
+      }
+
       const distance =
         (MAP_CAMERA_SPEED_PX_PER_SECOND * (elapsedMs / 1000)) / directionLength
-      updateCameraPosition(
+      const previousX = cameraXRef.current
+      const previousY = cameraYRef.current
+      const nextPosition = updateCameraPosition(
         cameraXRef.current + directionX * distance,
         cameraYRef.current + directionY * distance
       )
+      const movedX = nextPosition.x - previousX
+      const movedY = nextPosition.y - previousY
+      if (Math.abs(movedX) < 0.01 && Math.abs(movedY) < 0.01) {
+        stopMovement()
+        return
+      }
+
+      notifyMovementChange(true, movedX < -0.01 ? -1 : movedX > 0.01 ? 1 : 0)
       animationFrameRef.current = window.requestAnimationFrame(animate)
     }
 
@@ -442,16 +488,28 @@ const MapScene: React.FC<Props> = ({
         event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0
       const directionY =
         event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0
+      const previousX = cameraXRef.current
+      const previousY = cameraYRef.current
+      let nextPosition = { x: previousX, y: previousY }
       if (!event.repeat) {
-        updateCameraPosition(
+        nextPosition = updateCameraPosition(
           cameraXRef.current + directionX * MAP_CAMERA_KEY_STEP_PX,
           cameraYRef.current + directionY * MAP_CAMERA_KEY_STEP_PX
         )
       }
+      if (
+        !event.repeat &&
+        Math.abs(nextPosition.x - previousX) < 0.01 &&
+        Math.abs(nextPosition.y - previousY) < 0.01
+      ) {
+        return
+      }
+
       if (event.key === 'ArrowLeft') heldDirectionsRef.current.left = true
       if (event.key === 'ArrowRight') heldDirectionsRef.current.right = true
       if (event.key === 'ArrowUp') heldDirectionsRef.current.up = true
       if (event.key === 'ArrowDown') heldDirectionsRef.current.down = true
+      notifyMovementChange(true, directionX < 0 ? -1 : directionX > 0 ? 1 : 0)
       startAnimation()
     }
 
@@ -490,7 +548,7 @@ const MapScene: React.FC<Props> = ({
       window.removeEventListener('blur', stopMovement)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [updateCameraPosition])
+  }, [notifyMovementChange, updateCameraPosition])
 
   return (
     <div
