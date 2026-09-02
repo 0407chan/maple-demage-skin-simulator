@@ -1,29 +1,39 @@
 import type { RegionType } from 'type/wz'
+import { readMapSceneCache, writeMapSceneCache } from './mapSceneCache'
 import { loadWzImageSequence } from './wzImageAnimation'
-import type { WzPoint } from './wzImageAnimation'
+import type { WzImageFrame, WzImageSequence, WzPoint } from './wzImageAnimation'
+import type { MapleMapDetail } from 'type/map'
 
 const WZ_API_BASE_URL = 'https://maplestory.io/api/wz'
+const WZ_IMAGE_API_BASE_URL = 'https://maplestory.io/api/wz/img'
 const MAP_GROUND_SAMPLE_RATIOS = [0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56]
 const MAP_GROUND_ALPHA_THRESHOLD = 160
 const MAP_GROUND_MIN_OPAQUE_COUNT = 12
 const MAP_GROUND_FOOT_INSET = 18
+const MAX_BACKGROUND_CACHE_ENTRIES = 12
+const MAX_CONCURRENT_MAP_REQUESTS = 8
+const MAP_BACKGROUND_PREVIEW_COUNT = 6
 
 type WzNodeResponse = {
   children?: unknown
   value?: unknown
 }
 
-export type MapBaseBackground = {
+export type MapBackgroundLayer = {
   alpha: number
   flip: boolean
-  height: number
+  front: boolean
+  imagePath: string
   index: number
-  origin: WzPoint
-  src: string
+  sequence: WzImageSequence
   type: number
-  width: number
   x: number
   y: number
+}
+
+type MapBackgroundLoad = {
+  full: Promise<MapBackgroundLayer[]>
+  preview: Promise<MapBackgroundLayer[]>
 }
 
 export type MapGroundMetrics = {
@@ -32,17 +42,54 @@ export type MapGroundMetrics = {
   width: number
 }
 
-const backgroundCache = new Map<
-  string,
-  Promise<MapBaseBackground | undefined>
->()
+export type MapSceneLayout = {
+  foregroundHeight: number
+  foregroundWidth: number
+  groundY: number
+  origin: WzPoint
+}
+
+export type MapCameraBounds = {
+  maxX: number
+  maxY: number
+  minX: number
+  minY: number
+}
+
+const backgroundCache = new Map<string, MapBackgroundLoad>()
 const groundMetricsCache = new Map<string, Promise<MapGroundMetrics>>()
+const mapRequestQueue: Array<() => void> = []
+let activeMapRequestCount = 0
+
+const runNextMapRequest = () => {
+  while (
+    activeMapRequestCount < MAX_CONCURRENT_MAP_REQUESTS &&
+    mapRequestQueue.length > 0
+  ) {
+    activeMapRequestCount += 1
+    mapRequestQueue.shift()?.()
+  }
+}
+
+const limitedMapFetch = (url: string) =>
+  new Promise<Response>((resolve, reject) => {
+    mapRequestQueue.push(() => {
+      fetch(url)
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          activeMapRequestCount -= 1
+          runNextMapRequest()
+        })
+    })
+    runNextMapRequest()
+  })
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
 const readNode = async (url: string): Promise<WzNodeResponse | undefined> => {
-  const response = await fetch(url)
+  const response = await limitedMapFetch(url)
   if (!response.ok) return undefined
 
   const data: unknown = await response.json()
@@ -57,6 +104,11 @@ const readChildren = (node?: WzNodeResponse) =>
     : []
 
 const readValue = async (url: string) => (await readNode(url))?.value
+
+const readChildValue = (url: string, child: string, children: string[]) =>
+  children.includes(child)
+    ? readValue(`${url}/${child}`)
+    : Promise.resolve(undefined)
 
 const readNumber = (value: unknown, fallback: number) =>
   typeof value === 'number' && Number.isFinite(value) ? value : fallback
@@ -87,20 +139,21 @@ const loadBackgroundEntry = async (
   index: number,
   version: number,
   region: RegionType
-): Promise<MapBaseBackground | undefined> => {
-  const front = await readValue(`${entryUrl}/front`)
-  if (readBoolean(front)) return undefined
+): Promise<MapBackgroundLayer | undefined> => {
+  const children = readChildren(await readNode(entryUrl))
+  if (children.length === 0) return undefined
 
-  const [backgroundSet, imageNumber, type, x, y, alpha, flip, animated] =
+  const [backgroundSet, imageNumber, type, x, y, alpha, flip, animated, front] =
     await Promise.all([
-      readValue(`${entryUrl}/bS`),
-      readValue(`${entryUrl}/no`),
-      readValue(`${entryUrl}/type`),
-      readValue(`${entryUrl}/x`),
-      readValue(`${entryUrl}/y`),
-      readValue(`${entryUrl}/a`),
-      readValue(`${entryUrl}/f`),
-      readValue(`${entryUrl}/ani`)
+      readChildValue(entryUrl, 'bS', children),
+      readChildValue(entryUrl, 'no', children),
+      readChildValue(entryUrl, 'type', children),
+      readChildValue(entryUrl, 'x', children),
+      readChildValue(entryUrl, 'y', children),
+      readChildValue(entryUrl, 'a', children),
+      readChildValue(entryUrl, 'f', children),
+      readChildValue(entryUrl, 'ani', children),
+      readChildValue(entryUrl, 'front', children)
     ])
 
   if (
@@ -110,65 +163,259 @@ const loadBackgroundEntry = async (
     return undefined
   }
 
-  const sequence = await loadWzImageSequence(
-    getBackgroundImagePath(
-      backgroundSet,
-      String(imageNumber),
-      readBoolean(animated),
-      version,
-      region
-    )
+  const imagePath = getBackgroundImagePath(
+    backgroundSet,
+    String(imageNumber),
+    readBoolean(animated),
+    version,
+    region
   )
-  const frame = sequence.frames[0]
-  if (!frame?.src || frame.width <= 0 || frame.height <= 0) return undefined
+  const sequence = await loadWzImageSequence(imagePath)
+  const firstFrame = sequence.frames[0]
+  if (!firstFrame?.src || firstFrame.width <= 0 || firstFrame.height <= 0) {
+    return undefined
+  }
 
   return {
     alpha: Math.min(1, Math.max(0, readNumber(alpha, 255) / 255)),
     flip: readBoolean(flip),
-    height: frame.height,
+    front: readBoolean(front),
+    imagePath,
     index,
-    origin: frame.origin,
-    src: frame.src,
+    sequence,
     type: Math.trunc(readNumber(type, 0)),
-    width: frame.width,
     x: readNumber(x, 0),
     y: readNumber(y, 0)
   }
 }
 
-export const loadMapBaseBackground = (
+export const getMapWzImageUrl = (imagePath: string, frameIndex?: number) => {
+  const framePath =
+    frameIndex === undefined ? imagePath : `${imagePath}/${frameIndex}`
+  return framePath.replace(`${WZ_API_BASE_URL}/`, `${WZ_IMAGE_API_BASE_URL}/`)
+}
+
+export const createCachedMapBackgroundLayers = (
+  backgrounds: MapBackgroundLayer[]
+) =>
+  backgrounds.map((background) => ({
+    ...background,
+    sequence: {
+      ...background.sequence,
+      frames: background.sequence.frames.map((frame, frameIndex) => ({
+        ...frame,
+        src: frame.sourceUrl
+          ? getMapWzImageUrl(frame.sourceUrl)
+          : getMapWzImageUrl(
+              background.imagePath,
+              background.sequence.animated ? frameIndex : undefined
+            )
+      }))
+    }
+  }))
+
+const readCachedBackgroundLoad = (cacheKey: string) => {
+  const cached = backgroundCache.get(cacheKey)
+  if (!cached) return undefined
+
+  backgroundCache.delete(cacheKey)
+  backgroundCache.set(cacheKey, cached)
+  return cached
+}
+
+const loadBackgroundEntries = async (
+  entryNames: string[],
+  rootUrl: string,
+  version: number,
+  region: RegionType
+) => {
+  const backgrounds = await Promise.all(
+    entryNames.map(async (entryName) => {
+      try {
+        return await loadBackgroundEntry(
+          `${rootUrl}/${entryName}`,
+          Number(entryName),
+          version,
+          region
+        )
+      } catch {
+        return undefined
+      }
+    })
+  )
+
+  return backgrounds.filter(
+    (background): background is MapBackgroundLayer => background !== undefined
+  )
+}
+
+const createMapBackgroundLoad = (
+  mapId: number,
+  version: number,
+  region: RegionType,
+  cacheKey: string
+): MapBackgroundLoad => {
+  const persistedRequest = readMapSceneCache<MapBackgroundLayer[]>(cacheKey)
+    .then((persisted) => (Array.isArray(persisted) ? persisted : undefined))
+    .catch(() => undefined)
+  const rootUrl = getMapWzBackgroundPath(mapId, version, region)
+  const entryNamesRequest = persistedRequest.then((persisted) =>
+    persisted
+      ? []
+      : readNode(rootUrl).then((root) =>
+          readChildren(root).sort((left, right) => Number(left) - Number(right))
+        )
+  )
+
+  const preview = persistedRequest.then(async (persisted) => {
+    if (persisted) return persisted
+
+    const entryNames = await entryNamesRequest
+    return loadBackgroundEntries(
+      entryNames.slice(0, MAP_BACKGROUND_PREVIEW_COUNT),
+      rootUrl,
+      version,
+      region
+    )
+  })
+
+  const full = persistedRequest
+    .then(async (persisted) => {
+      if (persisted) return persisted
+
+      const [entryNames, previewBackgrounds] = await Promise.all([
+        entryNamesRequest,
+        preview
+      ])
+      const remainingBackgrounds = await loadBackgroundEntries(
+        entryNames.slice(MAP_BACKGROUND_PREVIEW_COUNT),
+        rootUrl,
+        version,
+        region
+      )
+      const backgrounds = [...previewBackgrounds, ...remainingBackgrounds].sort(
+        (left, right) => left.index - right.index
+      )
+
+      if (backgrounds.length > 0) {
+        void writeMapSceneCache(
+          cacheKey,
+          createCachedMapBackgroundLayers(backgrounds)
+        )
+      }
+
+      return backgrounds
+    })
+    .catch((error) => {
+      backgroundCache.delete(cacheKey)
+      throw error
+    })
+
+  return { full, preview }
+}
+
+const getMapBackgroundLoad = (
   mapId: number,
   version: number,
   region: RegionType
 ) => {
   const cacheKey = `${region}/${version}/${mapId}`
-  const cached = backgroundCache.get(cacheKey)
+  const cached = readCachedBackgroundLoad(cacheKey)
   if (cached) return cached
 
-  const request = (async () => {
-    const rootUrl = getMapWzBackgroundPath(mapId, version, region)
-    const entryNames = readChildren(await readNode(rootUrl)).sort(
-      (left, right) => Number(left) - Number(right)
-    )
+  const load = createMapBackgroundLoad(mapId, version, region, cacheKey)
+  backgroundCache.set(cacheKey, load)
+  while (backgroundCache.size > MAX_BACKGROUND_CACHE_ENTRIES) {
+    const oldestKey = backgroundCache.keys().next().value
+    if (oldestKey === undefined) break
+    backgroundCache.delete(oldestKey)
+  }
 
-    for (const entryName of entryNames) {
-      const background = await loadBackgroundEntry(
-        `${rootUrl}/${entryName}`,
-        Number(entryName),
-        version,
-        region
-      )
-      if (background) return background
-    }
+  return load
+}
 
-    return undefined
-  })().catch((error) => {
-    backgroundCache.delete(cacheKey)
-    throw error
-  })
+export const loadMapBackgroundPreviewLayers = (
+  mapId: number,
+  version: number,
+  region: RegionType
+) => getMapBackgroundLoad(mapId, version, region).preview
 
-  backgroundCache.set(cacheKey, request)
-  return request
+export const loadMapBackgroundLayers = (
+  mapId: number,
+  version: number,
+  region: RegionType
+) => getMapBackgroundLoad(mapId, version, region).full
+
+export const getMapSceneLayout = (
+  mapDetail: MapleMapDetail | undefined,
+  groundMetrics: MapGroundMetrics | undefined
+): MapSceneLayout => {
+  const foregroundWidth = groundMetrics?.width ?? mapDetail?.miniMap?.width ?? 0
+  const foregroundHeight =
+    groundMetrics?.height ?? mapDetail?.miniMap?.height ?? 0
+  const origin = {
+    x: mapDetail?.miniMap?.centerX ?? foregroundWidth / 2,
+    y:
+      mapDetail?.miniMap?.centerY ??
+      groundMetrics?.groundY ??
+      foregroundHeight / 2
+  }
+
+  return {
+    foregroundHeight,
+    foregroundWidth,
+    groundY: groundMetrics?.groundY ?? origin.y,
+    origin
+  }
+}
+
+export const getMapCameraBounds = ({
+  foregroundHeight,
+  foregroundTop,
+  foregroundWidth,
+  viewportHeight,
+  viewportWidth
+}: {
+  foregroundHeight: number
+  foregroundTop: number
+  foregroundWidth: number
+  viewportHeight: number
+  viewportWidth: number
+}): MapCameraBounds => {
+  const maxX = Math.max(0, (foregroundWidth - viewportWidth) / 2)
+  const canMoveVertically = foregroundHeight > viewportHeight
+  const minY = canMoveVertically ? Math.min(0, foregroundTop) : 0
+  const maxY = canMoveVertically
+    ? Math.max(0, foregroundTop + foregroundHeight - viewportHeight)
+    : 0
+
+  return {
+    maxX,
+    maxY,
+    minX: maxX === 0 ? 0 : -maxX,
+    minY
+  }
+}
+
+export const clampMapCameraX = (cameraX: number, bounds: MapCameraBounds) =>
+  Math.min(bounds.maxX, Math.max(bounds.minX, cameraX))
+
+export const clampMapCameraY = (cameraY: number, bounds: MapCameraBounds) =>
+  Math.min(bounds.maxY, Math.max(bounds.minY, cameraY))
+
+export const getMapBackgroundLayerOffsets = (
+  background: MapBackgroundLayer,
+  frame: WzImageFrame,
+  layout: MapSceneLayout
+) => {
+  const x =
+    layout.origin.x - layout.foregroundWidth / 2 + background.x - frame.origin.x
+
+  return {
+    x,
+    flippedX: -frame.width - x,
+    y: layout.origin.y + background.y - frame.origin.y
+  }
 }
 
 export const findMapGroundYFromAlpha = (

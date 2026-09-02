@@ -1,24 +1,33 @@
 .scene,
-.baseBackground,
-.baseTopFill,
-.foreground {
+.backgroundLayer {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.baseTopFill {
-  right: 0;
-  bottom: auto;
-  left: 0;
-}
-
 .scene {
   z-index: 0;
   overflow: hidden;
+  background-color: #282c34;
+  transition: background-color 160ms ease-out;
+}
+
+.camera {
+  position: absolute;
+  top: var(--map-world-top, 0);
+  left: 50%;
+  width: max(100%, var(--map-world-width, 100%));
+  height: var(--map-world-height, 100%);
+  pointer-events: none;
+  transform: translate(
+    calc(-50% - var(--map-camera-x, 0px)),
+    calc(0px - var(--map-camera-y, 0px))
+  );
+  will-change: transform;
 }
 
 .foreground {
+  position: absolute;
   right: auto;
   bottom: auto;
   left: 50%;
@@ -26,4 +35,31 @@
   max-width: none;
   height: auto;
   max-height: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.navigationHint {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 1;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(18, 22, 30, 0.62);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  pointer-events: none;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigationHint {
+    backdrop-filter: none;
+  }
 }

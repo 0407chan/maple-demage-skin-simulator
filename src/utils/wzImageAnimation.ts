@@ -7,6 +7,7 @@ export type WzPoint = {
 
 export type WzImageFrame = {
   src: string
+  sourceUrl?: string
   delay: number
   origin: WzPoint
   width: number
@@ -155,6 +156,7 @@ const createFrame = async (
 
   return {
     src: `data:image/png;base64,${node.value}`,
+    sourceUrl: url,
     delay: Math.max(1, readNumber(delay, DEFAULT_FRAME_DELAY)),
     origin: readPoint(origin),
     width: dimensions.width,

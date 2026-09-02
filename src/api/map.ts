@@ -4,10 +4,12 @@ import {
   UseQueryResult
 } from '@tanstack/react-query'
 import axios from 'axios'
-import { GetMapListQuery, MapleMap } from 'type/map'
+import { GetMapListQuery, MapleMap, MapleMapDetail } from 'type/map'
 import { RegionType } from 'type/wz'
 
 const API_BASE_URL = 'https://maplestory.io/api'
+const MAX_MAP_DETAIL_CACHE_ENTRIES = 30
+const mapDetailCache = new Map<string, Promise<MapleMapDetail>>()
 
 export const getMapList = async (
   query: GetMapListQuery
@@ -39,6 +41,37 @@ export const getMapIconUrl = (
   version: number,
   region: RegionType
 ) => `${API_BASE_URL}/${region}/${version}/map/${mapId}/icon`
+
+export const getMapDetail = (
+  mapId: number,
+  version: number,
+  region: RegionType
+) => {
+  const cacheKey = `${region}/${version}/${mapId}`
+  const cached = mapDetailCache.get(cacheKey)
+  if (cached) {
+    mapDetailCache.delete(cacheKey)
+    mapDetailCache.set(cacheKey, cached)
+    return cached
+  }
+
+  const request = axios
+    .get<MapleMapDetail>(`${API_BASE_URL}/${region}/${version}/map/${mapId}`)
+    .then((result) => result.data)
+    .catch((error) => {
+      mapDetailCache.delete(cacheKey)
+      throw error
+    })
+
+  mapDetailCache.set(cacheKey, request)
+  while (mapDetailCache.size > MAX_MAP_DETAIL_CACHE_ENTRIES) {
+    const oldestKey = mapDetailCache.keys().next().value
+    if (oldestKey === undefined) break
+    mapDetailCache.delete(oldestKey)
+  }
+
+  return request
+}
 
 export const getMapRenderUrl = (
   mapId: number,

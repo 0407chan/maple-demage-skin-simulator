@@ -67,6 +67,7 @@ describe('WZ image animation', () => {
     expect(sequence.frames[0]).toMatchObject({
       delay: 100,
       origin: { x: 3, y: 4 },
+      sourceUrl: '/skin/NoRed0/7',
       width: 1,
       height: 1
     })
