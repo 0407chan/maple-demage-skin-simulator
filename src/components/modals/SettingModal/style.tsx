@@ -310,6 +310,56 @@ export const DamageCard = styled.section`
   }
 `
 
+export const LanguageCard = styled.section`
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+
+  @media screen and (max-width: 520px) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+`
+
+export const LanguageSelect = styled.select`
+  width: min(190px, 42vw);
+  min-height: 42px;
+  flex: 0 0 auto;
+  padding: 0 34px 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  appearance: auto;
+  background: rgba(10, 13, 19, 0.72);
+  color: #f1f3f7;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    border-color: rgba(105, 174, 255, 0.58);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(105, 174, 255, 0.22);
+    outline-offset: 2px;
+  }
+
+  @media screen and (max-width: 520px) {
+    width: 100%;
+  }
+`
+
 export const ControlGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -396,12 +446,10 @@ export const SectionTitle = styled.h3`
 
 export const SectionDescription = styled.p`
   margin: 3px 0 0;
-  overflow: hidden;
   color: #858e9e;
   font-size: 11px;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 `
 
 export const DamageFields = styled.div`

@@ -29,6 +29,7 @@ import type {
 } from 'utils/mapScene'
 import { getWzAnimationPlayback } from 'utils/wzImageAnimation'
 import styles from './style.module.scss'
+import { useI18n } from 'i18n'
 
 export type MapMovementState = {
   horizontalDirection: -1 | 0 | 1
@@ -180,6 +181,7 @@ const MapScene: React.FC<Props> = ({
   region,
   version
 }) => {
+  const { t } = useI18n()
   const [preparedScene, setPreparedScene] = useState<PreparedMapScene>()
   const [cameraViewport, setCameraViewport] = useState<CameraViewport>({
     bounds: INITIAL_CAMERA_BOUNDS,
@@ -619,7 +621,7 @@ const MapScene: React.FC<Props> = ({
         <div className={styles.navigationHint}>
           {canNavigateHorizontally && '← →'}
           {canNavigateHorizontally && canNavigateVertically && ' '}
-          {canNavigateVertically && '↑ ↓'} 맵 탐색
+          {canNavigateVertically && '↑ ↓'} {t('map.navigation')}
         </div>
       )}
     </div>

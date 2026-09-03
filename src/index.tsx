@@ -12,6 +12,7 @@ import { wzVersionState } from './atoms/wzVersion'
 import { RegionType } from 'type/wz'
 import { getLatestReadyWzVersion } from 'utils/wzVersion'
 import { initializeAnalytics } from 'utils/analytics'
+import { I18nProvider } from 'i18n'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,12 +64,14 @@ initializeAnalytics()
 
 root.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RecoilRoot>
-        <ConfigProvider theme={antdTheme}>
-          <Router />
-        </ConfigProvider>
-      </RecoilRoot>
-    </QueryClientProvider>
+    <I18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <RecoilRoot>
+          <ConfigProvider theme={antdTheme}>
+            <Router />
+          </ConfigProvider>
+        </RecoilRoot>
+      </QueryClientProvider>
+    </I18nProvider>
   </React.StrictMode>
 )

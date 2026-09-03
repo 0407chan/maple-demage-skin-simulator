@@ -1,6 +1,7 @@
 import { SETTING_LIMITS } from 'constants/app_constants'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
+import { LocalePreference, localeOptions, useI18n } from 'i18n'
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Setting } from 'type/setting'
 import { trackDamageSettingChanged } from 'utils/analytics'
@@ -16,6 +17,7 @@ const digitsOnly = (value: string) =>
   value.replace(/[^0-9]/g, '').replaceAll(',', '')
 
 const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
+  const { localePreference, setLocalePreference, t } = useI18n()
   const [open, { setTrue: openDialog, setFalse: closeDialog }] =
     useBoolean(false)
   const initialSettingRef = useRef<Setting | undefined>(undefined)
@@ -179,7 +181,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
           <span />
           <span />
         </S.TriggerIcon>
-        세팅
+        {t('settings.trigger')}
       </S.TriggerButton>
 
       <S.BackBoard $open={open} onClick={handleClose} aria-hidden="true" />
@@ -197,21 +199,53 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
         <S.Header>
           <S.HeaderCopy>
             <S.Eyebrow>DAMAGE LAB</S.Eyebrow>
-            <S.DialogTitle id="setting-dialog-title">데미지 설정</S.DialogTitle>
+            <S.DialogTitle id="setting-dialog-title">
+              {t('settings.title')}
+            </S.DialogTitle>
             <S.Description id="setting-dialog-description">
-              전투 수치를 조정하고 결과를 바로 확인해 보세요.
+              {t('settings.description')}
             </S.Description>
           </S.HeaderCopy>
           <S.CloseButton
             type="button"
             onClick={handleClose}
-            aria-label="설정 닫기"
+            aria-label={t('settings.close')}
           >
             <span aria-hidden="true" />
           </S.CloseButton>
         </S.Header>
 
         <S.ScrollArea>
+          <S.LanguageCard>
+            <S.SectionHeading>
+              <S.SectionIcon data-tone="blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.7 15.7 0 0 0-1.2-5A8 8 0 0 1 18.9 11ZM12 4c.9 1.1 1.6 3.5 1.8 7H10.2c.2-3.5.9-5.9 1.8-7ZM9.4 6a15.7 15.7 0 0 0-1.2 5H5.1A8 8 0 0 1 9.4 6ZM5.1 13h3.1a15.7 15.7 0 0 0 1.2 5 8 8 0 0 1-4.3-5Zm6.9 7c-.9-1.1-1.6-3.5-1.8-7h3.6c-.2 3.5-.9 5.9-1.8 7Zm2.6-2a15.7 15.7 0 0 0 1.2-5h3.1a8 8 0 0 1-4.3 5Z" />
+                </svg>
+              </S.SectionIcon>
+              <S.SectionCopy>
+                <S.SectionTitle>{t('settings.language')}</S.SectionTitle>
+                <S.SectionDescription>
+                  {t('settings.languageDescription')}
+                </S.SectionDescription>
+              </S.SectionCopy>
+            </S.SectionHeading>
+            <S.LanguageSelect
+              value={localePreference}
+              aria-label={t('settings.languageLabel')}
+              onChange={(event) =>
+                setLocalePreference(event.target.value as LocalePreference)
+              }
+            >
+              <option value="auto">{t('settings.languageAuto')}</option>
+              {localeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </S.LanguageSelect>
+          </S.LanguageCard>
+
           <S.DamageCard>
             <S.SectionHeading>
               <S.SectionIcon data-tone="gold" aria-hidden="true">
@@ -220,9 +254,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                 </svg>
               </S.SectionIcon>
               <S.SectionCopy>
-                <S.SectionTitle>데미지 범위</S.SectionTitle>
+                <S.SectionTitle>{t('settings.damageRange')}</S.SectionTitle>
                 <S.SectionDescription>
-                  공격 한 번에 표시될 최소·최대 수치
+                  {t('settings.damageRangeDescription')}
                 </S.SectionDescription>
               </S.SectionCopy>
             </S.SectionHeading>
@@ -230,7 +264,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
             <S.DamageFields>
               <S.Field>
                 <S.FieldHeader>
-                  <S.FieldLabel htmlFor="min-damage">최소 데미지</S.FieldLabel>
+                  <S.FieldLabel htmlFor="min-damage">
+                    {t('settings.minDamage')}
+                  </S.FieldLabel>
                   <S.FieldBadge>MIN</S.FieldBadge>
                 </S.FieldHeader>
                 <S.NumberInput
@@ -249,7 +285,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
 
               <S.Field>
                 <S.FieldHeader>
-                  <S.FieldLabel htmlFor="max-damage">최대 데미지</S.FieldLabel>
+                  <S.FieldLabel htmlFor="max-damage">
+                    {t('settings.maxDamage')}
+                  </S.FieldLabel>
                   <S.FieldBadge>MAX</S.FieldBadge>
                 </S.FieldHeader>
                 <S.NumberInput
@@ -277,9 +315,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                   </svg>
                 </S.SectionIcon>
                 <S.SectionCopy>
-                  <S.SectionTitle>크리티컬</S.SectionTitle>
+                  <S.SectionTitle>{t('settings.critical')}</S.SectionTitle>
                   <S.SectionDescription>
-                    치명타가 발생할 확률
+                    {t('settings.criticalDescription')}
                   </S.SectionDescription>
                 </S.SectionCopy>
               </S.SectionHeading>
@@ -287,7 +325,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
               <S.Stepper>
                 <S.StepButton
                   type="button"
-                  aria-label="크리티컬 확률 10% 감소"
+                  aria-label={t('settings.criticalDecrease')}
                   disabled={
                     setting.criticalRate === undefined ||
                     setting.criticalRate <= SETTING_LIMITS.MIN_CRITICAL_RATE
@@ -299,7 +337,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                 <S.StepValue>
                   <S.StepInput
                     id="critical-rate"
-                    aria-label="크리티컬 확률"
+                    aria-label={t('settings.criticalRate')}
                     inputMode="numeric"
                     maxLength={3}
                     value={
@@ -313,7 +351,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                 </S.StepValue>
                 <S.StepButton
                   type="button"
-                  aria-label="크리티컬 확률 10% 증가"
+                  aria-label={t('settings.criticalIncrease')}
                   disabled={
                     setting.criticalRate === undefined ||
                     setting.criticalRate >= SETTING_LIMITS.MAX_CRITICAL_RATE
@@ -333,9 +371,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                   </svg>
                 </S.SectionIcon>
                 <S.SectionCopy>
-                  <S.SectionTitle>공격 타수</S.SectionTitle>
+                  <S.SectionTitle>{t('settings.hitCount')}</S.SectionTitle>
                   <S.SectionDescription>
-                    한 번에 표시할 데미지 수
+                    {t('settings.hitCountDescription')}
                   </S.SectionDescription>
                 </S.SectionCopy>
               </S.SectionHeading>
@@ -343,7 +381,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
               <S.Stepper>
                 <S.StepButton
                   type="button"
-                  aria-label="공격 타수 1 감소"
+                  aria-label={t('settings.hitCountDecrease')}
                   disabled={
                     setting.numberAttack === undefined ||
                     setting.numberAttack <= SETTING_LIMITS.MIN_NUMBER_ATTACK
@@ -355,7 +393,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                 <S.StepValue>
                   <S.StepInput
                     id="attack-count"
-                    aria-label="공격 타수"
+                    aria-label={t('settings.hitCountLabel')}
                     inputMode="numeric"
                     maxLength={2}
                     value={
@@ -365,11 +403,13 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                     }
                     onChange={(event) => updateAttackCount(event.target.value)}
                   />
-                  <S.Unit aria-hidden="true">회</S.Unit>
+                  <S.Unit aria-hidden="true">
+                    {t('settings.hitCountUnit')}
+                  </S.Unit>
                 </S.StepValue>
                 <S.StepButton
                   type="button"
-                  aria-label="공격 타수 1 증가"
+                  aria-label={t('settings.hitCountIncrease')}
                   disabled={
                     setting.numberAttack === undefined ||
                     setting.numberAttack >= SETTING_LIMITS.MAX_NUMBER_ATTACK
@@ -390,9 +430,9 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
                 </svg>
               </S.SectionIcon>
               <S.SectionCopy>
-                <S.SectionTitle>몬스터 무적모드</S.SectionTitle>
+                <S.SectionTitle>{t('settings.invincible')}</S.SectionTitle>
                 <S.SectionDescription>
-                  체력 감소와 처치·리스폰을 막습니다.
+                  {t('settings.invincibleDescription')}
                 </S.SectionDescription>
               </S.SectionCopy>
             </S.SectionHeading>
@@ -417,7 +457,7 @@ const SettingModal: React.FC<Props> = ({ setting, setSetting }) => {
 
           <S.AutoSaveNotice>
             <S.StatusDot aria-hidden="true" />
-            변경한 설정은 자동으로 저장됩니다.
+            {t('settings.autoSave')}
           </S.AutoSaveNotice>
         </S.ScrollArea>
       </S.Container>

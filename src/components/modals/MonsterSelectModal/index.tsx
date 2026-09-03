@@ -2,6 +2,7 @@ import { getMonsterIconUrl, useGetMonsterList } from 'api/monster'
 import { wzVersionState } from 'atoms/wzVersion'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
+import { useI18n } from 'i18n'
 import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
@@ -22,6 +23,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
   currentMonster,
   onSelect
 }) => {
+  const { formatNumber, t } = useI18n()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
@@ -108,7 +110,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
         type="button"
         className={styles.triggerButton}
         onClick={handleOpen}
-        aria-label={`몬스터 변경: 현재 ${currentMonster.name}`}
+        aria-label={t('monster.changeCurrent', { name: currentMonster.name })}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
@@ -151,17 +153,17 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           <div>
             <span className={styles.eyebrow}>MONSTER LIBRARY</span>
             <h2 id="monster-dialog-title" className={styles.dialogTitle}>
-              몬스터 변경
+              {t('monster.title')}
             </h2>
             <p id="monster-dialog-description" className={styles.description}>
-              이름으로 검색한 뒤 공격할 몬스터를 골라보세요.
+              {t('monster.description')}
             </p>
           </div>
           <button
             type="button"
             className={styles.closeButton}
             onClick={onClose}
-            aria-label="몬스터 변경 닫기"
+            aria-label={t('monster.close')}
           >
             <span aria-hidden="true" />
           </button>
@@ -178,15 +180,15 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
               className={styles.input}
               maxLength={30}
               value={searchKey}
-              placeholder="예: 슬라임, 주황버섯, 루시드"
-              aria-label="몬스터 검색"
+              placeholder={t('monster.placeholder')}
+              aria-label={t('monster.searchLabel')}
               onChange={(event) => setSearchKey(event.target.value)}
             />
             {searchKey && (
               <button
                 type="button"
                 className={styles.clearButton}
-                aria-label="검색어 지우기"
+                aria-label={t('common.clearSearch')}
                 onClick={() => setSearchKey('')}
               >
                 <span aria-hidden="true" />
@@ -195,8 +197,10 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           </div>
           <p className={styles.searchHint} aria-live="polite">
             {isSearchPending || isFetching
-              ? '몬스터를 찾는 중이에요.'
-              : `검색 결과 ${monsters.length}개`}
+              ? t('monster.searching')
+              : t('common.searchResults', {
+                  count: formatNumber(monsters.length)
+                })}
           </p>
         </div>
 
@@ -207,7 +211,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
             )}
           </span>
           <span className={styles.currentCopy}>
-            <span>현재 공격 대상</span>
+            <span>{t('monster.currentTarget')}</span>
             <strong>{currentMonster.name}</strong>
           </span>
           <span className={styles.levelBadge}>Lv. {currentMonster.level}</span>
@@ -217,13 +221,13 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           {!isVersionReady || isLoading || isSearchPending ? (
             <div className={styles.statusState} role="status">
               <span className={styles.spinner} aria-hidden="true" />
-              몬스터를 불러오고 있어요.
+              {t('monster.loading')}
             </div>
           ) : isError ? (
             <div className={styles.statusState} role="alert">
-              <strong>몬스터를 불러오지 못했어요.</strong>
+              <strong>{t('monster.error')}</strong>
               <button type="button" onClick={() => void refetch()}>
-                다시 시도
+                {t('common.retry')}
               </button>
             </div>
           ) : monsters.length === 0 ? (
@@ -231,8 +235,8 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
               <span className={styles.emptyIcon} aria-hidden="true">
                 ?
               </span>
-              <strong>검색 결과가 없어요.</strong>
-              <span>다른 몬스터 이름으로 찾아보세요.</span>
+              <strong>{t('common.noResults')}</strong>
+              <span>{t('monster.emptyHint')}</span>
             </div>
           ) : (
             monsters.map((monster) => {

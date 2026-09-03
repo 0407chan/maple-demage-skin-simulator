@@ -2,6 +2,7 @@ import { getMapIconUrl, useGetMapList } from 'api/map'
 import { wzVersionState } from 'atoms/wzVersion'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import useBoolean from 'hooks/useBoolean'
+import { useI18n } from 'i18n'
 import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import { useRecoilValue } from 'recoil'
@@ -29,6 +30,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
   currentBackground,
   onSelect
 }) => {
+  const { formatNumber, t } = useI18n()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const [searchKey, setSearchKey] = useState('')
   const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
@@ -89,7 +91,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
   const isSearchPending = searchKey.trim() !== debouncedSearchKey
   const isVersionReady =
     wzVersion.version !== undefined && wzVersion.region !== undefined
-  const currentName = currentBackground?.name ?? '기본 배경'
+  const currentName = currentBackground?.name ?? t('background.default')
   const currentIconUrl = currentBackground
     ? getIconUrl(currentBackground)
     : undefined
@@ -101,7 +103,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
         type="button"
         className={styles.triggerButton}
         onClick={onOpen}
-        aria-label={`배경 변경: 현재 ${currentName}`}
+        aria-label={t('background.changeCurrent', { name: currentName })}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
@@ -146,20 +148,20 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           <div>
             <span className={styles.eyebrow}>MAP LIBRARY</span>
             <h2 id="background-dialog-title" className={styles.dialogTitle}>
-              배경 변경
+              {t('background.title')}
             </h2>
             <p
               id="background-dialog-description"
               className={styles.description}
             >
-              맵 이름으로 검색한 뒤 전투 배경을 골라보세요.
+              {t('background.description')}
             </p>
           </div>
           <button
             type="button"
             className={styles.closeButton}
             onClick={onClose}
-            aria-label="배경 변경 닫기"
+            aria-label={t('background.close')}
           >
             <span aria-hidden="true" />
           </button>
@@ -176,15 +178,15 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               className={styles.input}
               maxLength={30}
               value={searchKey}
-              placeholder="예: 헤네시스, 리스항구, 루디브리엄"
-              aria-label="맵 검색"
+              placeholder={t('background.placeholder')}
+              aria-label={t('background.searchLabel')}
               onChange={(event) => setSearchKey(event.target.value)}
             />
             {searchKey && (
               <button
                 type="button"
                 className={styles.clearButton}
-                aria-label="검색어 지우기"
+                aria-label={t('common.clearSearch')}
                 onClick={() => setSearchKey('')}
               >
                 <span aria-hidden="true" />
@@ -193,8 +195,10 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           </div>
           <p className={styles.searchHint} aria-live="polite">
             {isSearchPending || isFetching
-              ? '맵을 찾는 중이에요.'
-              : `검색 결과 ${maps.length}개`}
+              ? t('background.searching')
+              : t('common.searchResults', {
+                  count: formatNumber(maps.length)
+                })}
           </p>
         </div>
 
@@ -208,7 +212,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               )}
             </span>
             <span className={styles.currentCopy}>
-              <span>현재 배경</span>
+              <span>{t('background.current')}</span>
               <strong>{currentName}</strong>
               {currentBackground?.streetName && (
                 <small>{currentBackground.streetName}</small>
@@ -223,8 +227,8 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           >
             <LandscapeIcon />
             <span>
-              <strong>기본 배경</strong>
-              <small>단색 배경으로 돌아가기</small>
+              <strong>{t('background.default')}</strong>
+              <small>{t('background.defaultDescription')}</small>
             </span>
             {!currentBackground && (
               <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -238,13 +242,13 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           {!isVersionReady || isLoading || isSearchPending ? (
             <div className={styles.statusState} role="status">
               <span className={styles.spinner} aria-hidden="true" />
-              맵을 불러오고 있어요.
+              {t('background.loading')}
             </div>
           ) : isError ? (
             <div className={styles.statusState} role="alert">
-              <strong>맵을 불러오지 못했어요.</strong>
+              <strong>{t('background.error')}</strong>
               <button type="button" onClick={() => void refetch()}>
-                다시 시도
+                {t('common.retry')}
               </button>
             </div>
           ) : maps.length === 0 ? (
@@ -252,8 +256,8 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               <span className={styles.emptyIcon} aria-hidden="true">
                 ?
               </span>
-              <strong>검색 결과가 없어요.</strong>
-              <span>다른 맵 이름으로 찾아보세요.</span>
+              <strong>{t('common.noResults')}</strong>
+              <span>{t('background.emptyHint')}</span>
             </div>
           ) : (
             maps.map((map) => {
@@ -285,7 +289,10 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                         textToHighlight={map.name}
                       />
                     </strong>
-                    <span>{map.streetName || `맵 #${map.id}`}</span>
+                    <span>
+                      {map.streetName ||
+                        t('background.mapNumber', { id: map.id })}
+                    </span>
                   </span>
                   {isCurrent ? (
                     <svg

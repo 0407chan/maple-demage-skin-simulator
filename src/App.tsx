@@ -23,6 +23,7 @@ import {
   SETTING_LIMITS
 } from 'constants/app_constants'
 import { useImageLoader } from 'hooks/useImageLoader'
+import { useI18n } from 'i18n'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
 import { useRecoilValue } from 'recoil'
@@ -49,7 +50,7 @@ import {
   getMonsterHealthPercent,
   getMonsterMaxHealth
 } from 'utils/monsterHealth'
-import { getRandomInt, numberWithCommas } from 'utils/number'
+import { getRandomInt } from 'utils/number'
 import { trackMonsterAttacked } from 'utils/analytics'
 import { SkinMap } from 'constants/damageSkinMapper'
 import DamageWrapper from './components/DamageWrapper'
@@ -250,6 +251,7 @@ const loadInitialState = (): AppState => {
 }
 
 const App: React.FC = () => {
+  const { formatNumber, t } = useI18n()
   const [state, setState] = useState<AppState>(loadInitialState)
   const [mapMovement, setMapMovement] =
     useState<MapMovementState>(IDLE_MAP_MOVEMENT)
@@ -387,7 +389,7 @@ const App: React.FC = () => {
     state.monsterHealth,
     maxMonsterHealth
   )
-  const monsterHealthLabel = `${numberWithCommas(state.monsterHealth)} / ${numberWithCommas(maxMonsterHealth)}`
+  const monsterHealthLabel = `${formatNumber(state.monsterHealth)} / ${formatNumber(maxMonsterHealth)}`
   const monsterImageAlignment = monsterImageFailed
     ? { bottomOffset: 0, horizontalOffset: 0 }
     : getMonsterImageAlignment({
@@ -829,12 +831,12 @@ const App: React.FC = () => {
         <a
           href="#mapping"
           className={styles.MappingToolButton}
-          aria-label="로컬 매핑 도구 열기"
+          aria-label={t('app.mapping.open')}
         >
           <svg viewBox="0 0 20 20" aria-hidden="true">
             <path d="M4.5 5.5h4v4h-4zM11.5 5.5h4v4h-4zM4.5 12.5h4v3h-4zM11.5 12.5h4v3h-4z" />
           </svg>
-          <span>매핑 도구</span>
+          <span>{t('app.mapping.label')}</span>
         </a>
       )}
       <div ref={bodyRef} className={clsx(styles.Body, 'no-drag')}>
@@ -861,7 +863,9 @@ const App: React.FC = () => {
           <div
             className={styles.MonsterHealth}
             role="progressbar"
-            aria-label={`${state.currentMonster.name} 체력`}
+            aria-label={t('app.monster.health', {
+              name: state.currentMonster.name
+            })}
             aria-valuemin={0}
             aria-valuemax={maxMonsterHealth}
             aria-valuenow={state.monsterHealth}
@@ -898,10 +902,14 @@ const App: React.FC = () => {
             }
             aria-label={
               state.monsterStatus === 'alive'
-                ? `${state.currentMonster.name} 공격하기`
+                ? t('app.monster.attack', { name: state.currentMonster.name })
                 : state.monsterStatus === 'dying'
-                  ? `${state.currentMonster.name} 쓰러지는 중`
-                  : `${state.currentMonster.name} 다시 나타나는 중`
+                  ? t('app.monster.dying', {
+                      name: state.currentMonster.name
+                    })
+                  : t('app.monster.respawning', {
+                      name: state.currentMonster.name
+                    })
             }
           >
             <img

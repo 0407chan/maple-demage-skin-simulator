@@ -5,6 +5,7 @@ import { useRecoilValue } from 'recoil'
 import { wzVersionState } from 'atoms/wzVersion'
 import { formatDamageString } from './util'
 import WzImage from './WzImage'
+import { useI18n } from 'i18n'
 
 type Props = {
   damageItem: DamageType
@@ -12,6 +13,7 @@ type Props = {
 }
 
 const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
+  const { formatNumber, t } = useI18n()
   const wzVersion = useRecoilValue(wzVersionState)
   const [animationStart] = useState(() => performance.now())
 
@@ -54,7 +56,10 @@ const DamageSkin: React.FC<Props> = ({ damageItem, currentSkin }) => {
       $delay={damageItem.level}
       style={{ bottom: damageItem.marginBottom }}
       role="img"
-      aria-label={`${damageItem.isCritical ? '크리티컬 ' : ''}데미지 ${damageItem.damage.toLocaleString()}`}
+      aria-label={t('damage.accessibleLabel', {
+        critical: damageItem.isCritical ? t('damage.criticalPrefix') : '',
+        damage: formatNumber(damageItem.damage)
+      })}
       // stop = 멈춤
       // stop
     >

@@ -2,6 +2,7 @@ import { wzVersionState } from 'atoms/wzVersion'
 import { SkinMap } from 'constants/damageSkinMapper'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
+import { useI18n } from 'i18n'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { ItemDto } from 'type/damage-skin'
@@ -23,11 +24,11 @@ type SkinSelectModalProps = {
   hideCloseButton?: boolean
 }
 
-const FILTER_OPTIONS: Array<{ label: string; value: SkinFilter }> = [
-  { label: '전체', value: 'all' },
-  { label: '유닛', value: 'unit' },
-  { label: '액션', value: 'action' }
-]
+const FILTER_OPTIONS = [
+  { key: 'skin.filter.all', value: 'all' },
+  { key: 'skin.filter.unit', value: 'unit' },
+  { key: 'skin.filter.action', value: 'action' }
+] as const satisfies ReadonlyArray<{ key: string; value: SkinFilter }>
 
 const FILTER_ANALYTICS_NAMES: Record<SkinFilter, SkinFilterName> = {
   all: '전체',
@@ -60,6 +61,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   setCurrentSkin,
   onConfirm
 }) => {
+  const { formatNumber, t } = useI18n()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
@@ -157,7 +159,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           type="button"
           className={styles.skinButton}
           onClick={handleOpen}
-          aria-label={`데미지 스킨 선택: ${currentSkin.name}`}
+          aria-label={t('skin.selectCurrent', { name: currentSkin.name })}
           aria-haspopup="dialog"
           aria-expanded={open}
         >
@@ -203,10 +205,10 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           <div className={styles.headerCopy}>
             <span className={styles.eyebrow}>SKIN LIBRARY</span>
             <h2 id="skin-dialog-title" className={styles.dialogTitle}>
-              데미지 스킨 선택
+              {t('skin.title')}
             </h2>
             <p id="skin-dialog-description" className={styles.description}>
-              원하는 스킨을 검색하고 바로 적용해 보세요.
+              {t('skin.description')}
             </p>
           </div>
 
@@ -215,7 +217,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
               type="button"
               className={styles.closeButton}
               onClick={onClose}
-              aria-label="데미지 스킨 선택 닫기"
+              aria-label={t('skin.close')}
             >
               <span aria-hidden="true" />
             </button>
@@ -233,15 +235,15 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
               className={styles.input}
               maxLength={20}
               value={searchKey}
-              placeholder="스킨 이름 검색"
-              aria-label="데미지 스킨 검색"
+              placeholder={t('skin.placeholder')}
+              aria-label={t('skin.searchLabel')}
               onChange={(event) => setSearchKey(event.target.value)}
             />
             {searchKey && (
               <button
                 type="button"
                 className={styles.clearButton}
-                aria-label="검색어 지우기"
+                aria-label={t('common.clearSearch')}
                 onClick={() => setSearchKey('')}
               >
                 <span aria-hidden="true" />
@@ -252,7 +254,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           <div
             className={styles.filterGroup}
             role="group"
-            aria-label="스킨 유형 필터"
+            aria-label={t('skin.filterLabel')}
           >
             {FILTER_OPTIONS.map((option) => (
               <button
@@ -262,7 +264,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                 aria-pressed={filter === option.value}
                 onClick={() => setFilter(option.value)}
               >
-                {option.label}
+                {t(option.key)}
               </button>
             ))}
           </div>
@@ -278,22 +280,26 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
               />
             </span>
             <span className={styles.currentCopy}>
-              <span className={styles.currentLabel}>현재 적용 중</span>
+              <span className={styles.currentLabel}>{t('skin.current')}</span>
               <strong className={styles.currentName}>{currentSkin.name}</strong>
             </span>
             <span className={styles.appliedBadge}>
               <svg viewBox="0 0 20 20" aria-hidden="true">
                 <path d="m5 10 3 3 7-7" />
               </svg>
-              적용됨
+              {t('skin.applied')}
             </span>
           </div>
         )}
 
         <div className={styles.listHeader}>
-          <span>스킨 목록</span>
+          <span>{t('skin.list')}</span>
           <span className={styles.resultCount} aria-live="polite">
-            {isLoading ? '불러오는 중' : `${filteredSkins.length}개`}
+            {isLoading
+              ? t('skin.loadingShort')
+              : t('common.count', {
+                  count: formatNumber(filteredSkins.length)
+                })}
           </span>
         </div>
 
@@ -301,7 +307,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           {isLoading ? (
             <div className={styles.loadingState} role="status">
               <span className={styles.spinner} aria-hidden="true" />
-              스킨을 불러오고 있어요.
+              {t('skin.loading')}
             </div>
           ) : filteredSkins.length > 0 ? (
             filteredSkins.map((skin) => (
@@ -320,8 +326,8 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                   <path d="m20 20-4.5-4.5m2.5-5A7.5 7.5 0 1 1 3 10.5a7.5 7.5 0 0 1 15 0Z" />
                 </svg>
               </span>
-              <strong>검색 결과가 없어요.</strong>
-              <span>다른 이름이나 필터로 다시 찾아보세요.</span>
+              <strong>{t('common.noResults')}</strong>
+              <span>{t('skin.emptyHint')}</span>
             </div>
           )}
         </div>
