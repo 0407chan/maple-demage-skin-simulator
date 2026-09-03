@@ -41,7 +41,7 @@
 
 .navigationHint {
   position: absolute;
-  bottom: 22px;
+  bottom: max(76px, calc(10vh - 20px));
   left: 50%;
   z-index: 1;
   padding: 7px 12px;
@@ -53,9 +53,19 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.2px;
+  white-space: nowrap;
   pointer-events: none;
   transform: translateX(-50%);
   backdrop-filter: blur(8px);
+}
+
+@media screen and (max-width: 640px) {
+  .navigationHint {
+    bottom: max(
+      92px,
+      calc(env(safe-area-inset-bottom, 0px) + 60px)
+    );
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
