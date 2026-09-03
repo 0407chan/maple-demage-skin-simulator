@@ -15,7 +15,7 @@ export const getMonsterList = async (
   const { region, version, ...params } = query
   const result = await axios.get<Monster[]>(
     `${API_BASE_URL}/${region}/${version}/mob`,
-    { params }
+    { params, timeout: 12000 }
   )
 
   return result.data ?? []
@@ -40,7 +40,8 @@ export const getMonsterDetail = async (
   region: RegionType
 ): Promise<MonsterDetail> => {
   const result = await axios.get<MonsterDetail>(
-    `${API_BASE_URL}/${region}/${version}/mob/${monsterId}`
+    `${API_BASE_URL}/${region}/${version}/mob/${monsterId}`,
+    { timeout: 12000 }
   )
 
   return result.data

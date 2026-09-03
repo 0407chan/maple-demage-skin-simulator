@@ -1,14 +1,7 @@
 export type SkinType = 'NoCri0' | 'NoCri1' | 'NoRed0' | 'NoRed1'
-export type RegionType =
-  | 'KMS'
-  | 'TMS'
-  | 'THMS'
-  | 'TMS'
-  | 'JMS'
-  | 'SEA'
-  | 'KMST'
-  | 'CMS'
-  | 'CMST'
+import { RegionType } from './wz'
+
+export type { RegionType } from './wz'
 export type GetDamageSkinQuery = {
   skinNumber?: number
   skinType: SkinType
@@ -60,6 +53,15 @@ export type ItemDto = {
   requiredJobs: string[]
   requiredLevel: number
   typeInfo: TypeInfo
+}
+
+export type ItemDetail = {
+  id: number
+  description?: {
+    id: number
+    name: string
+    description?: string
+  }
 }
 
 export type TypeInfo = {

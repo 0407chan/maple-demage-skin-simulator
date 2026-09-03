@@ -7,6 +7,7 @@ import axios from 'axios'
 import {
   GetDamageSkinResponse,
   GetItemListQuery,
+  ItemDetail,
   ItemDto,
   RegionType
 } from 'type/damage-skin'
@@ -77,22 +78,55 @@ export const getItemList = async (
   const result = await axios.get(
     `https://maplestory.io/api/${query.region}/${query.version}/item`,
     {
-      params: query
+      params: query,
+      timeout: 12000
     }
   )
   return result.data
 }
 
 export const useGetItemList = (
-  query: GetItemListQuery
+  query: GetItemListQuery,
+  enabled = true
 ): UseQueryResult<ItemDto[], unknown> => {
   return useQuery({
     queryKey: ['getItemList', query],
     queryFn: () => getItemList(query),
     placeholderData: keepPreviousData,
-    enabled: query.version !== undefined && query.region !== undefined
+    enabled:
+      enabled && query.version !== undefined && query.region !== undefined
   })
 }
+
+export const getItemDetail = async (
+  itemId: number,
+  version: number,
+  region: RegionType
+): Promise<ItemDetail> => {
+  const result = await axios.get<ItemDetail>(
+    `https://maplestory.io/api/${region}/${version}/item/${itemId}`,
+    { timeout: 12000 }
+  )
+
+  return result.data
+}
+
+export const useGetItemDetail = (
+  itemId?: number,
+  version?: number,
+  region?: RegionType,
+  enabled = true
+): UseQueryResult<ItemDetail, unknown> =>
+  useQuery({
+    queryKey: ['getItemDetail', region, version, itemId],
+    queryFn: () => getItemDetail(itemId!, version!, region!),
+    enabled:
+      enabled &&
+      itemId !== undefined &&
+      version !== undefined &&
+      region !== undefined,
+    staleTime: 1000 * 60 * 60
+  })
 export const getWzVersion = async (): Promise<WzType[]> => {
   const result = await axios.get('https://maplestory.io/api/wz')
   return result.data

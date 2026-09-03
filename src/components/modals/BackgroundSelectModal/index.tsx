@@ -2,6 +2,7 @@ import { getMapIconUrl, useGetMapList } from 'api/map'
 import { wzVersionState } from 'atoms/wzVersion'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import useBoolean from 'hooks/useBoolean'
+import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
 import { useI18n } from 'i18n'
 import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
@@ -30,7 +31,8 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
   currentBackground,
   onSelect
 }) => {
-  const { formatNumber, t } = useI18n()
+  const { formatCount, t } = useI18n()
+  const localizedContent = useLocalizedGameContent()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const [searchKey, setSearchKey] = useState('')
   const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
@@ -53,21 +55,37 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
 
   const query = useMemo(
     () => ({
-      region: wzVersion.region,
-      version: wzVersion.version,
+      region: localizedContent.region,
+      version: localizedContent.version,
       startPosition: 0,
       count: RESULT_COUNT,
       searchFor: debouncedSearchKey || undefined
     }),
-    [debouncedSearchKey, wzVersion.region, wzVersion.version]
+    [debouncedSearchKey, localizedContent.region, localizedContent.version]
   )
+  const localizedResultsQuery = useGetMapList(query, open)
+  const fallbackResultsQuery = useGetMapList(
+    {
+      ...query,
+      region: wzVersion.region,
+      version: wzVersion.version
+    },
+    open && localizedResultsQuery.isError
+  )
+  const currentNameQuery = useGetMapList({
+    region: localizedContent.region,
+    version: localizedContent.version,
+    startPosition: 0,
+    count: RESULT_COUNT
+  })
+  const usingFallback = localizedResultsQuery.isError
   const {
     data: mapResults = [],
     isError,
     isFetching,
     isLoading,
     refetch
-  } = useGetMapList(query, open || debouncedSearchKey.length === 0)
+  } = usingFallback ? fallbackResultsQuery : localizedResultsQuery
   const maps = useMemo(() => getUniqueByName(mapResults), [mapResults])
 
   const getIconUrl = (map: MapleMap) => {
@@ -90,8 +108,25 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
 
   const isSearchPending = searchKey.trim() !== debouncedSearchKey
   const isVersionReady =
-    wzVersion.version !== undefined && wzVersion.region !== undefined
-  const currentName = currentBackground?.name ?? t('background.default')
+    localizedContent.version !== undefined &&
+    localizedContent.region !== undefined
+  const localizedCurrentBackground = currentNameQuery.data?.find(
+    (map) => map.id === currentBackground?.id
+  )
+  const currentName =
+    localizedCurrentBackground?.name ??
+    currentBackground?.name ??
+    t('background.default')
+  const currentStreetName =
+    localizedCurrentBackground?.streetName ?? currentBackground?.streetName
+  const currentNameLanguage = localizedCurrentBackground
+    ? localizedContent.localeTag
+    : currentBackground
+      ? 'ko-KR'
+      : localizedContent.localeTag
+  const resultNameLanguage = usingFallback
+    ? 'ko-KR'
+    : localizedContent.localeTag
   const currentIconUrl = currentBackground
     ? getIconUrl(currentBackground)
     : undefined
@@ -116,7 +151,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
         </span>
         <span className={styles.triggerCopy}>
           <span className={styles.triggerLabel}>BACKGROUND</span>
-          <strong>{currentName}</strong>
+          <strong lang={currentNameLanguage}>{currentName}</strong>
         </span>
         <svg
           className={styles.triggerChevron}
@@ -196,9 +231,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
           <p className={styles.searchHint} aria-live="polite">
             {isSearchPending || isFetching
               ? t('background.searching')
-              : t('common.searchResults', {
-                  count: formatNumber(maps.length)
-                })}
+              : formatCount('searchResults', maps.length)}
           </p>
         </div>
 
@@ -213,9 +246,9 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
             </span>
             <span className={styles.currentCopy}>
               <span>{t('background.current')}</span>
-              <strong>{currentName}</strong>
-              {currentBackground?.streetName && (
-                <small>{currentBackground.streetName}</small>
+              <strong lang={currentNameLanguage}>{currentName}</strong>
+              {currentStreetName && (
+                <small lang={currentNameLanguage}>{currentStreetName}</small>
               )}
             </span>
           </div>
@@ -280,7 +313,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                     )}
                   </span>
                   <span className={styles.itemCopy}>
-                    <strong>
+                    <strong lang={resultNameLanguage}>
                       <Highlighter
                         autoEscape
                         caseSensitive={false}
@@ -289,7 +322,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                         textToHighlight={map.name}
                       />
                     </strong>
-                    <span>
+                    <span lang={resultNameLanguage}>
                       {map.streetName ||
                         t('background.mapNumber', { id: map.id })}
                     </span>

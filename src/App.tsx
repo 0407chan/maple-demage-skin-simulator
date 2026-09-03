@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid'
 import {
   getMonsterAnimationUrl,
   getMonsterIconUrl,
-  useGetMonsterDetail
+  useGetMonsterDetail,
+  useGetMonsterList
 } from 'api/monster'
 import { wzVersionState } from 'atoms/wzVersion'
 import { BackgroundSelectModal } from 'components/modals/BackgroundSelectModal'
@@ -23,6 +24,7 @@ import {
   SETTING_LIMITS
 } from 'constants/app_constants'
 import { useImageLoader } from 'hooks/useImageLoader'
+import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
 import { useI18n } from 'i18n'
 import hitImage from 'images/hit1_0.png'
 import standImage from 'images/stand.gif'
@@ -276,11 +278,55 @@ const App: React.FC = () => {
     topOffset: number
   } | null>(null)
   const wzVersion = useRecoilValue(wzVersionState)
+  const localizedContent = useLocalizedGameContent()
+  const { data: localizedMonsters = [] } = useGetMonsterList({
+    region: localizedContent.region,
+    version: localizedContent.version,
+    startPosition: 0,
+    count: 200
+  })
+  const localizedMonsterName = localizedMonsters.find(
+    (monster) => monster.id === state.currentMonster.id
+  )?.name
+  const currentMonsterName = localizedMonsterName ?? state.currentMonster.name
   const { data: currentMonsterDetail } = useGetMonsterDetail(
     state.currentMonster.id,
     wzVersion.version,
     wzVersion.region
   )
+  useEffect(() => {
+    const canonicalLevel = currentMonsterDetail?.meta?.level
+    const canonicalIsBoss = currentMonsterDetail?.meta?.isBoss
+    if (canonicalLevel === undefined && canonicalIsBoss === undefined) return
+
+    setState((previousState) => {
+      if (previousState.currentMonster.id !== currentMonsterDetail?.id) {
+        return previousState
+      }
+
+      const level = canonicalLevel ?? previousState.currentMonster.level
+      const isBoss = canonicalIsBoss ?? previousState.currentMonster.isBoss
+      if (
+        level === previousState.currentMonster.level &&
+        isBoss === previousState.currentMonster.isBoss
+      ) {
+        return previousState
+      }
+
+      return {
+        ...previousState,
+        currentMonster: {
+          ...previousState.currentMonster,
+          level,
+          isBoss
+        },
+        monsterHealth: getMonsterMaxHealth({
+          ...previousState.setting,
+          isBoss
+        })
+      }
+    })
+  }, [currentMonsterDetail])
   const { criticalHeight, normalHeight } = useImageLoader(state.skinNumber)
   const idleAnimation = getPrimaryMonsterAnimation(
     currentMonsterDetail?.framebooks,
@@ -864,7 +910,7 @@ const App: React.FC = () => {
             className={styles.MonsterHealth}
             role="progressbar"
             aria-label={t('app.monster.health', {
-              name: state.currentMonster.name
+              name: currentMonsterName
             })}
             aria-valuemin={0}
             aria-valuemax={maxMonsterHealth}
@@ -902,13 +948,13 @@ const App: React.FC = () => {
             }
             aria-label={
               state.monsterStatus === 'alive'
-                ? t('app.monster.attack', { name: state.currentMonster.name })
+                ? t('app.monster.attack', { name: currentMonsterName })
                 : state.monsterStatus === 'dying'
                   ? t('app.monster.dying', {
-                      name: state.currentMonster.name
+                      name: currentMonsterName
                     })
                   : t('app.monster.respawning', {
-                      name: state.currentMonster.name
+                      name: currentMonsterName
                     })
             }
           >

@@ -1,0 +1,20 @@
+{
+  "short_name": "伤害皮肤",
+  "name": "冒险岛伤害皮肤模拟器",
+  "description": "在互动模拟器中预览冒险岛伤害皮肤。",
+  "icons": [
+    {
+      "src": "../favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    { "src": "../logo192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "../logo512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "start_url": "../",
+  "scope": "../",
+  "display": "standalone",
+  "theme_color": "#111318",
+  "background_color": "#111318",
+  "lang": "zh-CN"
+}

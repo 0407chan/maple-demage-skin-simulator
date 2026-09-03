@@ -4,15 +4,30 @@ import { useRecoilState } from 'recoil'
 import { SkinMap } from 'constants/damageSkinMapper'
 import { useMemo } from 'react'
 import { uniqueSkinItemsByName } from './util'
+import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
 
-export const useSkinList = () => {
+const LOCALIZED_RESULT_COUNT = 50
+
+export const useSkinList = (localizedSearchTerm = '') => {
   const [wzVersion] = useRecoilState(wzVersionState)
+  const localizedContent = useLocalizedGameContent()
 
   const damageSkinItemListQuery = useGetItemList({
     searchFor: '데미지 스킨',
     version: wzVersion?.version,
     region: wzVersion?.region
   })
+  const normalizedLocalizedSearchTerm = localizedSearchTerm.trim()
+  const localizedItemListQuery = useGetItemList(
+    {
+      searchFor: normalizedLocalizedSearchTerm,
+      startPosition: 0,
+      count: LOCALIZED_RESULT_COUNT,
+      version: localizedContent.version,
+      region: localizedContent.region
+    },
+    localizedContent.locale !== 'ko' && normalizedLocalizedSearchTerm.length > 0
+  )
 
   const filteredLists = useMemo(() => {
     if (!damageSkinItemListQuery.data) {
@@ -36,8 +51,18 @@ export const useSkinList = () => {
     return { currentItemList, newSkinItemList }
   }, [damageSkinItemListQuery.data])
 
+  const localizedNames = useMemo(
+    () =>
+      new Map(
+        (localizedItemListQuery.data ?? []).map((item) => [item.id, item.name])
+      ),
+    [localizedItemListQuery.data]
+  )
+
   return {
     ...filteredLists,
-    isLoading: damageSkinItemListQuery.isLoading
+    localizedNames,
+    isLoading: damageSkinItemListQuery.isLoading,
+    isLocalizedSearching: localizedItemListQuery.isFetching
   }
 }

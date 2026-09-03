@@ -1,8 +1,10 @@
 import { wzVersionState } from 'atoms/wzVersion'
+import { useGetItemDetail } from 'api/damage-skin'
 import { SkinMap } from 'constants/damageSkinMapper'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
 import { useI18n } from 'i18n'
+import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { ItemDto } from 'type/damage-skin'
@@ -29,6 +31,8 @@ const FILTER_OPTIONS = [
   { key: 'skin.filter.unit', value: 'unit' },
   { key: 'skin.filter.action', value: 'action' }
 ] as const satisfies ReadonlyArray<{ key: string; value: SkinFilter }>
+
+const SEARCH_DEBOUNCE_MS = 150
 
 const FILTER_ANALYTICS_NAMES: Record<SkinFilter, SkinFilterName> = {
   all: '전체',
@@ -61,7 +65,8 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   setCurrentSkin,
   onConfirm
 }) => {
-  const { formatNumber, t } = useI18n()
+  const { formatCount, t } = useI18n()
+  const localizedContent = useLocalizedGameContent()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
@@ -69,9 +74,26 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
     '#skin-search'
   )
   const [searchKey, setSearchKey] = useState('')
-  const { currentItemList, isLoading } = useSkinList()
+  const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
+  const { currentItemList, localizedNames, isLoading, isLocalizedSearching } =
+    useSkinList(debouncedSearchKey)
   const wzVersion = useRecoilValue(wzVersionState)
   const [filter, setFilter] = useState<SkinFilter>('all')
+  const { data: localizedCurrentSkin } = useGetItemDetail(
+    currentSkin?.id,
+    localizedContent.version,
+    localizedContent.region,
+    localizedContent.locale !== 'ko'
+  )
+
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => setDebouncedSearchKey(searchKey.trim()),
+      SEARCH_DEBOUNCE_MS
+    )
+
+    return () => window.clearTimeout(timer)
+  }, [searchKey])
 
   const getItemIconUrl = (skin: ItemDto) =>
     `https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${skin.id}/icon`
@@ -117,7 +139,7 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
         skinVariantCount: skinNumbers.length,
         previousSkin: currentSkin,
         filter: FILTER_ANALYTICS_NAMES[filter],
-        searchTerm: searchKey,
+        searchTerm: debouncedSearchKey,
         searchResultCount: filteredSkins.length,
         region: wzVersion.region,
         version: wzVersion.version
@@ -128,17 +150,45 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
   }
 
   const filteredSkins = useMemo(() => {
-    const normalizedSearchKey = searchKey.trim().toLocaleLowerCase('ko-KR')
+    const normalizedSearchKey = debouncedSearchKey.toLocaleLowerCase()
 
     return currentItemList.filter((item) => {
+      const localizedName =
+        localizedNames.get(item.id) ??
+        (item.id === currentSkin?.id
+          ? localizedCurrentSkin?.description?.name
+          : undefined)
       const matchesSearch =
         normalizedSearchKey.length === 0 ||
-        item.name.toLocaleLowerCase('ko-KR').includes(normalizedSearchKey)
+        item.name.toLocaleLowerCase('ko-KR').includes(normalizedSearchKey) ||
+        localizedName?.toLocaleLowerCase().includes(normalizedSearchKey)
       const matchesFilter = matchesSkinFilter(item, filter)
 
       return matchesSearch && matchesFilter
     })
-  }, [currentItemList, filter, searchKey])
+  }, [
+    currentItemList,
+    currentSkin?.id,
+    debouncedSearchKey,
+    filter,
+    localizedCurrentSkin?.description?.name,
+    localizedNames
+  ])
+
+  const getLocalizedSkinName = (skin: ItemDto) =>
+    localizedNames.get(skin.id) ??
+    (skin.id === currentSkin?.id
+      ? localizedCurrentSkin?.description?.name
+      : undefined)
+
+  const currentSkinName =
+    localizedCurrentSkin?.description?.name ?? currentSkin?.name
+  const currentSkinNameLanguage = localizedCurrentSkin?.description?.name
+    ? localizedContent.localeTag
+    : 'ko-KR'
+  const isSearchPending = searchKey.trim() !== debouncedSearchKey
+  const isSearching = isSearchPending || isLocalizedSearching
+  const isListLoading = isLoading || (isSearching && filteredSkins.length === 0)
 
   const handleOpen = () => {
     trackSelectorOpened({
@@ -159,7 +209,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           type="button"
           className={styles.skinButton}
           onClick={handleOpen}
-          aria-label={t('skin.selectCurrent', { name: currentSkin.name })}
+          aria-label={t('skin.selectCurrent', {
+            name: currentSkinName ?? currentSkin.name
+          })}
           aria-haspopup="dialog"
           aria-expanded={open}
         >
@@ -172,7 +224,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           </span>
           <span className={styles.triggerCopy}>
             <span className={styles.triggerLabel}>DAMAGE SKIN</span>
-            <span className={styles.skinText}>{currentSkin.name}</span>
+            <span className={styles.skinText} lang={currentSkinNameLanguage}>
+              {currentSkinName}
+            </span>
           </span>
           <svg
             className={styles.triggerChevron}
@@ -281,7 +335,12 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
             </span>
             <span className={styles.currentCopy}>
               <span className={styles.currentLabel}>{t('skin.current')}</span>
-              <strong className={styles.currentName}>{currentSkin.name}</strong>
+              <strong
+                className={styles.currentName}
+                lang={currentSkinNameLanguage}
+              >
+                {currentSkinName}
+              </strong>
             </span>
             <span className={styles.appliedBadge}>
               <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -295,16 +354,14 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
         <div className={styles.listHeader}>
           <span>{t('skin.list')}</span>
           <span className={styles.resultCount} aria-live="polite">
-            {isLoading
+            {isListLoading
               ? t('skin.loadingShort')
-              : t('common.count', {
-                  count: formatNumber(filteredSkins.length)
-                })}
+              : formatCount('count', filteredSkins.length)}
           </span>
         </div>
 
         <div className={styles.body}>
-          {isLoading ? (
+          {isListLoading ? (
             <div className={styles.loadingState} role="status">
               <span className={styles.spinner} aria-hidden="true" />
               {t('skin.loading')}
@@ -315,7 +372,13 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
                 key={skin.id}
                 skin={skin}
                 currentSkin={currentSkin}
-                searchKey={searchKey}
+                displayName={getLocalizedSkinName(skin) ?? skin.name}
+                nameLanguage={
+                  getLocalizedSkinName(skin)
+                    ? localizedContent.localeTag
+                    : 'ko-KR'
+                }
+                searchKey={debouncedSearchKey}
                 onSelect={handleSkinSelect}
               />
             ))

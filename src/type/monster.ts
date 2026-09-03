@@ -13,6 +13,10 @@ export type MonsterDetail = {
   name: string
   description?: string
   framebooks: Record<string, number>
+  meta?: {
+    level?: number
+    isBoss?: boolean
+  }
 }
 
 export type GetMonsterListQuery = {

@@ -1,7 +1,14 @@
-import { getMonsterIconUrl, useGetMonsterList } from 'api/monster'
+import {
+  getMonsterDetail,
+  getMonsterDetailQueryKey,
+  getMonsterIconUrl,
+  useGetMonsterList
+} from 'api/monster'
+import { useQueryClient } from '@tanstack/react-query'
 import { wzVersionState } from 'atoms/wzVersion'
 import useBoolean from 'hooks/useBoolean'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
+import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
 import { useI18n } from 'i18n'
 import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
@@ -23,7 +30,9 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
   currentMonster,
   onSelect
 }) => {
-  const { formatNumber, t } = useI18n()
+  const { formatCount, t } = useI18n()
+  const queryClient = useQueryClient()
+  const localizedContent = useLocalizedGameContent()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
@@ -45,25 +54,63 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
 
   const query = useMemo(
     () => ({
-      region: wzVersion.region,
-      version: wzVersion.version,
+      region: localizedContent.region,
+      version: localizedContent.version,
       startPosition: 0,
       count: RESULT_COUNT,
       searchFor: debouncedSearchKey || undefined
     }),
-    [debouncedSearchKey, wzVersion.region, wzVersion.version]
+    [debouncedSearchKey, localizedContent.region, localizedContent.version]
   )
+  const localizedResultsQuery = useGetMonsterList(query, open)
+  const fallbackResultsQuery = useGetMonsterList(
+    {
+      ...query,
+      region: wzVersion.region,
+      version: wzVersion.version
+    },
+    open && localizedResultsQuery.isError
+  )
+  const currentNameQuery = useGetMonsterList({
+    region: localizedContent.region,
+    version: localizedContent.version,
+    startPosition: 0,
+    count: RESULT_COUNT
+  })
+  const canonicalMetadataQuery = useGetMonsterList({
+    region: wzVersion.region,
+    version: wzVersion.version,
+    startPosition: 0,
+    count: RESULT_COUNT
+  })
+  const usingFallback = localizedResultsQuery.isError
   const {
     data: monsterResults = [],
     isError,
     isFetching,
     isLoading,
     refetch
-  } = useGetMonsterList(query, open || debouncedSearchKey.length === 0)
-  const monsters = useMemo(
-    () => getUniqueByName(monsterResults),
-    [monsterResults]
-  )
+  } = usingFallback ? fallbackResultsQuery : localizedResultsQuery
+  const monsters = useMemo(() => {
+    const canonicalMetadata = new Map(
+      (canonicalMetadataQuery.data ?? []).map((monster) => [
+        monster.id,
+        monster
+      ])
+    )
+
+    return getUniqueByName(monsterResults).map((monster) => {
+      const canonicalMonster = canonicalMetadata.get(monster.id)
+      if (!canonicalMonster) return monster
+
+      return {
+        ...monster,
+        level: canonicalMonster.level,
+        isBoss: canonicalMonster.isBoss,
+        mobType: canonicalMonster.mobType
+      }
+    })
+  }, [canonicalMetadataQuery.data, monsterResults])
 
   const getIconUrl = (monster: Monster) => {
     if (wzVersion.version === undefined || wzVersion.region === undefined) {
@@ -76,16 +123,38 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
   const handleSelect = (monster: Monster) => {
     const version = wzVersion.version
     const region = wzVersion.region
+    const trackSelection = (selectedMonster: Monster) =>
+      trackMonsterSelected({
+        monster: selectedMonster,
+        previousMonster: currentMonster,
+        searchTerm: debouncedSearchKey,
+        searchResultCount: monsters.length,
+        region,
+        version
+      })
+
     onSelect(monster)
-    trackMonsterSelected({
-      monster,
-      previousMonster: currentMonster,
-      searchTerm: debouncedSearchKey,
-      searchResultCount: monsters.length,
-      region,
-      version
-    })
     onClose()
+
+    if (version === undefined || region === undefined) {
+      trackSelection(monster)
+      return
+    }
+
+    void queryClient
+      .fetchQuery({
+        queryKey: getMonsterDetailQueryKey(monster.id, version, region),
+        queryFn: () => getMonsterDetail(monster.id, version, region),
+        staleTime: 1000 * 60 * 60
+      })
+      .then((canonicalDetail) =>
+        trackSelection({
+          ...monster,
+          level: canonicalDetail.meta?.level ?? monster.level,
+          isBoss: canonicalDetail.meta?.isBoss ?? monster.isBoss
+        })
+      )
+      .catch(() => trackSelection(monster))
   }
 
   const handleOpen = () => {
@@ -101,7 +170,18 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
 
   const isSearchPending = searchKey.trim() !== debouncedSearchKey
   const isVersionReady =
-    wzVersion.version !== undefined && wzVersion.region !== undefined
+    localizedContent.version !== undefined &&
+    localizedContent.region !== undefined
+  const localizedCurrentName = currentNameQuery.data?.find(
+    (monster) => monster.id === currentMonster.id
+  )?.name
+  const currentName = localizedCurrentName ?? currentMonster.name
+  const currentNameLanguage = localizedCurrentName
+    ? localizedContent.localeTag
+    : 'ko-KR'
+  const resultNameLanguage = usingFallback
+    ? 'ko-KR'
+    : localizedContent.localeTag
 
   return (
     <>
@@ -110,7 +190,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
         type="button"
         className={styles.triggerButton}
         onClick={handleOpen}
-        aria-label={t('monster.changeCurrent', { name: currentMonster.name })}
+        aria-label={t('monster.changeCurrent', { name: currentName })}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
@@ -121,7 +201,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
         </span>
         <span className={styles.triggerCopy}>
           <span className={styles.triggerLabel}>MONSTER</span>
-          <strong>{currentMonster.name}</strong>
+          <strong lang={currentNameLanguage}>{currentName}</strong>
         </span>
         <svg
           className={styles.triggerChevron}
@@ -198,9 +278,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           <p className={styles.searchHint} aria-live="polite">
             {isSearchPending || isFetching
               ? t('monster.searching')
-              : t('common.searchResults', {
-                  count: formatNumber(monsters.length)
-                })}
+              : formatCount('searchResults', monsters.length)}
           </p>
         </div>
 
@@ -212,7 +290,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
           </span>
           <span className={styles.currentCopy}>
             <span>{t('monster.currentTarget')}</span>
-            <strong>{currentMonster.name}</strong>
+            <strong lang={currentNameLanguage}>{currentName}</strong>
           </span>
           <span className={styles.levelBadge}>Lv. {currentMonster.level}</span>
         </div>
@@ -256,7 +334,7 @@ export const MonsterSelectModal: React.FC<MonsterSelectModalProps> = ({
                     )}
                   </span>
                   <span className={styles.itemCopy}>
-                    <strong>
+                    <strong lang={resultNameLanguage}>
                       <Highlighter
                         autoEscape
                         caseSensitive={false}

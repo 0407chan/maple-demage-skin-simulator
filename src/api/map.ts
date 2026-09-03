@@ -17,7 +17,7 @@ export const getMapList = async (
   const { region, version, ...params } = query
   const result = await axios.get<MapleMap[]>(
     `${API_BASE_URL}/${region}/${version}/map`,
-    { params }
+    { params, timeout: 12000 }
   )
 
   return result.data ?? []

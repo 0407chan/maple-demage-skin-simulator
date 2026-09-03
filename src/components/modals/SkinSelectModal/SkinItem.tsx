@@ -8,6 +8,8 @@ import styles from './style.module.scss'
 type SkinItemProps = {
   skin: ItemDto
   currentSkin?: ItemDto
+  displayName: string
+  nameLanguage: string
   searchKey: string
   onSelect: (skin: ItemDto) => void
 }
@@ -15,11 +17,13 @@ type SkinItemProps = {
 export const SkinItem: React.FC<SkinItemProps> = ({
   skin,
   currentSkin,
+  displayName,
+  nameLanguage,
   searchKey,
   onSelect
 }) => {
   const wzVersion = useRecoilValue(wzVersionState)
-  const isCurrent = currentSkin?.name === skin.name
+  const isCurrent = currentSkin?.id === skin.id
 
   return (
     <button
@@ -35,13 +39,13 @@ export const SkinItem: React.FC<SkinItemProps> = ({
           alt=""
         />
       </span>
-      <span className={styles.skinText}>
+      <span className={styles.skinText} lang={nameLanguage}>
         <Highlighter
           autoEscape
           caseSensitive={false}
           highlightClassName={styles.highlight}
           searchWords={[searchKey]}
-          textToHighlight={skin.name ?? ''}
+          textToHighlight={displayName}
         />
       </span>
       {isCurrent && (

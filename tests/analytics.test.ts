@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   ANALYTICS_EVENT_NAMES,
   getChangedSettingFields,
+  getLocaleAnalyticsParameters,
   getSkinAnalyticsType
 } from '../src/utils/analytics'
 import { ItemDto } from '../src/type/damage-skin'
@@ -61,5 +62,14 @@ describe('GA4 이벤트 체계', () => {
         }
       )
     ).toEqual(['최소_데미지', '크리티컬_확률', '몬스터_무적_모드'])
+  })
+
+  test('모든 이벤트에 붙일 표시 언어와 선택 방식을 만든다', () => {
+    expect(
+      getLocaleAnalyticsParameters({ locale: 'zh-TW', preference: 'auto' })
+    ).toEqual({
+      ui_locale: 'zh-TW',
+      locale_preference: 'auto'
+    })
   })
 })

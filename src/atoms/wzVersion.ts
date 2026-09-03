@@ -1,5 +1,5 @@
 import { atom } from 'recoil'
-import { RegionType } from 'type/damage-skin'
+import { RegionType } from 'type/wz'
 
 export const wzVersionState = atom<{
   version?: number

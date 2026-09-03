@@ -8,7 +8,9 @@ export const ANALYTICS_EVENT_NAMES = {
   MONSTER_SELECTED: '몬스터_선택',
   DAMAGE_SKIN_SELECTED: '데미지_스킨_선택',
   DAMAGE_SETTING_CHANGED: '데미지_설정_변경',
-  MONSTER_ATTACKED: '몬스터_공격'
+  MONSTER_ATTACKED: '몬스터_공격',
+  LOCALE_VIEWED: '표시_언어_노출',
+  LANGUAGE_CHANGED: '표시_언어_변경'
 } as const
 
 export type SkinAnalyticsType = '액션' | '유닛' | '일반'
@@ -24,6 +26,18 @@ type WzContext = {
 }
 
 let analyticsInitialized = false
+let localeParameters: AnalyticsParameters = {}
+
+export const getLocaleAnalyticsParameters = ({
+  locale,
+  preference
+}: {
+  locale: string
+  preference: string
+}) => ({
+  ui_locale: locale,
+  locale_preference: preference
+})
 
 const getWzParameters = ({ region, version }: WzContext) => ({
   wz_region: region,
@@ -45,7 +59,40 @@ const sendEvent = (
   parameters: AnalyticsParameters
 ) => {
   if (!analyticsInitialized) return
-  ReactGA.event(eventName, compactParameters(parameters))
+  ReactGA.event(
+    eventName,
+    compactParameters({ ...parameters, ...localeParameters })
+  )
+}
+
+export const setAnalyticsLocaleContext = ({
+  locale,
+  preference
+}: {
+  locale: string
+  preference: string
+}) => {
+  localeParameters = getLocaleAnalyticsParameters({ locale, preference })
+}
+
+export const trackLocaleViewed = () => {
+  sendEvent(ANALYTICS_EVENT_NAMES.LOCALE_VIEWED, {})
+}
+
+export const trackLanguageChanged = ({
+  previousLocale,
+  nextLocale,
+  preference
+}: {
+  previousLocale: string
+  nextLocale: string
+  preference: string
+}) => {
+  sendEvent(ANALYTICS_EVENT_NAMES.LANGUAGE_CHANGED, {
+    previous_ui_locale: previousLocale,
+    next_ui_locale: nextLocale,
+    next_locale_preference: preference
+  })
 }
 
 export const initializeAnalytics = () => {

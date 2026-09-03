@@ -6,8 +6,13 @@ import React, {
   useMemo,
   useState
 } from 'react'
+import {
+  setAnalyticsLocaleContext,
+  trackLanguageChanged,
+  trackLocaleViewed
+} from 'utils/analytics'
 
-export type Locale = 'ko' | 'en' | 'ja' | 'zh-CN'
+export type Locale = 'ko' | 'en' | 'ja' | 'zh-CN' | 'zh-TW'
 export type LocalePreference = 'auto' | Locale
 
 const LOCALE_STORAGE_KEY = 'mapleSimulatorLocale'
@@ -23,9 +28,11 @@ const korean = {
   'app.monster.respawning': '{name} 다시 나타나는 중',
   'common.clearSearch': '검색어 지우기',
   'common.retry': '다시 시도',
-  'common.searchResults': '검색 결과 {count}개',
+  'common.searchResults.one': '검색 결과 {count}개',
+  'common.searchResults.other': '검색 결과 {count}개',
   'common.noResults': '검색 결과가 없어요.',
-  'common.count': '{count}개',
+  'common.count.one': '{count}개',
+  'common.count.other': '{count}개',
   'settings.trigger': '세팅',
   'settings.title': '데미지 설정',
   'settings.description': '전투 수치를 조정하고 결과를 바로 확인해 보세요.',
@@ -115,9 +122,11 @@ const english: TranslationTable = {
   'app.monster.respawning': '{name} is respawning',
   'common.clearSearch': 'Clear search',
   'common.retry': 'Try again',
-  'common.searchResults': '{count} results',
+  'common.searchResults.one': '{count} result',
+  'common.searchResults.other': '{count} results',
   'common.noResults': 'No results found.',
-  'common.count': '{count}',
+  'common.count.one': '{count} item',
+  'common.count.other': '{count} items',
   'settings.trigger': 'Settings',
   'settings.title': 'Damage settings',
   'settings.description': 'Tune combat values and see the result immediately.',
@@ -148,30 +157,29 @@ const english: TranslationTable = {
   'settings.autoSave': 'Changes are saved automatically.',
   'monster.changeCurrent': 'Change monster. Current: {name}',
   'monster.title': 'Change monster',
-  'monster.description':
-    'Search by Korean name and choose a monster to attack.',
+  'monster.description': 'Search by name and choose a monster to attack.',
   'monster.close': 'Close monster selection',
-  'monster.placeholder': 'e.g. 슬라임, 주황버섯, 루시드',
+  'monster.placeholder': 'e.g. Slime, Orange Mushroom, Lucid',
   'monster.searchLabel': 'Search monsters',
   'monster.searching': 'Searching for monsters…',
   'monster.currentTarget': 'Current target',
   'monster.loading': 'Loading monsters…',
   'monster.error': 'Could not load monsters.',
-  'monster.emptyHint': 'Try another Korean monster name.',
+  'monster.emptyHint': 'Try another monster name.',
   'background.default': 'Default background',
   'background.changeCurrent': 'Change background. Current: {name}',
   'background.title': 'Change background',
   'background.description':
-    'Search by Korean map name and choose a battle background.',
+    'Search by map name and choose a battle background.',
   'background.close': 'Close background selection',
-  'background.placeholder': 'e.g. 헤네시스, 리스항구, 루디브리엄',
+  'background.placeholder': 'e.g. Henesys, Lith Harbor, Ludibrium',
   'background.searchLabel': 'Search maps',
   'background.searching': 'Searching for maps…',
   'background.current': 'Current background',
   'background.defaultDescription': 'Return to the solid-color background',
   'background.loading': 'Loading maps…',
   'background.error': 'Could not load maps.',
-  'background.emptyHint': 'Try another Korean map name.',
+  'background.emptyHint': 'Try another map name.',
   'background.mapNumber': 'Map #{id}',
   'skin.selectCurrent': 'Select damage skin. Current: {name}',
   'skin.title': 'Select a damage skin',
@@ -188,7 +196,7 @@ const english: TranslationTable = {
   'skin.list': 'Skin list',
   'skin.loadingShort': 'Loading',
   'skin.loading': 'Loading damage skins…',
-  'skin.emptyHint': 'Try another Korean name or filter.',
+  'skin.emptyHint': 'Try another name or filter.',
   'damage.accessibleLabel': '{critical}damage {damage}',
   'damage.criticalPrefix': 'Critical ',
   'map.navigation': 'Explore map'
@@ -205,9 +213,11 @@ const japanese: TranslationTable = {
   'app.monster.respawning': '{name}が再出現中',
   'common.clearSearch': '検索をクリア',
   'common.retry': '再試行',
-  'common.searchResults': '検索結果 {count}件',
+  'common.searchResults.one': '検索結果 {count}件',
+  'common.searchResults.other': '検索結果 {count}件',
   'common.noResults': '検索結果がありません。',
-  'common.count': '{count}件',
+  'common.count.one': '{count}件',
+  'common.count.other': '{count}件',
   'settings.trigger': '設定',
   'settings.title': 'ダメージ設定',
   'settings.description': '戦闘数値を調整し、結果をすぐに確認できます。',
@@ -237,30 +247,28 @@ const japanese: TranslationTable = {
   'settings.autoSave': '変更した設定は自動的に保存されます。',
   'monster.changeCurrent': 'モンスター変更：現在 {name}',
   'monster.title': 'モンスター変更',
-  'monster.description':
-    '韓国語の名前で検索し、攻撃するモンスターを選んでください。',
+  'monster.description': '名前で検索し、攻撃するモンスターを選んでください。',
   'monster.close': 'モンスター選択を閉じる',
-  'monster.placeholder': '例：슬라임、주황버섯、루시드',
+  'monster.placeholder': '例：スライム、メイプルキノコ、ルシード',
   'monster.searchLabel': 'モンスター検索',
   'monster.searching': 'モンスターを検索中…',
   'monster.currentTarget': '現在の攻撃対象',
   'monster.loading': 'モンスターを読み込み中…',
   'monster.error': 'モンスターを読み込めませんでした。',
-  'monster.emptyHint': '別の韓国語モンスター名で検索してください。',
+  'monster.emptyHint': '別のモンスター名で検索してください。',
   'background.default': 'デフォルト背景',
   'background.changeCurrent': '背景変更：現在 {name}',
   'background.title': '背景変更',
-  'background.description':
-    '韓国語のマップ名で検索し、戦闘背景を選んでください。',
+  'background.description': 'マップ名で検索し、戦闘背景を選んでください。',
   'background.close': '背景選択を閉じる',
-  'background.placeholder': '例：헤네시스、리스항구、루디브리엄',
+  'background.placeholder': '例：ヘネシス、リス港口、ルディブリアム',
   'background.searchLabel': 'マップ検索',
   'background.searching': 'マップを検索中…',
   'background.current': '現在の背景',
   'background.defaultDescription': '単色の背景に戻す',
   'background.loading': 'マップを読み込み中…',
   'background.error': 'マップを読み込めませんでした。',
-  'background.emptyHint': '別の韓国語マップ名で検索してください。',
+  'background.emptyHint': '別のマップ名で検索してください。',
   'background.mapNumber': 'マップ #{id}',
   'skin.selectCurrent': 'ダメージスキン選択：現在 {name}',
   'skin.title': 'ダメージスキン選択',
@@ -277,7 +285,7 @@ const japanese: TranslationTable = {
   'skin.list': 'スキン一覧',
   'skin.loadingShort': '読み込み中',
   'skin.loading': 'スキンを読み込み中…',
-  'skin.emptyHint': '別の韓国語名またはフィルターをお試しください。',
+  'skin.emptyHint': '別の名前またはフィルターをお試しください。',
   'damage.accessibleLabel': '{critical}ダメージ {damage}',
   'damage.criticalPrefix': 'クリティカル ',
   'map.navigation': 'マップ探索'
@@ -294,9 +302,11 @@ const simplifiedChinese: TranslationTable = {
   'app.monster.respawning': '{name}正在重生',
   'common.clearSearch': '清除搜索',
   'common.retry': '重试',
-  'common.searchResults': '搜索结果 {count} 个',
+  'common.searchResults.one': '搜索结果 {count} 个',
+  'common.searchResults.other': '搜索结果 {count} 个',
   'common.noResults': '没有搜索结果。',
-  'common.count': '{count} 个',
+  'common.count.one': '{count} 个',
+  'common.count.other': '{count} 个',
   'settings.trigger': '设置',
   'settings.title': '伤害设置',
   'settings.description': '调整战斗数值并立即查看结果。',
@@ -326,28 +336,28 @@ const simplifiedChinese: TranslationTable = {
   'settings.autoSave': '更改会自动保存。',
   'monster.changeCurrent': '更换怪物：当前为{name}',
   'monster.title': '更换怪物',
-  'monster.description': '使用韩文名称搜索并选择要攻击的怪物。',
+  'monster.description': '按名称搜索并选择要攻击的怪物。',
   'monster.close': '关闭怪物选择',
-  'monster.placeholder': '例如：슬라임、주황버섯、루시드',
+  'monster.placeholder': '例如：绿水灵、花蘑菇、露希妲',
   'monster.searchLabel': '搜索怪物',
   'monster.searching': '正在搜索怪物…',
   'monster.currentTarget': '当前攻击目标',
   'monster.loading': '正在加载怪物…',
   'monster.error': '无法加载怪物。',
-  'monster.emptyHint': '请尝试其他韩文怪物名称。',
+  'monster.emptyHint': '请尝试其他怪物名称。',
   'background.default': '默认背景',
   'background.changeCurrent': '更换背景：当前为{name}',
   'background.title': '更换背景',
-  'background.description': '使用韩文地图名称搜索并选择战斗背景。',
+  'background.description': '按地图名称搜索并选择战斗背景。',
   'background.close': '关闭背景选择',
-  'background.placeholder': '例如：헤네시스、리스항구、루디브리엄',
+  'background.placeholder': '例如：射手村、明珠港、玩具城',
   'background.searchLabel': '搜索地图',
   'background.searching': '正在搜索地图…',
   'background.current': '当前背景',
   'background.defaultDescription': '返回纯色背景',
   'background.loading': '正在加载地图…',
   'background.error': '无法加载地图。',
-  'background.emptyHint': '请尝试其他韩文地图名称。',
+  'background.emptyHint': '请尝试其他地图名称。',
   'background.mapNumber': '地图 #{id}',
   'skin.selectCurrent': '选择伤害皮肤：当前为{name}',
   'skin.title': '选择伤害皮肤',
@@ -364,24 +374,115 @@ const simplifiedChinese: TranslationTable = {
   'skin.list': '皮肤列表',
   'skin.loadingShort': '加载中',
   'skin.loading': '正在加载伤害皮肤…',
-  'skin.emptyHint': '请尝试其他韩文名称或筛选条件。',
+  'skin.emptyHint': '请尝试其他名称或筛选条件。',
   'damage.accessibleLabel': '{critical}伤害 {damage}',
   'damage.criticalPrefix': '暴击',
   'map.navigation': '探索地图'
+}
+
+const traditionalChinese: TranslationTable = {
+  'app.title': '傷害字型模擬器',
+  'app.description': '在互動模擬器中預覽新楓之谷傷害字型。',
+  'app.mapping.open': '開啟本機映射工具',
+  'app.mapping.label': '映射工具',
+  'app.monster.health': '{name}的生命值',
+  'app.monster.attack': '攻擊{name}',
+  'app.monster.dying': '正在擊敗{name}',
+  'app.monster.respawning': '{name}正在重生',
+  'common.clearSearch': '清除搜尋',
+  'common.retry': '重試',
+  'common.searchResults.one': '搜尋結果 {count} 個',
+  'common.searchResults.other': '搜尋結果 {count} 個',
+  'common.noResults': '沒有搜尋結果。',
+  'common.count.one': '{count} 個',
+  'common.count.other': '{count} 個',
+  'settings.trigger': '設定',
+  'settings.title': '傷害設定',
+  'settings.description': '調整戰鬥數值並立即查看結果。',
+  'settings.close': '關閉設定',
+  'settings.language': '顯示語言',
+  'settings.languageDescription':
+    '首次使用瀏覽器語言，並記住您手動選擇的語言。',
+  'settings.languageLabel': '選擇顯示語言',
+  'settings.languageAuto': '自動（瀏覽器）',
+  'settings.damageRange': '傷害範圍',
+  'settings.damageRangeDescription': '單次攻擊顯示的最小和最大數值',
+  'settings.minDamage': '最小傷害',
+  'settings.maxDamage': '最大傷害',
+  'settings.critical': '爆擊',
+  'settings.criticalDescription': '爆擊發生機率',
+  'settings.criticalDecrease': '爆擊率降低 10%',
+  'settings.criticalRate': '爆擊率',
+  'settings.criticalIncrease': '爆擊率提高 10%',
+  'settings.hitCount': '攻擊段數',
+  'settings.hitCountDescription': '單次攻擊顯示的傷害數字數量',
+  'settings.hitCountDecrease': '攻擊段數減少 1',
+  'settings.hitCountLabel': '攻擊段數',
+  'settings.hitCountUnit': '次',
+  'settings.hitCountIncrease': '攻擊段數增加 1',
+  'settings.invincible': '怪物無敵模式',
+  'settings.invincibleDescription': '防止生命值減少、擊敗和重生。',
+  'settings.autoSave': '變更會自動儲存。',
+  'monster.changeCurrent': '更換怪物：目前為{name}',
+  'monster.title': '更換怪物',
+  'monster.description': '按名稱搜尋並選擇要攻擊的怪物。',
+  'monster.close': '關閉怪物選擇',
+  'monster.placeholder': '例如：綠水靈、菇菇寶貝、露希妲',
+  'monster.searchLabel': '搜尋怪物',
+  'monster.searching': '正在搜尋怪物…',
+  'monster.currentTarget': '目前攻擊目標',
+  'monster.loading': '正在載入怪物…',
+  'monster.error': '無法載入怪物。',
+  'monster.emptyHint': '請嘗試其他怪物名稱。',
+  'background.default': '預設背景',
+  'background.changeCurrent': '更換背景：目前為{name}',
+  'background.title': '更換背景',
+  'background.description': '按地圖名稱搜尋並選擇戰鬥背景。',
+  'background.close': '關閉背景選擇',
+  'background.placeholder': '例如：弓箭手村、維多利亞港、玩具城',
+  'background.searchLabel': '搜尋地圖',
+  'background.searching': '正在搜尋地圖…',
+  'background.current': '目前背景',
+  'background.defaultDescription': '返回純色背景',
+  'background.loading': '正在載入地圖…',
+  'background.error': '無法載入地圖。',
+  'background.emptyHint': '請嘗試其他地圖名稱。',
+  'background.mapNumber': '地圖 #{id}',
+  'skin.selectCurrent': '選擇傷害字型：目前為{name}',
+  'skin.title': '選擇傷害字型',
+  'skin.description': '搜尋傷害字型並立即套用。',
+  'skin.close': '關閉傷害字型選擇',
+  'skin.placeholder': '搜尋傷害字型名稱',
+  'skin.searchLabel': '搜尋傷害字型',
+  'skin.filterLabel': '篩選傷害字型類型',
+  'skin.filter.all': '全部',
+  'skin.filter.unit': '單位',
+  'skin.filter.action': '動作',
+  'skin.current': '目前使用',
+  'skin.applied': '已套用',
+  'skin.list': '傷害字型清單',
+  'skin.loadingShort': '載入中',
+  'skin.loading': '正在載入傷害字型…',
+  'skin.emptyHint': '請嘗試其他名稱或篩選條件。',
+  'damage.accessibleLabel': '{critical}傷害 {damage}',
+  'damage.criticalPrefix': '爆擊',
+  'map.navigation': '探索地圖'
 }
 
 const translations: Record<Locale, TranslationTable> = {
   ko: korean,
   en: english,
   ja: japanese,
-  'zh-CN': simplifiedChinese
+  'zh-CN': simplifiedChinese,
+  'zh-TW': traditionalChinese
 }
 
-const localeTags: Record<Locale, string> = {
+export const localeTags: Record<Locale, string> = {
   ko: 'ko-KR',
   en: 'en-US',
   ja: 'ja-JP',
-  'zh-CN': 'zh-CN'
+  'zh-CN': 'zh-CN',
+  'zh-TW': 'zh-TW'
 }
 
 export const localeOptions: ReadonlyArray<{
@@ -391,7 +492,8 @@ export const localeOptions: ReadonlyArray<{
   { value: 'ko', label: '한국어' },
   { value: 'en', label: 'English' },
   { value: 'ja', label: '日本語' },
-  { value: 'zh-CN', label: '简体中文' }
+  { value: 'zh-CN', label: '简体中文' },
+  { value: 'zh-TW', label: '繁體中文' }
 ]
 
 export const resolveSupportedLocale = (
@@ -401,6 +503,14 @@ export const resolveSupportedLocale = (
     const normalized = language.toLowerCase()
     if (normalized === 'ko' || normalized.startsWith('ko-')) return 'ko'
     if (normalized === 'ja' || normalized.startsWith('ja-')) return 'ja'
+    if (
+      normalized === 'zh-tw' ||
+      normalized === 'zh-hk' ||
+      normalized === 'zh-mo' ||
+      normalized.startsWith('zh-hant')
+    ) {
+      return 'zh-TW'
+    }
     if (normalized === 'zh' || normalized.startsWith('zh-')) return 'zh-CN'
     if (normalized === 'en' || normalized.startsWith('en-')) return 'en'
   }
@@ -433,10 +543,12 @@ const getInitialPreference = (): LocalePreference => {
 
 type I18nContextValue = {
   locale: Locale
+  localeTag: string
   localePreference: LocalePreference
   setLocalePreference: (preference: LocalePreference) => void
   t: (key: TranslationKey, params?: TranslationParams) => string
   formatNumber: (value: number) => string
+  formatCount: (kind: 'count' | 'searchResults', value: number) => string
 }
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined)
@@ -456,19 +568,29 @@ export const I18nProvider: React.FC<React.PropsWithChildren> = ({
       window.removeEventListener('languagechange', handleLanguageChange)
   }, [])
 
-  const setLocalePreference = useCallback((preference: LocalePreference) => {
-    setLocalePreferenceState(preference)
+  const setLocalePreference = useCallback(
+    (preference: LocalePreference) => {
+      const nextLocale = preference === 'auto' ? browserLocale : preference
+      setAnalyticsLocaleContext({ locale: nextLocale, preference })
+      trackLanguageChanged({
+        previousLocale: locale,
+        nextLocale,
+        preference
+      })
+      setLocalePreferenceState(preference)
 
-    try {
-      if (preference === 'auto') {
-        localStorage.removeItem(LOCALE_STORAGE_KEY)
-      } else {
-        localStorage.setItem(LOCALE_STORAGE_KEY, preference)
+      try {
+        if (preference === 'auto') {
+          localStorage.removeItem(LOCALE_STORAGE_KEY)
+        } else {
+          localStorage.setItem(LOCALE_STORAGE_KEY, preference)
+        }
+      } catch {
+        // The language still changes for this session when storage is unavailable.
       }
-    } catch {
-      // The language still changes for this session when storage is unavailable.
-    }
-  }, [])
+    },
+    [browserLocale, locale]
+  )
 
   const t = useCallback(
     (key: TranslationKey, params: TranslationParams = {}) =>
@@ -485,9 +607,27 @@ export const I18nProvider: React.FC<React.PropsWithChildren> = ({
     [locale]
   )
 
+  const formatCount = useCallback(
+    (kind: 'count' | 'searchResults', value: number) => {
+      const pluralCategory = new Intl.PluralRules(localeTags[locale]).select(
+        value
+      )
+      const suffix = pluralCategory === 'one' ? 'one' : 'other'
+
+      return t(`common.${kind}.${suffix}` as TranslationKey, {
+        count: formatNumber(value)
+      })
+    },
+    [formatNumber, locale, t]
+  )
+
   useEffect(() => {
-    document.documentElement.lang = localeTags[locale]
-    document.title = t('app.title')
+    const localeTag = localeTags[locale]
+    const title = t('app.title')
+    const descriptionText = t('app.description')
+
+    document.documentElement.lang = localeTag
+    document.title = title
 
     let description = document.querySelector<HTMLMetaElement>(
       'meta[name="description"]'
@@ -497,18 +637,78 @@ export const I18nProvider: React.FC<React.PropsWithChildren> = ({
       description.name = 'description'
       document.head.appendChild(description)
     }
-    description.content = t('app.description')
+    description.content = descriptionText
+
+    const metadata = [
+      ['meta[property="og:title"]', 'property', 'og:title', title],
+      [
+        'meta[property="og:description"]',
+        'property',
+        'og:description',
+        descriptionText
+      ],
+      [
+        'meta[property="og:locale"]',
+        'property',
+        'og:locale',
+        localeTag.replace('-', '_')
+      ],
+      ['meta[name="twitter:title"]', 'name', 'twitter:title', title],
+      [
+        'meta[name="twitter:description"]',
+        'name',
+        'twitter:description',
+        descriptionText
+      ],
+      [
+        'meta[name="apple-mobile-web-app-title"]',
+        'name',
+        'apple-mobile-web-app-title',
+        title
+      ]
+    ] as const
+
+    metadata.forEach(([selector, attribute, property, content]) => {
+      let element = document.querySelector<HTMLMetaElement>(selector)
+      if (!element) {
+        element = document.createElement('meta')
+        element.setAttribute(attribute, property)
+        document.head.appendChild(element)
+      }
+      element.content = content
+    })
+
+    const manifest = document.querySelector<HTMLLinkElement>(
+      'link[rel="manifest"]'
+    )
+    if (manifest) {
+      manifest.href = `${import.meta.env.BASE_URL}manifests/manifest.${locale}.json`
+    }
   }, [locale, t])
+
+  useEffect(() => {
+    setAnalyticsLocaleContext({ locale, preference: localePreference })
+    trackLocaleViewed()
+  }, [locale, localePreference])
 
   const value = useMemo<I18nContextValue>(
     () => ({
       locale,
+      localeTag: localeTags[locale],
       localePreference,
       setLocalePreference,
       t,
-      formatNumber
+      formatNumber,
+      formatCount
     }),
-    [formatNumber, locale, localePreference, setLocalePreference, t]
+    [
+      formatCount,
+      formatNumber,
+      locale,
+      localePreference,
+      setLocalePreference,
+      t
+    ]
   )
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
