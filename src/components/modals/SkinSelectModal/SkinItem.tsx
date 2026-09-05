@@ -35,6 +35,8 @@ export const SkinItem: React.FC<SkinItemProps> = ({
       <span className={styles.itemIconFrame} aria-hidden="true">
         <img
           className={styles.skinImg}
+          loading="lazy"
+          decoding="async"
           src={`https://maplestory.io/api/${wzVersion.region}/${wzVersion.version}/item/${skin.id}/icon`}
           alt=""
         />

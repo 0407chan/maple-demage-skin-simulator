@@ -14,6 +14,36 @@
       ]
     },
     {
+      "index": 321,
+      "itemIds": [
+        2635469,
+        2635470
+      ],
+      "names": [
+        "돌의 정령 액션 데미지 스킨 (유닛)"
+      ]
+    },
+    {
+      "index": 324,
+      "itemIds": [
+        2635516,
+        2635517
+      ],
+      "names": [
+        "겨울 찐빵 액션 데미지 스킨"
+      ]
+    },
+    {
+      "index": 326,
+      "itemIds": [
+        2635529,
+        2635530
+      ],
+      "names": [
+        "젤리냥 액션 데미지 스킨"
+      ]
+    },
+    {
       "index": 330,
       "itemIds": [
         2635781,
@@ -624,6 +654,1530 @@
       "animated": true,
       "frameCount": 5,
       "duration": 300
+    },
+    "KMS/389/321/NoCri0/0": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/0.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/1": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/1.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/2": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/2.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/3.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/4.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/5": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/5.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/6": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/6.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/7": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/7.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/8": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/8.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri0/9": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri0/9.png",
+      "width": 85,
+      "height": 85,
+      "origin": {
+        "x": 42,
+        "y": 21
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/0": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/0.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/1": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/1.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/2": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/2.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/3.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/4.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/5": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/5.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/6": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/6.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/7": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/7.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/8": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/8.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/9": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/9.png",
+      "width": 85,
+      "height": 90,
+      "origin": {
+        "x": 42,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/321/NoCri1/effect3": {
+      "path": "generated/damage-skins/KMS/389/321/NoCri1/effect3.png",
+      "width": 72,
+      "height": 70,
+      "origin": {
+        "x": 73,
+        "y": 34
+      },
+      "animated": true,
+      "frameCount": 2,
+      "duration": 120
+    },
+    "KMS/389/321/NoCustom/NoCri1/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoCustom/NoCri1/3.png",
+      "width": 53,
+      "height": 55,
+      "origin": {
+        "x": 29,
+        "y": -8
+      },
+      "animated": false,
+      "frameCount": 1,
+      "duration": 60
+    },
+    "KMS/389/321/NoCustom/NoCri1/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoCustom/NoCri1/4.png",
+      "width": 53,
+      "height": 55,
+      "origin": {
+        "x": 29,
+        "y": -8
+      },
+      "animated": false,
+      "frameCount": 1,
+      "duration": 60
+    },
+    "KMS/389/321/NoCustom/NoRed1/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoCustom/NoRed1/3.png",
+      "width": 50,
+      "height": 48,
+      "origin": {
+        "x": 27,
+        "y": -8
+      },
+      "animated": false,
+      "frameCount": 1,
+      "duration": 60
+    },
+    "KMS/389/321/NoCustom/NoRed1/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoCustom/NoRed1/4.png",
+      "width": 50,
+      "height": 48,
+      "origin": {
+        "x": 27,
+        "y": -8
+      },
+      "animated": false,
+      "frameCount": 1,
+      "duration": 60
+    },
+    "KMS/389/321/NoRed0/0": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/0.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/1": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/1.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/2": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/2.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/3.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/4.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/5": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/5.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/6": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/6.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/7": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/7.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/8": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/8.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed0/9": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed0/9.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 4,
+      "duration": 240
+    },
+    "KMS/389/321/NoRed1/0": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/0.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/1": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/1.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/2": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/2.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/3": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/3.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/4": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/4.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/5": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/5.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/6": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/6.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 4,
+      "duration": 240
+    },
+    "KMS/389/321/NoRed1/7": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/7.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/8": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/8.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/321/NoRed1/9": {
+      "path": "generated/damage-skins/KMS/389/321/NoRed1/9.png",
+      "width": 80,
+      "height": 80,
+      "origin": {
+        "x": 39,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 3,
+      "duration": 180
+    },
+    "KMS/389/324/NoCri0/0": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/0.png",
+      "width": 76,
+      "height": 79,
+      "origin": {
+        "x": 35,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/1": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/1.png",
+      "width": 71,
+      "height": 85,
+      "origin": {
+        "x": 34,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/2": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/2.png",
+      "width": 72,
+      "height": 85,
+      "origin": {
+        "x": 35,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/3": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/3.png",
+      "width": 72,
+      "height": 76,
+      "origin": {
+        "x": 35,
+        "y": 14
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/4": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/4.png",
+      "width": 74,
+      "height": 76,
+      "origin": {
+        "x": 36,
+        "y": 14
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/5": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/5.png",
+      "width": 74,
+      "height": 79,
+      "origin": {
+        "x": 36,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/6": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/6.png",
+      "width": 73,
+      "height": 85,
+      "origin": {
+        "x": 34,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/7": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/7.png",
+      "width": 74,
+      "height": 74,
+      "origin": {
+        "x": 36,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/8": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/8.png",
+      "width": 74,
+      "height": 85,
+      "origin": {
+        "x": 36,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri0/9": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri0/9.png",
+      "width": 74,
+      "height": 79,
+      "origin": {
+        "x": 36,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/0": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/0.png",
+      "width": 84,
+      "height": 86,
+      "origin": {
+        "x": 38,
+        "y": 22
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/1": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/1.png",
+      "width": 77,
+      "height": 93,
+      "origin": {
+        "x": 37,
+        "y": 29
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/2": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/2.png",
+      "width": 79,
+      "height": 93,
+      "origin": {
+        "x": 38,
+        "y": 29
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/3": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/3.png",
+      "width": 79,
+      "height": 83,
+      "origin": {
+        "x": 38,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/4": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/4.png",
+      "width": 81,
+      "height": 83,
+      "origin": {
+        "x": 39,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/5": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/5.png",
+      "width": 81,
+      "height": 86,
+      "origin": {
+        "x": 39,
+        "y": 22
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/6": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/6.png",
+      "width": 79,
+      "height": 93,
+      "origin": {
+        "x": 38,
+        "y": 29
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/7": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/7.png",
+      "width": 81,
+      "height": 82,
+      "origin": {
+        "x": 39,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/8": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/8.png",
+      "width": 81,
+      "height": 93,
+      "origin": {
+        "x": 39,
+        "y": 29
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/9": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/9.png",
+      "width": 81,
+      "height": 86,
+      "origin": {
+        "x": 39,
+        "y": 22
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoCri1/effect3": {
+      "path": "generated/damage-skins/KMS/389/324/NoCri1/effect3.png",
+      "width": 65,
+      "height": 67,
+      "origin": {
+        "x": 33,
+        "y": 8
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/0": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/0.png",
+      "width": 70,
+      "height": 73,
+      "origin": {
+        "x": 33,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/1": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/1.png",
+      "width": 66,
+      "height": 79,
+      "origin": {
+        "x": 32,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/2": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/2.png",
+      "width": 67,
+      "height": 79,
+      "origin": {
+        "x": 33,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/3": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/3.png",
+      "width": 67,
+      "height": 70,
+      "origin": {
+        "x": 32,
+        "y": 11
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/4": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/4.png",
+      "width": 69,
+      "height": 70,
+      "origin": {
+        "x": 34,
+        "y": 11
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/5": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/5.png",
+      "width": 69,
+      "height": 72,
+      "origin": {
+        "x": 34,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/6": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/6.png",
+      "width": 68,
+      "height": 79,
+      "origin": {
+        "x": 33,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/7": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/7.png",
+      "width": 69,
+      "height": 69,
+      "origin": {
+        "x": 34,
+        "y": 10
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/8": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/8.png",
+      "width": 69,
+      "height": 78,
+      "origin": {
+        "x": 34,
+        "y": 19
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed0/9": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed0/9.png",
+      "width": 69,
+      "height": 72,
+      "origin": {
+        "x": 34,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/0": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/0.png",
+      "width": 76,
+      "height": 79,
+      "origin": {
+        "x": 35,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/1": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/1.png",
+      "width": 71,
+      "height": 85,
+      "origin": {
+        "x": 34,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/2": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/2.png",
+      "width": 72,
+      "height": 85,
+      "origin": {
+        "x": 35,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/3": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/3.png",
+      "width": 72,
+      "height": 76,
+      "origin": {
+        "x": 35,
+        "y": 14
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/4": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/4.png",
+      "width": 74,
+      "height": 76,
+      "origin": {
+        "x": 36,
+        "y": 14
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/5": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/5.png",
+      "width": 74,
+      "height": 79,
+      "origin": {
+        "x": 36,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/6": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/6.png",
+      "width": 73,
+      "height": 85,
+      "origin": {
+        "x": 34,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/7": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/7.png",
+      "width": 74,
+      "height": 74,
+      "origin": {
+        "x": 36,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/8": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/8.png",
+      "width": 74,
+      "height": 85,
+      "origin": {
+        "x": 36,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/324/NoRed1/9": {
+      "path": "generated/damage-skins/KMS/389/324/NoRed1/9.png",
+      "width": 74,
+      "height": 79,
+      "origin": {
+        "x": 36,
+        "y": 17
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 300
+    },
+    "KMS/389/326/NoCri0/0": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/0.png",
+      "width": 71,
+      "height": 82,
+      "origin": {
+        "x": 35,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/1": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/1.png",
+      "width": 71,
+      "height": 82,
+      "origin": {
+        "x": 38,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/2": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/2.png",
+      "width": 71,
+      "height": 82,
+      "origin": {
+        "x": 34,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/3": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/3.png",
+      "width": 72,
+      "height": 82,
+      "origin": {
+        "x": 37,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/4": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/4.png",
+      "width": 71,
+      "height": 82,
+      "origin": {
+        "x": 36,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/5": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/5.png",
+      "width": 71,
+      "height": 78,
+      "origin": {
+        "x": 36,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/6": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/6.png",
+      "width": 71,
+      "height": 82,
+      "origin": {
+        "x": 39,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/7": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/7.png",
+      "width": 72,
+      "height": 82,
+      "origin": {
+        "x": 39,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/8": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/8.png",
+      "width": 72,
+      "height": 79,
+      "origin": {
+        "x": 36,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri0/9": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri0/9.png",
+      "width": 72,
+      "height": 79,
+      "origin": {
+        "x": 37,
+        "y": 23
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/0": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/0.png",
+      "width": 79,
+      "height": 91,
+      "origin": {
+        "x": 38,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/1": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/1.png",
+      "width": 79,
+      "height": 92,
+      "origin": {
+        "x": 42,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/2": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/2.png",
+      "width": 79,
+      "height": 92,
+      "origin": {
+        "x": 38,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/3": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/3.png",
+      "width": 80,
+      "height": 92,
+      "origin": {
+        "x": 42,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/4": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/4.png",
+      "width": 79,
+      "height": 92,
+      "origin": {
+        "x": 39,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/5": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/5.png",
+      "width": 79,
+      "height": 87,
+      "origin": {
+        "x": 39,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/6": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/6.png",
+      "width": 79,
+      "height": 91,
+      "origin": {
+        "x": 43,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/7": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/7.png",
+      "width": 80,
+      "height": 91,
+      "origin": {
+        "x": 43,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/8": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/8.png",
+      "width": 80,
+      "height": 88,
+      "origin": {
+        "x": 39,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/9": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/9.png",
+      "width": 80,
+      "height": 88,
+      "origin": {
+        "x": 40,
+        "y": 31
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoCri1/effect3": {
+      "path": "generated/damage-skins/KMS/389/326/NoCri1/effect3.png",
+      "width": 54,
+      "height": 50,
+      "origin": {
+        "x": 29,
+        "y": -5
+      },
+      "animated": false,
+      "frameCount": 1,
+      "duration": 90
+    },
+    "KMS/389/326/NoRed0/0": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/0.png",
+      "width": 47,
+      "height": 63,
+      "origin": {
+        "x": 25,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/1": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/1.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/2": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/2.png",
+      "width": 47,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/3": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/3.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/4": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/4.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/5": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/5.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/6": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/6.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/7": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/7.png",
+      "width": 47,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/8": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/8.png",
+      "width": 46,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed0/9": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed0/9.png",
+      "width": 47,
+      "height": 63,
+      "origin": {
+        "x": 24,
+        "y": 13
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/0": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/0.png",
+      "width": 52,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/1": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/1.png",
+      "width": 51,
+      "height": 71,
+      "origin": {
+        "x": 26,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/2": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/2.png",
+      "width": 52,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/3": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/3.png",
+      "width": 51,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/4": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/4.png",
+      "width": 52,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/5": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/5.png",
+      "width": 51,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/6": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/6.png",
+      "width": 51,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/7": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/7.png",
+      "width": 52,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/8": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/8.png",
+      "width": 51,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
+    },
+    "KMS/389/326/NoRed1/9": {
+      "path": "generated/damage-skins/KMS/389/326/NoRed1/9.png",
+      "width": 52,
+      "height": 71,
+      "origin": {
+        "x": 27,
+        "y": 18
+      },
+      "animated": true,
+      "frameCount": 5,
+      "duration": 450
     },
     "KMS/389/330/NoCri0/0": {
       "path": "generated/damage-skins/KMS/389/330/NoCri0/0.png",

@@ -14,10 +14,11 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
+from wz_img_metadata import find_img_node, read_img_metadata
 
 try:
     from PIL import Image
@@ -70,7 +71,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--region", default="KMS")
     parser.add_argument("--version", type=int, required=True)
-    parser.add_argument("--workers", type=int, default=24)
     parser.add_argument(
         "--indices",
         type=int,
@@ -111,23 +111,6 @@ def fetch_bytes(url: str, suffix: str, attempts: int = 5) -> bytes:
                 time.sleep(min(8, 1.5**attempt))
 
     raise RuntimeError(f"요청 실패: {url}") from last_error
-
-
-def fetch_json(url: str) -> dict[str, Any]:
-    payload = fetch_bytes(url, ".json")
-    data = json.loads(payload)
-    if not isinstance(data, dict):
-        raise RuntimeError(f"JSON 객체가 아닌 응답: {url}")
-    return data
-
-
-def fetch_optional_json(url: str) -> Optional[dict[str, Any]]:
-    try:
-        return fetch_json(url)
-    except urllib.error.HTTPError as error:
-        if error.code == 404:
-            return None
-        raise
 
 
 def read_skin_map() -> dict[int, tuple[int, ...]]:
@@ -313,8 +296,14 @@ def read_delay(node: Optional[dict[str, Any]]) -> int:
 
 
 def collect_metadata(
-    nodes: list[ExportedNode], region: str, version: int, workers: int
+    nodes: list[ExportedNode], region: str, version: int
 ) -> dict[str, Optional[dict[str, Any]]]:
+    # IMG에는 origin/delay가 함께 들어 있다. 수천 개의 JSON 노드를 요청하지 않는다.
+    raw_url = (
+        f"https://maplestory.io/api/wz/export/{region}/{version}/Effect/"
+        "DamageSkin.img?rawImage=true"
+    )
+    root = read_img_metadata(fetch_bytes(raw_url, ".img"))
     urls: set[str] = set()
     for node in nodes:
         if node.static_image is not None:
@@ -325,19 +314,13 @@ def collect_metadata(
             urls.add(metadata_url(region, version, node, "delay", frame_number))
 
     results: dict[str, Optional[dict[str, Any]]] = {}
-    print(f"[metadata] {len(urls)}개 요청 (캐시 재사용 가능)", flush=True)
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures: dict[Future[Optional[dict[str, Any]]], str] = {
-            executor.submit(fetch_optional_json, url): url for url in sorted(urls)
-        }
-        for completed, future in enumerate(as_completed(futures), start=1):
-            url = futures[future]
-            try:
-                results[url] = future.result()
-            except Exception as error:
-                raise RuntimeError(f"메타데이터 요청 실패: {url}") from error
-            if completed % 100 == 0 or completed == len(futures):
-                print(f"[metadata] {completed}/{len(futures)}", flush=True)
+    for url in sorted(urls):
+        path = url.split("/DamageSkin.img/", 1)[1]
+        try:
+            results[url] = find_img_node(root, path)
+        except KeyError as error:
+            raise RuntimeError(f"원본 IMG 메타데이터 누락: {path}") from error
+    print(f"[metadata] 원본 IMG 1개에서 {len(urls)}개 값 추출", flush=True)
     return results
 
 
@@ -475,7 +458,19 @@ def main() -> int:
             nodes.extend(exported)
             print(f"[export] {skin.index}: {len(exported)}개 노드", flush=True)
 
-    metadata = collect_metadata(nodes, args.region, args.version, args.workers)
+    # 일부 export가 비어 있어도 성공한 것처럼 불완전한 묶음을 배포하지 않는다.
+    for skin in action_skins:
+        exported_paths = {node.node_path for node in nodes if node.skin == skin}
+        required_paths = {
+            path for path in NODE_PATHS
+            if not path.startswith("NoCustom/")
+            or any("유닛" in name for name in skin.names)
+        }
+        missing = sorted(required_paths - exported_paths)
+        if missing:
+            raise RuntimeError(f"스킨 {skin.index} 필수 노드 누락: {', '.join(missing)}")
+
+    metadata = collect_metadata(nodes, args.region, args.version)
     assets: dict[str, dict[str, Any]] = {}
     for completed, node in enumerate(nodes, start=1):
         key, asset = create_asset(node, args.region, args.version, metadata)

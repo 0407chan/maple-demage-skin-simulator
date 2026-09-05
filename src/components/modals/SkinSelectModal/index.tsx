@@ -14,6 +14,7 @@ import {
   trackSelectorOpened
 } from 'utils/analytics'
 import { preloadWzImageSequences } from 'utils/wzImageAnimation'
+import { getPrebuiltActionSkinUrls } from 'utils/prebuiltActionSkin'
 import { SkinItem } from './SkinItem'
 import styles from './style.module.scss'
 import { useSkinList } from './useSkinList'
@@ -103,7 +104,9 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
       if (!wzVersion.version || !wzVersion.region) return Promise.resolve()
 
       const baseUrl = `https://maplestory.io/api/wz/${wzVersion.region}/${wzVersion.version}/Effect/DamageSkin.img/${skinNumber}`
-      return preloadWzImageSequences(getSkinImageUrls(baseUrl))
+      return preloadWzImageSequences(
+        getPrebuiltActionSkinUrls(baseUrl) ?? getSkinImageUrls(baseUrl)
+      )
     },
     [wzVersion.region, wzVersion.version]
   )
@@ -360,40 +363,42 @@ export const SkinSelectModal: React.FC<SkinSelectModalProps> = ({
           </span>
         </div>
 
-        <div className={styles.body}>
-          {isListLoading ? (
-            <div className={styles.loadingState} role="status">
-              <span className={styles.spinner} aria-hidden="true" />
-              {t('skin.loading')}
-            </div>
-          ) : filteredSkins.length > 0 ? (
-            filteredSkins.map((skin) => (
-              <SkinItem
-                key={skin.id}
-                skin={skin}
-                currentSkin={currentSkin}
-                displayName={getLocalizedSkinName(skin) ?? skin.name}
-                nameLanguage={
-                  getLocalizedSkinName(skin)
-                    ? localizedContent.localeTag
-                    : 'ko-KR'
-                }
-                searchKey={debouncedSearchKey}
-                onSelect={handleSkinSelect}
-              />
-            ))
-          ) : (
-            <div className={styles.emptyState} role="status">
-              <span className={styles.emptyIcon} aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="m20 20-4.5-4.5m2.5-5A7.5 7.5 0 1 1 3 10.5a7.5 7.5 0 0 1 15 0Z" />
-                </svg>
-              </span>
-              <strong>{t('common.noResults')}</strong>
-              <span>{t('skin.emptyHint')}</span>
-            </div>
-          )}
-        </div>
+        {open && (
+          <div className={styles.body}>
+            {isListLoading ? (
+              <div className={styles.loadingState} role="status">
+                <span className={styles.spinner} aria-hidden="true" />
+                {t('skin.loading')}
+              </div>
+            ) : filteredSkins.length > 0 ? (
+              filteredSkins.map((skin) => (
+                <SkinItem
+                  key={skin.id}
+                  skin={skin}
+                  currentSkin={currentSkin}
+                  displayName={getLocalizedSkinName(skin) ?? skin.name}
+                  nameLanguage={
+                    getLocalizedSkinName(skin)
+                      ? localizedContent.localeTag
+                      : 'ko-KR'
+                  }
+                  searchKey={debouncedSearchKey}
+                  onSelect={handleSkinSelect}
+                />
+              ))
+            ) : (
+              <div className={styles.emptyState} role="status">
+                <span className={styles.emptyIcon} aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="m20 20-4.5-4.5m2.5-5A7.5 7.5 0 1 1 3 10.5a7.5 7.5 0 0 1 15 0Z" />
+                  </svg>
+                </span>
+                <strong>{t('common.noResults')}</strong>
+                <span>{t('skin.emptyHint')}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   )

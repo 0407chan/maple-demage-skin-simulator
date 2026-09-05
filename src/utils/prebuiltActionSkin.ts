@@ -28,8 +28,25 @@ export const getPrebuiltActionSkinAsset = (apiUrl: string) => {
   const match = apiUrl.match(WZ_DAMAGE_SKIN_URL)
   if (!match) return undefined
 
-  const [, region, version, skinIndex, nodePath] = match
-  return manifest.assets[`${region}/${version}/${skinIndex}/${nodePath}`]
+  // 같은 지역의 기존 스킨은 API 버전이 올라가도 배포한 원본 버전을 사용한다.
+  const [, region, , skinIndex, nodePath] = match
+  return manifest.assets[
+    `${region}/${manifest.wzVersion}/${skinIndex}/${nodePath}`
+  ]
 }
 
 export const getPrebuiltActionSkinManifest = () => manifest
+
+// 묶음에 실제로 존재하는 노드만 준비한다. 일반형 액션 스킨에는 유닛 문자가 없다.
+export const getPrebuiltActionSkinUrls = (baseUrl: string) => {
+  const skinMatch = `${baseUrl}/NoCri0/0`.match(WZ_DAMAGE_SKIN_URL)
+  if (!skinMatch) return undefined
+  const [, region, , skinIndex] = skinMatch
+  const prefix = `${region}/${manifest.wzVersion}/${skinIndex}/`
+  const keys = Object.keys(manifest.assets).filter((key) =>
+    key.startsWith(prefix)
+  )
+  return keys.length > 0
+    ? keys.map((key) => `${baseUrl}/${key.slice(prefix.length)}`)
+    : undefined
+}

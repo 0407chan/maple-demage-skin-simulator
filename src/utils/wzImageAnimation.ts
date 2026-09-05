@@ -1,4 +1,5 @@
 import { getPrebuiltActionSkinAsset } from 'utils/prebuiltActionSkin'
+import { preloadImage } from 'utils/imagePreloader'
 
 export type WzPoint = {
   x: number
@@ -266,7 +267,11 @@ export const preloadWzImageSequences = async (
       cursor += 1
 
       try {
-        await loadWzImageSequence(url)
+        const sequence = await loadWzImageSequence(url)
+        // APNG의 메타데이터만 읽고 끝내면 첫 공격 때 이미지 다운로드가 시작된다.
+        if (getPrebuiltActionSkinAsset(url)) {
+          await preloadImage(sequence.frames[0].src)
+        }
       } catch {
         // 일부 노드가 없는 스킨도 있으므로 나머지 이미지는 계속 준비한다.
       }
