@@ -1,0 +1,2082 @@
+{
+  "schemaVersion": 1,
+  "region": "GMS",
+  "wzVersion": 83,
+  "metadataCommit": "fec53bc7714dc0f1ae3f50b2986cdf2727e0912a",
+  "maps": [
+    {
+      "id": 100000000,
+      "name": "헤네시스",
+      "streetName": "빅토리아 아일랜드",
+      "labels": {
+        "ko": {
+          "name": "헤네시스",
+          "streetName": "빅토리아 아일랜드"
+        },
+        "en": {
+          "name": "Henesys",
+          "streetName": "Victoria Island"
+        },
+        "ja": {
+          "name": "ヘネシス",
+          "streetName": "ビクトリアアイランド"
+        },
+        "zh-CN": {
+          "name": "射手村",
+          "streetName": "金银岛"
+        },
+        "zh-TW": {
+          "name": "弓箭手村",
+          "streetName": "維多利亞島"
+        }
+      },
+      "foregroundPath": "generated/maps/100000000/foreground.webp",
+      "iconPath": "generated/maps/100000000/icon.webp",
+      "backgroundColor": "rgb(51, 102, 204)",
+      "detail": {
+        "id": 100000000,
+        "name": "헤네시스",
+        "streetName": "빅토리아 아일랜드",
+        "miniMap": {
+          "centerX": 1068,
+          "centerY": 661,
+          "width": 7444,
+          "height": 1391
+        }
+      },
+      "groundMetrics": {
+        "groundY": 603,
+        "width": 7344,
+        "height": 1193
+      },
+      "backgrounds": [
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-0.webp",
+          "index": 0,
+          "type": 3,
+          "x": 0,
+          "y": 0,
+          "rx": 0,
+          "ry": 0,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-0.webp",
+                "width": 256,
+                "height": 256,
+                "origin": {
+                  "x": 128,
+                  "y": 128
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-1.webp",
+          "index": 1,
+          "type": 4,
+          "x": 116,
+          "y": -71,
+          "rx": -5,
+          "ry": -3,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-1.webp",
+                "width": 1024,
+                "height": 579,
+                "origin": {
+                  "x": 512,
+                  "y": 289
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-2.webp",
+          "index": 2,
+          "type": 0,
+          "x": 495,
+          "y": 45,
+          "rx": -20,
+          "ry": 3,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-2.webp",
+                "width": 2493,
+                "height": 340,
+                "origin": {
+                  "x": 1246,
+                  "y": 170
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-3.webp",
+          "index": 3,
+          "type": 0,
+          "x": 374,
+          "y": -259,
+          "rx": -20,
+          "ry": 3,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-3.webp",
+                "width": 315,
+                "height": 268,
+                "origin": {
+                  "x": 157,
+                  "y": 134
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-4.webp",
+          "index": 4,
+          "type": 0,
+          "x": -66,
+          "y": 186,
+          "rx": -40,
+          "ry": -5,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-4.webp",
+                "width": 1024,
+                "height": 257,
+                "origin": {
+                  "x": 512,
+                  "y": 128
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-5.webp",
+          "index": 5,
+          "type": 0,
+          "x": 958,
+          "y": 168,
+          "rx": -40,
+          "ry": -5,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-5.webp",
+                "width": 1024,
+                "height": 294,
+                "origin": {
+                  "x": 512,
+                  "y": 147
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-6.webp",
+          "index": 6,
+          "type": 0,
+          "x": 1982,
+          "y": 186,
+          "rx": -40,
+          "ry": -5,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-6.webp",
+                "width": 1024,
+                "height": 257,
+                "origin": {
+                  "x": 512,
+                  "y": 128
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000000/background-7.webp",
+          "index": 7,
+          "type": 0,
+          "x": 3006,
+          "y": 168,
+          "rx": -40,
+          "ry": -5,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000000/background-7.webp",
+                "width": 1024,
+                "height": 294,
+                "origin": {
+                  "x": 512,
+                  "y": 147
+                },
+                "delay": 100
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 100000100,
+      "name": "헤네시스 시장",
+      "streetName": "헤네시스",
+      "labels": {
+        "ko": {
+          "name": "헤네시스 시장",
+          "streetName": "헤네시스"
+        },
+        "en": {
+          "name": "Henesys Market",
+          "streetName": "Henesys"
+        },
+        "ja": {
+          "name": "ヘネシス市場",
+          "streetName": "ヘネシス"
+        },
+        "zh-CN": {
+          "name": "射手村市场",
+          "streetName": "射手村"
+        },
+        "zh-TW": {
+          "name": "弓箭手村商場",
+          "streetName": "弓箭手村"
+        }
+      },
+      "foregroundPath": "generated/maps/100000100/foreground.webp",
+      "iconPath": "generated/maps/100000100/icon.webp",
+      "backgroundColor": "rgb(51, 102, 204)",
+      "detail": {
+        "id": 100000100,
+        "name": "헤네시스 시장",
+        "streetName": "헤네시스",
+        "miniMap": {
+          "centerX": 618,
+          "centerY": 588,
+          "width": 5865,
+          "height": 1078
+        }
+      },
+      "groundMetrics": {
+        "groundY": 397,
+        "width": 5760,
+        "height": 880
+      },
+      "backgrounds": [
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000100/background-0.webp",
+          "index": 0,
+          "type": 3,
+          "x": 0,
+          "y": 0,
+          "rx": 0,
+          "ry": 0,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000100/background-0.webp",
+                "width": 256,
+                "height": 256,
+                "origin": {
+                  "x": 128,
+                  "y": 128
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000100/background-1.webp",
+          "index": 1,
+          "type": 4,
+          "x": 107,
+          "y": -61,
+          "rx": -5,
+          "ry": 4,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000100/background-1.webp",
+                "width": 1024,
+                "height": 579,
+                "origin": {
+                  "x": 512,
+                  "y": 289
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000100/background-2.webp",
+          "index": 2,
+          "type": 0,
+          "x": 399,
+          "y": 166,
+          "rx": -16,
+          "ry": 8,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000100/background-2.webp",
+                "width": 2493,
+                "height": 340,
+                "origin": {
+                  "x": 1246,
+                  "y": 170
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/100000100/background-3.webp",
+          "index": 3,
+          "type": 0,
+          "x": 278,
+          "y": -138,
+          "rx": -16,
+          "ry": 8,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/100000100/background-3.webp",
+                "width": 315,
+                "height": 268,
+                "origin": {
+                  "x": 157,
+                  "y": 134
+                },
+                "delay": 100
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 323010000,
+      "name": "작은 버섯 동산 <1>",
+      "streetName": "헤네시스",
+      "labels": {
+        "ko": {
+          "name": "작은 버섯 동산 <1>",
+          "streetName": "헤네시스"
+        },
+        "en": {
+          "name": "작은 버섯 동산 <1>",
+          "streetName": "헤네시스"
+        },
+        "ja": {
+          "name": "작은 버섯 동산 <1>",
+          "streetName": "헤네시스"
+        },
+        "zh-CN": {
+          "name": "작은 버섯 동산 <1>",
+          "streetName": "헤네시스"
+        },
+        "zh-TW": {
+          "name": "작은 버섯 동산 <1>",
+          "streetName": "헤네시스"
+        }
+      },
+      "source": {
+        "region": "KMS",
+        "wzVersion": 389,
+        "foregroundMethod": "wz-sprites"
+      },
+      "placement": {
+        "coordinateSystem": "map-image-pixels",
+        "anchor": "monster-feet",
+        "x": 723,
+        "y": 313
+      },
+      "foregroundPath": "generated/maps/323010000/foreground.webp",
+      "iconPath": "generated/maps/323010000/icon.webp",
+      "backgroundColor": "rgb(0, 102, 255)",
+      "detail": {
+        "id": 323010000,
+        "name": "작은 버섯 동산 <1>",
+        "streetName": "헤네시스",
+        "miniMap": {
+          "centerX": -1620,
+          "centerY": 945,
+          "width": 1530,
+          "height": 1152
+        }
+      },
+      "groundMetrics": {
+        "groundY": 767,
+        "width": 1530,
+        "height": 1152
+      },
+      "backgrounds": [
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-0.webp",
+          "index": 0,
+          "type": 1,
+          "x": -48,
+          "y": -109,
+          "rx": 0,
+          "ry": 0,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-0.webp",
+                "width": 22,
+                "height": 738,
+                "origin": {
+                  "x": 11,
+                  "y": 369
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-1.webp",
+          "index": 1,
+          "type": 4,
+          "x": -255,
+          "y": -111,
+          "rx": -1,
+          "ry": -2,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-1.webp",
+                "width": 850,
+                "height": 222,
+                "origin": {
+                  "x": 425,
+                  "y": 111
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-2.webp",
+          "index": 2,
+          "type": 1,
+          "x": -12,
+          "y": -56,
+          "rx": -5,
+          "ry": -5,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-2.webp",
+                "width": 517,
+                "height": 162,
+                "origin": {
+                  "x": 258,
+                  "y": 81
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-3.webp",
+          "index": 3,
+          "type": 1,
+          "x": -64,
+          "y": -48,
+          "rx": -10,
+          "ry": -12,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-3.webp",
+                "width": 630,
+                "height": 238,
+                "origin": {
+                  "x": 315,
+                  "y": 119
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-4.webp",
+          "index": 4,
+          "type": 1,
+          "x": -288,
+          "y": 76,
+          "rx": -10,
+          "ry": -12,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-4.webp",
+                "width": 630,
+                "height": 11,
+                "origin": {
+                  "x": 315,
+                  "y": 5
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-5.webp",
+          "index": 5,
+          "type": 1,
+          "x": 0,
+          "y": 87,
+          "rx": -10,
+          "ry": -12,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-5.webp",
+                "width": 630,
+                "height": 11,
+                "origin": {
+                  "x": 315,
+                  "y": 5
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-6.webp",
+          "index": 6,
+          "type": 4,
+          "x": -68,
+          "y": -69,
+          "rx": -2,
+          "ry": -10,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-6.webp",
+                "width": 613,
+                "height": 125,
+                "origin": {
+                  "x": 306,
+                  "y": 62
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-7.webp",
+          "index": 7,
+          "type": 1,
+          "x": -341,
+          "y": 12,
+          "rx": -12,
+          "ry": -15,
+          "cx": 1200,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-7.webp",
+                "width": 600,
+                "height": 173,
+                "origin": {
+                  "x": 300,
+                  "y": 86
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-8.webp",
+          "index": 8,
+          "type": 1,
+          "x": 130,
+          "y": -56,
+          "rx": -12,
+          "ry": -15,
+          "cx": 1200,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-8.webp",
+                "width": 600,
+                "height": 213,
+                "origin": {
+                  "x": 171,
+                  "y": 58
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-9.webp",
+          "index": 9,
+          "type": 1,
+          "x": -21,
+          "y": 260,
+          "rx": -15,
+          "ry": -15,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-9.webp",
+                "width": 22,
+                "height": 267,
+                "origin": {
+                  "x": 11,
+                  "y": 133
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-10.webp",
+          "index": 10,
+          "type": 1,
+          "x": -654,
+          "y": 201,
+          "rx": -15,
+          "ry": -15,
+          "cx": 2000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-10.webp",
+                "width": 500,
+                "height": 346,
+                "origin": {
+                  "x": 82,
+                  "y": 242
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-11.webp",
+          "index": 11,
+          "type": 1,
+          "x": 14,
+          "y": 133,
+          "rx": -15,
+          "ry": -15,
+          "cx": 2000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-11.webp",
+                "width": 500,
+                "height": 329,
+                "origin": {
+                  "x": 250,
+                  "y": 164
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-12.webp",
+          "index": 12,
+          "type": 1,
+          "x": 514,
+          "y": 99,
+          "rx": -15,
+          "ry": -15,
+          "cx": 2000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-12.webp",
+                "width": 500,
+                "height": 354,
+                "origin": {
+                  "x": 250,
+                  "y": 177
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/323010000/background-13.webp",
+          "index": 13,
+          "type": 1,
+          "x": 1014,
+          "y": 123,
+          "rx": -15,
+          "ry": -15,
+          "cx": 2000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/323010000/background-13.webp",
+                "width": 500,
+                "height": 379,
+                "origin": {
+                  "x": 250,
+                  "y": 189
+                },
+                "delay": 100
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 450005121,
+      "name": "물과 햇살의 숲",
+      "streetName": "아르카나",
+      "labels": {
+        "ko": {
+          "name": "물과 햇살의 숲",
+          "streetName": "아르카나"
+        },
+        "en": {
+          "name": "물과 햇살의 숲",
+          "streetName": "아르카나"
+        },
+        "ja": {
+          "name": "물과 햇살의 숲",
+          "streetName": "아르카나"
+        },
+        "zh-CN": {
+          "name": "물과 햇살의 숲",
+          "streetName": "아르카나"
+        },
+        "zh-TW": {
+          "name": "물과 햇살의 숲",
+          "streetName": "아르카나"
+        }
+      },
+      "source": {
+        "region": "KMS",
+        "wzVersion": 389,
+        "foregroundMethod": "wz-sprites"
+      },
+      "placement": {
+        "coordinateSystem": "map-image-pixels",
+        "anchor": "monster-feet",
+        "x": 1446,
+        "y": 884
+      },
+      "foregroundPath": "generated/maps/450005121/foreground.webp",
+      "iconPath": "generated/maps/450005121/icon.webp",
+      "backgroundColor": "rgb(28, 47, 140)",
+      "detail": {
+        "id": 450005121,
+        "name": "물과 햇살의 숲",
+        "streetName": "아르카나",
+        "miniMap": {
+          "centerX": 620,
+          "centerY": 761,
+          "width": 2770,
+          "height": 1090
+        }
+      },
+      "groundMetrics": {
+        "groundY": 369,
+        "width": 2770,
+        "height": 1090
+      },
+      "backgrounds": [
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-0.webp",
+          "index": 0,
+          "type": 3,
+          "x": 0,
+          "y": 0,
+          "rx": 0,
+          "ry": 0,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-0.webp",
+                "width": 100,
+                "height": 100,
+                "origin": {
+                  "x": 50,
+                  "y": 50
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-1.webp",
+          "index": 1,
+          "type": 1,
+          "x": 0,
+          "y": -160,
+          "rx": 0,
+          "ry": -10,
+          "cx": 100,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-1.webp",
+                "width": 542,
+                "height": 679,
+                "origin": {
+                  "x": 271,
+                  "y": 342
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-2.webp",
+          "index": 2,
+          "type": 1,
+          "x": 0,
+          "y": 229,
+          "rx": 0,
+          "ry": -10,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-2.webp",
+                "width": 100,
+                "height": 100,
+                "origin": {
+                  "x": 50,
+                  "y": 50
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-3.webp",
+          "index": 3,
+          "type": 1,
+          "x": 0,
+          "y": -300,
+          "rx": 0,
+          "ry": -30,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-3.webp",
+                "width": 690,
+                "height": 241,
+                "origin": {
+                  "x": 345,
+                  "y": 120
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-4.webp",
+          "index": 4,
+          "type": 1,
+          "x": -334,
+          "y": -376,
+          "rx": 0,
+          "ry": -30,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-4.webp",
+                "width": 700,
+                "height": 241,
+                "origin": {
+                  "x": 350,
+                  "y": 120
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-5.webp",
+          "index": 5,
+          "type": 1,
+          "x": 450,
+          "y": -90,
+          "rx": -2,
+          "ry": -40,
+          "cx": 1000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-5.webp",
+                "width": 666,
+                "height": 370,
+                "origin": {
+                  "x": 2,
+                  "y": 171
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-6.webp",
+          "index": 6,
+          "type": 1,
+          "x": 449,
+          "y": -90,
+          "rx": -2,
+          "ry": -40,
+          "cx": 1000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-6.webp",
+                "width": 663,
+                "height": 440,
+                "origin": {
+                  "x": 662,
+                  "y": 236
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-7.webp",
+          "index": 7,
+          "type": 0,
+          "x": 150,
+          "y": -450,
+          "rx": -1,
+          "ry": -25,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-7.webp",
+                "width": 282,
+                "height": 282,
+                "origin": {
+                  "x": 141,
+                  "y": 141
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.8784313725490196,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-8.webp",
+          "index": 8,
+          "type": 0,
+          "x": 300,
+          "y": -190,
+          "rx": -4,
+          "ry": -45,
+          "cx": 2000,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-8.webp",
+                "width": 569,
+                "height": 222,
+                "origin": {
+                  "x": 284,
+                  "y": 111
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.8784313725490196,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-9.webp",
+          "index": 9,
+          "type": 0,
+          "x": -300,
+          "y": -230,
+          "rx": -3,
+          "ry": -45,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-9.webp",
+                "width": 581,
+                "height": 249,
+                "origin": {
+                  "x": 290,
+                  "y": 124
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-10.webp",
+          "index": 10,
+          "type": 0,
+          "x": 100,
+          "y": -350,
+          "rx": -10,
+          "ry": -35,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-10.webp",
+                "width": 466,
+                "height": 104,
+                "origin": {
+                  "x": 233,
+                  "y": 52
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-11.webp",
+          "index": 11,
+          "type": 0,
+          "x": 400,
+          "y": -450,
+          "rx": -10,
+          "ry": -35,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-11.webp",
+                "width": 289,
+                "height": 84,
+                "origin": {
+                  "x": 144,
+                  "y": 42
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-12.webp",
+          "index": 12,
+          "type": 0,
+          "x": 400,
+          "y": -250,
+          "rx": -10,
+          "ry": -35,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-12.webp",
+                "width": 349,
+                "height": 91,
+                "origin": {
+                  "x": 174,
+                  "y": 45
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-13.webp",
+          "index": 13,
+          "type": 0,
+          "x": 800,
+          "y": -350,
+          "rx": -10,
+          "ry": -35,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-13.webp",
+                "width": 376,
+                "height": 79,
+                "origin": {
+                  "x": 188,
+                  "y": 39
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.8784313725490196,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-14.webp",
+          "index": 14,
+          "type": 0,
+          "x": -400,
+          "y": -300,
+          "rx": -10,
+          "ry": -35,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-14.webp",
+                "width": 482,
+                "height": 124,
+                "origin": {
+                  "x": 241,
+                  "y": 62
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-15.webp",
+          "index": 15,
+          "type": 1,
+          "x": 450,
+          "y": -30,
+          "rx": -3,
+          "ry": -45,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-15.webp",
+                "width": 1412,
+                "height": 841,
+                "origin": {
+                  "x": 706,
+                  "y": 420
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-16.webp",
+          "index": 16,
+          "type": 1,
+          "x": -6,
+          "y": -1,
+          "rx": -7,
+          "ry": -68,
+          "cx": 742,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-16.webp",
+                "width": 745,
+                "height": 520,
+                "origin": {
+                  "x": 372,
+                  "y": 260
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-17.webp",
+          "index": 17,
+          "type": 1,
+          "x": 600,
+          "y": -50,
+          "rx": -10,
+          "ry": -75,
+          "cx": 1300,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-17.webp",
+                "width": 746,
+                "height": 471,
+                "origin": {
+                  "x": 373,
+                  "y": 235
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-18.webp",
+          "index": 18,
+          "type": 1,
+          "x": -150,
+          "y": -7,
+          "rx": -10,
+          "ry": -75,
+          "cx": 1300,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-18.webp",
+                "width": 769,
+                "height": 389,
+                "origin": {
+                  "x": 384,
+                  "y": 194
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-19.webp",
+          "index": 19,
+          "type": 1,
+          "x": 300,
+          "y": -50,
+          "rx": -15,
+          "ry": -90,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-19.webp",
+                "width": 367,
+                "height": 426,
+                "origin": {
+                  "x": 183,
+                  "y": 213
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": true,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-20.webp",
+          "index": 20,
+          "type": 1,
+          "x": -250,
+          "y": -16,
+          "rx": -15,
+          "ry": -90,
+          "cx": 1200,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-20.webp",
+                "width": 277,
+                "height": 358,
+                "origin": {
+                  "x": 138,
+                  "y": 179
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-21.webp",
+          "index": 21,
+          "type": 0,
+          "x": 500,
+          "y": -42,
+          "rx": -15,
+          "ry": -90,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-21.webp",
+                "width": 322,
+                "height": 404,
+                "origin": {
+                  "x": 161,
+                  "y": 202
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-22.webp",
+          "index": 22,
+          "type": 1,
+          "x": 850,
+          "y": -100,
+          "rx": -25,
+          "ry": -95,
+          "cx": 1600,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-22.webp",
+                "width": 545,
+                "height": 590,
+                "origin": {
+                  "x": 272,
+                  "y": 295
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-23.webp",
+          "index": 23,
+          "type": 1,
+          "x": -600,
+          "y": -86,
+          "rx": -25,
+          "ry": -95,
+          "cx": 1100,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-23.webp",
+                "width": 436,
+                "height": 468,
+                "origin": {
+                  "x": 218,
+                  "y": 234
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-24.webp",
+          "index": 24,
+          "type": 1,
+          "x": -348,
+          "y": -70,
+          "rx": -25,
+          "ry": -95,
+          "cx": 1350,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-24.webp",
+                "width": 374,
+                "height": 429,
+                "origin": {
+                  "x": 187,
+                  "y": 214
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-25.webp",
+          "index": 25,
+          "type": 1,
+          "x": -500,
+          "y": 110,
+          "rx": -25,
+          "ry": -95,
+          "cx": 1500,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-25.webp",
+                "width": 458,
+                "height": 160,
+                "origin": {
+                  "x": 229,
+                  "y": 80
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-26.webp",
+          "index": 26,
+          "type": 1,
+          "x": 450,
+          "y": 130,
+          "rx": -25,
+          "ry": -95,
+          "cx": 1300,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-26.webp",
+                "width": 285,
+                "height": 131,
+                "origin": {
+                  "x": 142,
+                  "y": 65
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": false,
+          "imagePath": "generated/maps/450005121/background-27.webp",
+          "index": 27,
+          "type": 1,
+          "x": 720,
+          "y": 116,
+          "rx": -25,
+          "ry": -95,
+          "cx": 900,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-27.webp",
+                "width": 213,
+                "height": 83,
+                "origin": {
+                  "x": 106,
+                  "y": 41
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-28.webp",
+          "index": 28,
+          "type": 1,
+          "x": 0,
+          "y": 309,
+          "rx": 0,
+          "ry": -95,
+          "cx": 350,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-28.webp",
+                "width": 566,
+                "height": 244,
+                "origin": {
+                  "x": 291,
+                  "y": 123
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.3764705882352941,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-29.webp",
+          "index": 29,
+          "type": 1,
+          "x": 120,
+          "y": 225,
+          "rx": -95,
+          "ry": -95,
+          "cx": 350,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-29.webp",
+                "width": 604,
+                "height": 64,
+                "origin": {
+                  "x": 301,
+                  "y": 32
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-30.webp",
+          "index": 30,
+          "type": 4,
+          "x": 0,
+          "y": 284,
+          "rx": 7,
+          "ry": -95,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-30.webp",
+                "width": 744,
+                "height": 182,
+                "origin": {
+                  "x": 372,
+                  "y": 91
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.6274509803921569,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-31.webp",
+          "index": 31,
+          "type": 4,
+          "x": 0,
+          "y": 413,
+          "rx": 7,
+          "ry": -95,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-31.webp",
+                "width": 690,
+                "height": 241,
+                "origin": {
+                  "x": 345,
+                  "y": 120
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 0.8784313725490196,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-32.webp",
+          "index": 32,
+          "type": 4,
+          "x": 0,
+          "y": 305,
+          "rx": 7,
+          "ry": -95,
+          "cx": 800,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-32.webp",
+                "width": 535,
+                "height": 214,
+                "origin": {
+                  "x": 267,
+                  "y": 107
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-33.webp",
+          "index": 33,
+          "type": 0,
+          "x": 140,
+          "y": 290,
+          "rx": -1,
+          "ry": -95,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-33.webp",
+                "width": 329,
+                "height": 212,
+                "origin": {
+                  "x": 164,
+                  "y": 106
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": false,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-34.webp",
+          "index": 34,
+          "type": 0,
+          "x": -900,
+          "y": -120,
+          "rx": -95,
+          "ry": -110,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-34.webp",
+                "width": 843,
+                "height": 1092,
+                "origin": {
+                  "x": 421,
+                  "y": 546
+                },
+                "delay": 100
+              }
+            ]
+          }
+        },
+        {
+          "alpha": 1,
+          "flip": true,
+          "front": true,
+          "imagePath": "generated/maps/450005121/background-35.webp",
+          "index": 35,
+          "type": 0,
+          "x": 2690,
+          "y": -180,
+          "rx": -95,
+          "ry": -110,
+          "cx": 0,
+          "cy": 0,
+          "sequence": {
+            "animated": false,
+            "loop": false,
+            "frames": [
+              {
+                "src": "generated/maps/450005121/background-35.webp",
+                "width": 843,
+                "height": 1092,
+                "origin": {
+                  "x": 421,
+                  "y": 546
+                },
+                "delay": 100
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

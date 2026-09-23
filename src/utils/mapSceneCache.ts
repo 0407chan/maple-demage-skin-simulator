@@ -1,6 +1,7 @@
 const MAP_SCENE_CACHE_DATABASE = 'maple-damage-skin-map-scenes'
 const MAP_SCENE_CACHE_STORE = 'backgrounds'
-const MAP_SCENE_CACHE_VERSION = 1
+// Version 1 did not retain background parallax rates or repeat spacing.
+const MAP_SCENE_CACHE_VERSION = 2
 const MAX_PERSISTED_MAP_SCENES = 6
 
 type MapSceneCacheRecord<T> = {

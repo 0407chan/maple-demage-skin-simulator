@@ -49,6 +49,13 @@ class ImgMetadataTests(unittest.TestCase):
         self.assertEqual(reader.string_block(), "origin")
         self.assertEqual(reader.position, len(reader.data))
 
+    def test_skips_bounded_collision_polygon_without_losing_next_property(self):
+        data = b"\x73" + string("Property") + properties([
+            ("polygon", extended("Shape2D#Convex2D", b"unused collision shape")),
+            ("z", b"\x03\x07"),
+        ])
+        self.assertEqual(read_img_metadata(data)["z"]["value"], 7)
+
     def test_unicode_string(self):
         text = "유닛"
         encoded = b"".join(struct.pack("<H", ord(c) ^ (0xAAAA + i)) for i, c in enumerate(text))

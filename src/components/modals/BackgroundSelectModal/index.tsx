@@ -1,23 +1,21 @@
-import { getMapIconUrl, useGetMapList } from 'api/map'
+import { getBundledMapIconUrl, getBundledMapList } from 'utils/bundledMaps'
+import { getMapIconUrl, useMapLibrary } from 'api/map'
 import { wzVersionState } from 'atoms/wzVersion'
+import { useRecoilValue } from 'recoil'
 import { useAccessibleDialog } from 'hooks/useAccessibleDialog'
-import useBoolean from 'hooks/useBoolean'
 import { useLocalizedGameContent } from 'hooks/useLocalizedGameContent'
+import useBoolean from 'hooks/useBoolean'
 import { useI18n } from 'i18n'
 import React, { useEffect, useMemo, useState } from 'react'
 import Highlighter from 'react-highlight-words'
-import { useRecoilValue } from 'recoil'
 import { MapleMap } from 'type/map'
-import { getUniqueByName } from 'utils/uniqueByName'
+import { mergeMapLists } from 'utils/mapSelection'
 import styles from './style.module.scss'
 
 type BackgroundSelectModalProps = {
   currentBackground?: MapleMap
   onSelect: (background?: MapleMap) => void
 }
-
-const SEARCH_DEBOUNCE_MS = 150
-const RESULT_COUNT = 200
 
 const LandscapeIcon: React.FC = () => (
   <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -31,12 +29,50 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
   currentBackground,
   onSelect
 }) => {
-  const { formatCount, t } = useI18n()
-  const localizedContent = useLocalizedGameContent()
+  const { formatCount, locale, t } = useI18n()
   const [open, { setTrue: onOpen, setFalse: onClose }] = useBoolean(false)
   const [searchKey, setSearchKey] = useState('')
-  const [debouncedSearchKey, setDebouncedSearchKey] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const localizedContent = useLocalizedGameContent()
   const wzVersion = useRecoilValue(wzVersionState)
+
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => setDebouncedSearch(searchKey.trim()),
+      250
+    )
+    return () => window.clearTimeout(timer)
+  }, [searchKey])
+
+  const localizedQuery = useMapLibrary(
+    {
+      region: localizedContent.region,
+      version: localizedContent.version,
+      searchFor: debouncedSearch || undefined
+    },
+    open
+  )
+  const usingFallback =
+    localizedQuery.isLoadingError &&
+    (localizedContent.region !== wzVersion.region ||
+      localizedContent.version !== wzVersion.version)
+  const fallbackQuery = useMapLibrary(
+    {
+      region: wzVersion.region,
+      version: wzVersion.version,
+      searchFor: debouncedSearch || undefined
+    },
+    open && usingFallback
+  )
+  const remoteQuery = usingFallback ? fallbackQuery : localizedQuery
+  const isSearchPending = searchKey.trim() !== debouncedSearch
+  const isLoading =
+    isSearchPending || localizedContent.isLoading || remoteQuery.isLoading
+  const sourceVersion = usingFallback
+    ? wzVersion.version
+    : localizedContent.version
+  const hasRemoteError =
+    remoteQuery.isError || (!isLoading && sourceVersion === undefined)
 
   const { dialogRef, triggerRef } = useAccessibleDialog(
     open,
@@ -44,57 +80,15 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
     '#background-search'
   )
 
-  useEffect(() => {
-    const timer = window.setTimeout(
-      () => setDebouncedSearchKey(searchKey.trim()),
-      SEARCH_DEBOUNCE_MS
-    )
-
-    return () => window.clearTimeout(timer)
-  }, [searchKey])
-
-  const query = useMemo(
-    () => ({
-      region: localizedContent.region,
-      version: localizedContent.version,
-      startPosition: 0,
-      count: RESULT_COUNT,
-      searchFor: debouncedSearchKey || undefined
-    }),
-    [debouncedSearchKey, localizedContent.region, localizedContent.version]
+  const maps = useMemo(
+    () =>
+      mergeMapLists(
+        getBundledMapList(locale, searchKey),
+        isSearchPending ? [] : (remoteQuery.data?.pages.flat() ?? [])
+      ),
+    [locale, searchKey, isSearchPending, remoteQuery.data]
   )
-  const localizedResultsQuery = useGetMapList(query, open)
-  const fallbackResultsQuery = useGetMapList(
-    {
-      ...query,
-      region: wzVersion.region,
-      version: wzVersion.version
-    },
-    open && localizedResultsQuery.isError
-  )
-  const currentNameQuery = useGetMapList({
-    region: localizedContent.region,
-    version: localizedContent.version,
-    startPosition: 0,
-    count: RESULT_COUNT
-  })
-  const usingFallback = localizedResultsQuery.isError
-  const {
-    data: mapResults = [],
-    isError,
-    isFetching,
-    isLoading,
-    refetch
-  } = usingFallback ? fallbackResultsQuery : localizedResultsQuery
-  const maps = useMemo(() => getUniqueByName(mapResults), [mapResults])
-
-  const getIconUrl = (map: MapleMap) => {
-    if (wzVersion.version === undefined || wzVersion.region === undefined) {
-      return undefined
-    }
-
-    return getMapIconUrl(map.id, wzVersion.version, wzVersion.region)
-  }
+  const allMaps = useMemo(() => getBundledMapList(locale), [locale])
 
   const handleSelect = (map: MapleMap) => {
     onSelect(map)
@@ -106,11 +100,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
     onClose()
   }
 
-  const isSearchPending = searchKey.trim() !== debouncedSearchKey
-  const isVersionReady =
-    localizedContent.version !== undefined &&
-    localizedContent.region !== undefined
-  const localizedCurrentBackground = currentNameQuery.data?.find(
+  const localizedCurrentBackground = [...allMaps, ...maps].find(
     (map) => map.id === currentBackground?.id
   )
   const currentName =
@@ -119,16 +109,15 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
     t('background.default')
   const currentStreetName =
     localizedCurrentBackground?.streetName ?? currentBackground?.streetName
-  const currentNameLanguage = localizedCurrentBackground
-    ? localizedContent.localeTag
-    : currentBackground
-      ? 'ko-KR'
-      : localizedContent.localeTag
-  const resultNameLanguage = usingFallback
-    ? 'ko-KR'
-    : localizedContent.localeTag
+  const currentNameLanguage = locale
+  const resultNameLanguage = usingFallback ? 'ko-KR' : locale
+  const getIconUrl = (id: number) =>
+    getBundledMapIconUrl(id) ??
+    (wzVersion.version !== undefined && wzVersion.region !== undefined
+      ? getMapIconUrl(id, wzVersion.version, wzVersion.region)
+      : undefined)
   const currentIconUrl = currentBackground
-    ? getIconUrl(currentBackground)
+    ? getIconUrl(currentBackground.id)
     : undefined
 
   return (
@@ -229,7 +218,7 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
             )}
           </div>
           <p className={styles.searchHint} aria-live="polite">
-            {isSearchPending || isFetching
+            {isLoading
               ? t('background.searching')
               : formatCount('searchResults', maps.length)}
           </p>
@@ -249,6 +238,11 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               <strong lang={currentNameLanguage}>{currentName}</strong>
               {currentStreetName && (
                 <small lang={currentNameLanguage}>{currentStreetName}</small>
+              )}
+              {currentBackground && (
+                <small>
+                  {t('background.mapNumber', { id: currentBackground.id })}
+                </small>
               )}
             </span>
           </div>
@@ -272,19 +266,28 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
         </div>
 
         <div className={styles.resultList}>
-          {!isVersionReady || isLoading || isSearchPending ? (
+          {open && isLoading && (
             <div className={styles.statusState} role="status">
               <span className={styles.spinner} aria-hidden="true" />
               {t('background.loading')}
             </div>
-          ) : isError ? (
+          )}
+          {open && hasRemoteError && (
             <div className={styles.statusState} role="alert">
               <strong>{t('background.error')}</strong>
-              <button type="button" onClick={() => void refetch()}>
+              <button
+                type="button"
+                onClick={() =>
+                  void (remoteQuery.isFetchNextPageError
+                    ? remoteQuery.fetchNextPage()
+                    : remoteQuery.refetch())
+                }
+              >
                 {t('common.retry')}
               </button>
             </div>
-          ) : maps.length === 0 ? (
+          )}
+          {maps.length === 0 && !isLoading && !hasRemoteError ? (
             <div className={styles.statusState} role="status">
               <span className={styles.emptyIcon} aria-hidden="true">
                 ?
@@ -293,9 +296,10 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               <span>{t('background.emptyHint')}</span>
             </div>
           ) : (
+            open &&
             maps.map((map) => {
               const isCurrent = map.id === currentBackground?.id
-              const iconUrl = getIconUrl(map)
+              const iconUrl = getIconUrl(map.id)
 
               return (
                 <button
@@ -318,13 +322,13 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
                         autoEscape
                         caseSensitive={false}
                         highlightClassName={styles.highlight}
-                        searchWords={[debouncedSearchKey]}
+                        searchWords={[searchKey.trim()]}
                         textToHighlight={map.name}
                       />
                     </strong>
                     <span lang={resultNameLanguage}>
-                      {map.streetName ||
-                        t('background.mapNumber', { id: map.id })}
+                      {map.streetName && `${map.streetName} · `}
+                      {t('background.mapNumber', { id: map.id })}
                     </span>
                   </span>
                   {isCurrent ? (
@@ -340,6 +344,24 @@ export const BackgroundSelectModal: React.FC<BackgroundSelectModalProps> = ({
               )
             })
           )}
+          {open &&
+            !isSearchPending &&
+            remoteQuery.hasNextPage &&
+            !remoteQuery.isFetchNextPageError && (
+              <div className={styles.statusState}>
+                <button
+                  type="button"
+                  disabled={remoteQuery.isFetchingNextPage}
+                  onClick={() => void remoteQuery.fetchNextPage()}
+                >
+                  {t(
+                    remoteQuery.isFetchingNextPage
+                      ? 'background.loading'
+                      : 'background.loadMore'
+                  )}
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </>

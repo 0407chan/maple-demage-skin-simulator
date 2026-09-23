@@ -194,6 +194,18 @@ describe('map scene', () => {
     ).toEqual({ maxX: 0, maxY: 300, minX: 0, minY: -300 })
   })
 
+  test('PC 화면보다 짧아도 발 위치 정렬로 잘린 맵 하단까지 탐색한다', () => {
+    const bounds = getMapCameraBounds({
+      foregroundWidth: 2770,
+      foregroundHeight: 1090,
+      foregroundTop: 731,
+      viewportWidth: 2048,
+      viewportHeight: 1250
+    })
+    expect(bounds.maxY).toBe(571)
+    expect(731 + 1090 - bounds.maxY).toBe(1250)
+  })
+
   test('카메라 위치가 맵 가장자리를 넘어가지 않게 제한한다', () => {
     const bounds = getMapCameraBounds({
       foregroundHeight: 1600,

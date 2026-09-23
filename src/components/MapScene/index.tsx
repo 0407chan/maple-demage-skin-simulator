@@ -1,4 +1,9 @@
-import { getMapDetail, getMapRenderUrl } from 'api/map'
+import { getBundledMapScene } from 'utils/bundledMaps'
+import { reconstructMap } from 'utils/reconstructMap'
+import type { ReconstructedMap } from 'utils/reconstructMap'
+import type { MapSourceProgress } from 'utils/mapSourceClient'
+import type { MapleMapDetail } from 'type/map'
+import type { RegionType } from 'type/wz'
 import React, {
   useCallback,
   useEffect,
@@ -7,29 +12,23 @@ import React, {
   useRef,
   useState
 } from 'react'
-import type { MapleMapDetail } from 'type/map'
-import type { RegionType } from 'type/wz'
 import {
   clampMapCameraX,
   clampMapCameraY,
-  getImageEdgeColors,
-  getMapBackgroundLayerOffsets,
-  getMapBackgroundRepeat,
   getMapCameraBounds,
-  getMapSceneLayout,
-  loadMapBackgroundLayers,
-  loadMapBackgroundPreviewLayers,
-  measureMapGround
+  getMapSceneLayout
 } from 'utils/mapScene'
 import type {
   MapBackgroundLayer,
   MapCameraBounds,
-  MapGroundMetrics,
-  MapSceneLayout
+  MapGroundMetrics
 } from 'utils/mapScene'
-import { getWzAnimationPlayback } from 'utils/wzImageAnimation'
 import styles from './style.module.scss'
 import { useI18n } from 'i18n'
+import { getMapPlacementX, getMapPlacementY } from 'utils/monsterPlacement'
+import type { PlacementPoint } from 'utils/monsterPlacement'
+import BackgroundCanvas from './BackgroundCanvas'
+import type { BackgroundCanvasHandle } from './BackgroundCanvas'
 
 export type MapMovementState = {
   horizontalDirection: -1 | 0 | 1
@@ -38,10 +37,14 @@ export type MapMovementState = {
 
 type Props = {
   mapId: number
+  version?: number
+  region?: RegionType
   monsterFootY?: number
+  monsterFootX?: number
+  onPlacementOffsetChange?: (point: PlacementPoint) => void
+  foregroundRef?: React.Ref<HTMLImageElement>
+  navigationEnabled?: boolean
   onMovementChange?: (movement: MapMovementState) => void
-  region: RegionType
-  version: number
 }
 
 type PreparedMapScene = {
@@ -51,13 +54,6 @@ type PreparedMapScene = {
   groundMetrics?: MapGroundMetrics
   mapDetail?: MapleMapDetail
   mapId: number
-}
-
-type BackgroundLayerProps = {
-  background: MapBackgroundLayer
-  foregroundTop?: number
-  layout: MapSceneLayout
-  worldTop: number
 }
 
 type CameraViewport = {
@@ -80,12 +76,6 @@ const IDLE_MAP_MOVEMENT: MapMovementState = {
   isMoving: false
 }
 
-const getBackgroundPositionX = (x: number) => {
-  const offset = `${x < 0 ? '-' : '+'} ${Math.abs(x)}px`
-
-  return `calc(50% ${offset})`
-}
-
 const isMapNavigationBlocked = (target?: EventTarget | null) => {
   const targetElement = target instanceof Element ? target : undefined
   const editingControl = targetElement?.closest(
@@ -100,98 +90,45 @@ const isMapNavigationBlocked = (target?: EventTarget | null) => {
   )
 }
 
-const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
-  background,
-  foregroundTop,
-  layout,
-  worldTop
-}) => {
-  const [frameIndex, setFrameIndex] = useState(0)
-
-  useEffect(() => {
-    setFrameIndex(0)
-    if (
-      !background.sequence.animated ||
-      background.sequence.frames.length <= 1
-    ) {
-      return
-    }
-
-    let active = true
-    let timer: number | undefined
-    const animationStart = performance.now()
-
-    const updateFrame = () => {
-      if (!active) return
-
-      const playback = getWzAnimationPlayback(
-        background.sequence.frames,
-        performance.now() - animationStart,
-        true
-      )
-      setFrameIndex(playback.index)
-
-      if (Number.isFinite(playback.remaining)) {
-        timer = window.setTimeout(updateFrame, playback.remaining)
-      }
-    }
-
-    updateFrame()
-
-    return () => {
-      active = false
-      if (timer !== undefined) window.clearTimeout(timer)
-    }
-  }, [background.sequence])
-
-  const frame =
-    background.sequence.frames[
-      Math.min(frameIndex, background.sequence.frames.length - 1)
-    ]
-  if (!frame) return null
-
-  const offsets = getMapBackgroundLayerOffsets(background, frame, layout)
-  const x = background.flip ? offsets.flippedX : offsets.x
-  const y =
-    foregroundTop === undefined
-      ? `calc(50% + ${offsets.y - layout.foregroundHeight / 2}px)`
-      : `${foregroundTop + offsets.y - worldTop}px`
-
-  return (
-    <div
-      className={styles.backgroundLayer}
-      data-map-background-front={background.front ? 'true' : undefined}
-      data-map-background-index={background.index}
-      style={{
-        backgroundImage: `url("${frame.src}")`,
-        backgroundPosition: `${getBackgroundPositionX(x)} ${y}`,
-        backgroundRepeat: getMapBackgroundRepeat(background.type),
-        backgroundSize: `${frame.width}px ${frame.height}px`,
-        opacity: background.alpha,
-        transform: background.flip ? 'scaleX(-1)' : undefined
-      }}
-    />
-  )
-}
-
 const MapScene: React.FC<Props> = ({
   mapId,
-  monsterFootY,
-  onMovementChange,
+  version,
   region,
-  version
+  monsterFootY,
+  monsterFootX,
+  onPlacementOffsetChange,
+  foregroundRef,
+  navigationEnabled = true,
+  onMovementChange
 }) => {
   const { t } = useI18n()
-  const [preparedScene, setPreparedScene] = useState<PreparedMapScene>()
+  const bundledScene = useMemo(() => getBundledMapScene(mapId), [mapId])
+  const sourceKey = `${region}/${version}/${mapId}`
+  const [remoteScene, setRemoteScene] = useState<{
+    key: string
+    scene: PreparedMapScene
+  }>()
+  const [failedSource, setFailedSource] = useState<string>()
+  const [retryCount, setRetryCount] = useState(0)
+  const [progress, setProgress] = useState<MapSourceProgress>()
+  const preparedScene =
+    bundledScene ??
+    (remoteScene?.key === sourceKey ? remoteScene.scene : undefined)
+  const loadFailed = !bundledScene && failedSource === sourceKey
   const [cameraViewport, setCameraViewport] = useState<CameraViewport>({
     bounds: INITIAL_CAMERA_BOUNDS,
     height: 0,
     width: 0
   })
   const sceneRef = useRef<HTMLDivElement>(null)
+  const backCanvasRef = useRef<BackgroundCanvasHandle>(null)
+  const frontCanvasRef = useRef<BackgroundCanvasHandle>(null)
   const cameraXRef = useRef(0)
   const cameraYRef = useRef(0)
   const cameraBoundsRef = useRef<MapCameraBounds>(INITIAL_CAMERA_BOUNDS)
+  const initialPlacementRef = useRef<
+    { key: string; x: number; y: number } | undefined
+  >(undefined)
   const heldDirectionsRef = useRef({
     down: false,
     left: false,
@@ -201,90 +138,43 @@ const MapScene: React.FC<Props> = ({
   const movementStateRef = useRef<MapMovementState>(IDLE_MAP_MOVEMENT)
   const animationFrameRef = useRef<number | undefined>(undefined)
   const lastAnimationTimeRef = useRef<number | undefined>(undefined)
-  const requestedForegroundUrl = useMemo(
-    () => getMapRenderUrl(mapId, version, region),
-    [mapId, region, version]
-  )
-
   useEffect(() => {
+    if (bundledScene || version === undefined || region === undefined) return
     let active = true
-    let committedStage = -1
-
-    const previewRequest = loadMapBackgroundPreviewLayers(
+    let result: ReconstructedMap | undefined
+    const controller = new AbortController()
+    setRemoteScene(undefined)
+    setFailedSource(undefined)
+    setProgress(undefined)
+    void reconstructMap({
       mapId,
       version,
-      region
-    ).catch((error) => {
-      console.warn('맵 우선 배경 레이어를 준비하지 못했습니다.', error)
-      return []
-    })
-    const backgroundsRequest = loadMapBackgroundLayers(
-      mapId,
-      version,
-      region
-    ).catch((error) => {
-      console.warn('맵 전체 배경 레이어를 준비하지 못했습니다.', error)
-      return previewRequest
-    })
-    const detailRequest = getMapDetail(mapId, version, region).catch(
-      (error) => {
-        console.warn('맵 좌표 정보를 준비하지 못했습니다.', error)
-        return undefined
+      region,
+      signal: controller.signal,
+      refresh: retryCount > 0,
+      onProgress: (next) => {
+        if (active) setProgress(next)
       }
-    )
-    const groundRequest = measureMapGround(requestedForegroundUrl).catch(
-      (error) => {
-        console.warn('맵 발판 위치를 준비하지 못했습니다.', error)
-        return undefined
-      }
-    )
-
-    const commitScene = async (
-      stage: number,
-      backgrounds: MapBackgroundLayer[],
-      mapDetail: MapleMapDetail | undefined,
-      groundMetrics: MapGroundMetrics | undefined
-    ) => {
-      const baseBackground = backgrounds.find((background) => !background.front)
-      const baseFrame = baseBackground?.sequence.frames[0]
-      const edgeColors = baseFrame
-        ? await getImageEdgeColors(baseFrame.src).catch(() => undefined)
-        : undefined
-
-      if (!active || stage < committedStage) return
-      committedStage = stage
-      setPreparedScene({
-        backgroundColor: edgeColors?.top ?? edgeColors?.bottom,
-        backgrounds,
-        foregroundUrl: requestedForegroundUrl,
-        groundMetrics,
-        mapDetail,
-        mapId
+    })
+      .then((scene) => {
+        if (!active) {
+          scene.dispose()
+          return
+        }
+        result = scene
+        setRemoteScene({ key: sourceKey, scene })
       })
-    }
-
-    void Promise.all([detailRequest, groundRequest]).then(
-      ([mapDetail, groundMetrics]) => {
-        void commitScene(0, [], mapDetail, groundMetrics)
-      }
-    )
-
-    void Promise.all([previewRequest, detailRequest, groundRequest]).then(
-      ([backgrounds, mapDetail, groundMetrics]) => {
-        void commitScene(1, backgrounds, mapDetail, groundMetrics)
-      }
-    )
-
-    void Promise.all([backgroundsRequest, detailRequest, groundRequest]).then(
-      ([backgrounds, mapDetail, groundMetrics]) => {
-        void commitScene(2, backgrounds, mapDetail, groundMetrics)
-      }
-    )
-
+      .catch((error) => {
+        if (!active) return
+        console.warn('맵 원본을 복원하지 못했습니다.', error)
+        setFailedSource(sourceKey)
+      })
     return () => {
       active = false
+      controller.abort()
+      result?.dispose()
     }
-  }, [mapId, region, requestedForegroundUrl, version])
+  }, [bundledScene, mapId, region, version, sourceKey, retryCount])
 
   const layout = useMemo(
     () =>
@@ -293,11 +183,16 @@ const MapScene: React.FC<Props> = ({
   )
   const foregroundTop =
     monsterFootY === undefined ? undefined : monsterFootY - layout.groundY
-  const backLayers = preparedScene?.backgrounds.filter(
-    (background) => !background.front
+  const backLayers = useMemo(
+    () =>
+      preparedScene?.backgrounds.filter((background) => !background.front) ??
+      [],
+    [preparedScene?.backgrounds]
   )
-  const frontLayers = preparedScene?.backgrounds.filter(
-    (background) => background.front
+  const frontLayers = useMemo(
+    () =>
+      preparedScene?.backgrounds.filter((background) => background.front) ?? [],
+    [preparedScene?.backgrounds]
   )
 
   const updateCameraPosition = useCallback(
@@ -314,6 +209,8 @@ const MapScene: React.FC<Props> = ({
       scene.style.setProperty('--map-camera-y', `${cameraY}px`)
       scene.dataset.mapCameraX = cameraX.toFixed(1)
       scene.dataset.mapCameraY = cameraY.toFixed(1)
+      backCanvasRef.current?.draw()
+      frontCanvasRef.current?.draw()
       return { x: cameraX, y: cameraY }
     },
     []
@@ -358,6 +255,48 @@ const MapScene: React.FC<Props> = ({
         viewportWidth
       })
       cameraBoundsRef.current = bounds
+      const placement = bundledScene?.placement
+      if (
+        placement &&
+        monsterFootX !== undefined &&
+        monsterFootY !== undefined
+      ) {
+        const initial = getMapPlacementX(
+          placement.x,
+          layout.foregroundWidth,
+          viewportWidth,
+          monsterFootX
+        )
+        const initialY = getMapPlacementY(
+          placement.y,
+          measuredForegroundTop,
+          monsterFootY,
+          bounds
+        )
+        const key = `${mapId}/${viewportWidth}/${viewportHeight}/${layout.foregroundWidth}/${layout.foregroundHeight}`
+        const previous = initialPlacementRef.current
+        if (previous?.key !== key) {
+          cameraXRef.current = initial.cameraX
+          cameraYRef.current = initialY.cameraY
+        } else {
+          // Sprite loading/selection can change its visible foot centre. Keep
+          // the anchor aligned while preserving any manual camera movement.
+          cameraXRef.current += initial.cameraX - previous.x
+          cameraYRef.current += initialY.cameraY - previous.y
+        }
+        initialPlacementRef.current = {
+          key,
+          x: initial.cameraX,
+          y: initialY.cameraY
+        }
+        onPlacementOffsetChange?.({
+          x: initial.monsterOffsetX,
+          y: initialY.monsterOffsetY
+        })
+      } else {
+        initialPlacementRef.current = undefined
+        onPlacementOffsetChange?.({ x: 0, y: 0 })
+      }
       setCameraViewport((current) =>
         current.width === viewportWidth &&
         current.height === viewportHeight &&
@@ -382,6 +321,11 @@ const MapScene: React.FC<Props> = ({
     resizeObserver.observe(scene)
     return () => resizeObserver.disconnect()
   }, [
+    mapId,
+    bundledScene,
+    monsterFootX,
+    monsterFootY,
+    onPlacementOffsetChange,
     foregroundTop,
     layout.foregroundHeight,
     layout.foregroundWidth,
@@ -418,6 +362,11 @@ const MapScene: React.FC<Props> = ({
         animationFrameRef.current = undefined
       }
       notifyMovementChange(false, 0)
+    }
+
+    if (!navigationEnabled) {
+      stopMovement()
+      return
     }
 
     const animate = (time: number) => {
@@ -550,81 +499,133 @@ const MapScene: React.FC<Props> = ({
       window.removeEventListener('blur', stopMovement)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [notifyMovementChange, updateCameraPosition])
+  }, [navigationEnabled, notifyMovementChange, updateCameraPosition])
 
   return (
-    <div
-      ref={sceneRef}
-      className={styles.scene}
-      data-map-id={preparedScene?.mapId}
-      data-map-navigation-enabled={canNavigate ? 'true' : 'false'}
-      data-map-navigation-horizontal={
-        canNavigateHorizontally ? 'true' : 'false'
-      }
-      data-map-navigation-vertical={canNavigateVertically ? 'true' : 'false'}
-      style={{ backgroundColor: preparedScene?.backgroundColor }}
-      aria-hidden="true"
-    >
+    <>
       <div
-        className={styles.camera}
-        style={
-          {
-            '--map-world-height':
-              cameraViewport.height > 0 ? `${cameraWorldHeight}px` : '100%',
-            '--map-world-top': `${cameraWorldTop}px`,
-            '--map-world-width': `${layout.foregroundWidth}px`
-          } as React.CSSProperties
+        ref={sceneRef}
+        className={styles.scene}
+        data-map-id={preparedScene?.mapId}
+        data-map-source={
+          preparedScene
+            ? bundledScene
+              ? 'bundled'
+              : 'reconstructed'
+            : undefined
         }
+        data-map-navigation-enabled={
+          canNavigate && navigationEnabled ? 'true' : 'false'
+        }
+        data-map-navigation-horizontal={
+          canNavigateHorizontally ? 'true' : 'false'
+        }
+        data-map-navigation-vertical={canNavigateVertically ? 'true' : 'false'}
+        style={{ backgroundColor: preparedScene?.backgroundColor }}
+        aria-hidden="true"
       >
-        {backLayers?.map((background) => (
-          <BackgroundLayer
-            key={`back-${background.index}`}
-            background={background}
-            foregroundTop={resolvedForegroundTop}
+        {backLayers.length > 0 && (
+          <BackgroundCanvas
+            key={`back-${mapId}`}
+            ref={backCanvasRef}
+            layers={backLayers}
             layout={layout}
-            worldTop={cameraWorldTop}
-          />
-        ))}
-        {preparedScene && (
-          <img
-            className={styles.foreground}
-            crossOrigin="anonymous"
-            data-map-ground-y={
-              monsterFootY !== undefined ? Math.round(monsterFootY) : undefined
-            }
-            draggable="false"
-            src={preparedScene.foregroundUrl}
-            style={{
-              top:
-                resolvedForegroundTop === undefined
-                  ? '50%'
-                  : `${resolvedForegroundTop - cameraWorldTop}px`,
-              transform:
-                resolvedForegroundTop === undefined
-                  ? 'translate(-50%, -50%)'
-                  : 'translateX(-50%)'
-            }}
-            alt=""
+            width={cameraViewport.width}
+            height={cameraViewport.height}
+            foregroundTop={resolvedForegroundTop ?? 0}
+            cameraXRef={cameraXRef}
+            cameraYRef={cameraYRef}
           />
         )}
-        {frontLayers?.map((background) => (
-          <BackgroundLayer
-            key={`front-${background.index}`}
-            background={background}
-            foregroundTop={resolvedForegroundTop}
+        <div
+          className={styles.camera}
+          style={
+            {
+              '--map-world-height':
+                cameraViewport.height > 0 ? `${cameraWorldHeight}px` : '100%',
+              '--map-world-top': `${cameraWorldTop}px`,
+              '--map-world-width': `${layout.foregroundWidth}px`
+            } as React.CSSProperties
+          }
+        >
+          {preparedScene && (
+            <img
+              ref={foregroundRef}
+              className={styles.foreground}
+              crossOrigin="anonymous"
+              data-map-region={bundledScene?.source.region ?? region}
+              data-map-version={bundledScene?.source.wzVersion ?? version}
+              data-map-ground-y={
+                monsterFootY !== undefined
+                  ? Math.round(monsterFootY)
+                  : undefined
+              }
+              draggable="false"
+              src={preparedScene.foregroundUrl}
+              style={{
+                top:
+                  resolvedForegroundTop === undefined
+                    ? '50%'
+                    : `${resolvedForegroundTop - cameraWorldTop}px`,
+                transform:
+                  resolvedForegroundTop === undefined
+                    ? 'translate(-50%, -50%)'
+                    : 'translateX(-50%)'
+              }}
+              alt=""
+            />
+          )}
+        </div>
+        {frontLayers.length > 0 && (
+          <BackgroundCanvas
+            key={`front-${mapId}`}
+            ref={frontCanvasRef}
+            front
+            layers={frontLayers}
             layout={layout}
-            worldTop={cameraWorldTop}
+            width={cameraViewport.width}
+            height={cameraViewport.height}
+            foregroundTop={resolvedForegroundTop ?? 0}
+            cameraXRef={cameraXRef}
+            cameraYRef={cameraYRef}
           />
-        ))}
+        )}
+        {canNavigate && navigationEnabled && (
+          <div className={styles.navigationHint}>
+            {canNavigateHorizontally && '← →'}
+            {canNavigateHorizontally && canNavigateVertically && ' '}
+            {canNavigateVertically && '↑ ↓'} {t('map.navigation')}
+          </div>
+        )}
       </div>
-      {canNavigate && (
-        <div className={styles.navigationHint}>
-          {canNavigateHorizontally && '← →'}
-          {canNavigateHorizontally && canNavigateVertically && ' '}
-          {canNavigateVertically && '↑ ↓'} {t('map.navigation')}
+      {!preparedScene && (
+        <div
+          className={styles.loadState}
+          role={loadFailed ? 'alert' : 'status'}
+        >
+          {loadFailed
+            ? t('background.error')
+            : progress?.phase === 'images'
+              ? t('background.progress', {
+                  completed: progress.completed,
+                  total: progress.total
+                })
+              : t(
+                  progress?.phase === 'render'
+                    ? 'background.restoring'
+                    : 'background.loading'
+                )}
+          {loadFailed && (
+            <button
+              type="button"
+              onClick={() => setRetryCount((value) => value + 1)}
+            >
+              {t('common.retry')}
+            </button>
+          )}
         </div>
       )}
-    </div>
+    </>
   )
 }
 

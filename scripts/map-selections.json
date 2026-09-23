@@ -1,0 +1,24 @@
+[
+  {
+    "mapId": 323010000,
+    "mapName": "작은 버섯 동산 <1>",
+    "region": "KMS",
+    "wzVersion": 389,
+    "coordinateSystem": "map-image-pixels",
+    "anchor": "monster-feet",
+    "x": 723,
+    "y": 313
+  },
+  {
+    "mapId": 450005121,
+    "mapName": "물과 햇살의 숲",
+    "coordinateSystem": "map-image-pixels",
+    "anchor": "monster-feet",
+    "region": "KMS",
+    "wzVersion": 389,
+    "imageWidth": 2770,
+    "imageHeight": 1090,
+    "x": 1446,
+    "y": 884
+  }
+]

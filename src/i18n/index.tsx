@@ -82,9 +82,12 @@ const korean = {
   'background.current': '현재 배경',
   'background.defaultDescription': '단색 배경으로 돌아가기',
   'background.loading': '맵을 불러오고 있어요.',
+  'background.progress': '배경과 발판을 불러오고 있어요. {completed}/{total}',
+  'background.restoring': '맵을 준비하고 있어요.',
   'background.error': '맵을 불러오지 못했어요.',
   'background.emptyHint': '다른 맵 이름으로 찾아보세요.',
   'background.mapNumber': '맵 #{id}',
+  'background.loadMore': '더 보기',
   'skin.selectCurrent': '데미지 스킨 선택: {name}',
   'skin.title': '데미지 스킨 선택',
   'skin.description': '원하는 스킨을 검색하고 바로 적용해 보세요.',
@@ -103,7 +106,15 @@ const korean = {
   'skin.emptyHint': '다른 이름이나 필터로 다시 찾아보세요.',
   'damage.accessibleLabel': '{critical}데미지 {damage}',
   'damage.criticalPrefix': '크리티컬 ',
-  'map.navigation': '맵 탐색'
+  'map.navigation': '맵 탐색',
+  'map.placement.title': '위치 조정',
+  'map.placement.done': '완료',
+  'map.placement.copy': '좌표 복사',
+  'map.placement.copied': '복사됨',
+  'map.placement.reset': '초기화',
+  'map.placement.hint': '버섯 드래그 · 방향키 1px · Shift 10px · 발밑 기준',
+  'map.placement.copyFallback':
+    '복사가 제한되어 있습니다. 아래 좌표를 선택해 복사해 주세요.'
 } as const
 
 type TranslationKey = keyof typeof korean
@@ -178,9 +189,12 @@ const english: TranslationTable = {
   'background.current': 'Current background',
   'background.defaultDescription': 'Return to the solid-color background',
   'background.loading': 'Loading maps…',
+  'background.progress': 'Loading scenery and platforms… {completed}/{total}',
+  'background.restoring': 'Preparing the map…',
   'background.error': 'Could not load maps.',
   'background.emptyHint': 'Try another map name.',
   'background.mapNumber': 'Map #{id}',
+  'background.loadMore': 'Load more',
   'skin.selectCurrent': 'Select damage skin. Current: {name}',
   'skin.title': 'Select a damage skin',
   'skin.description': 'Search for a skin and apply it instantly.',
@@ -199,7 +213,14 @@ const english: TranslationTable = {
   'skin.emptyHint': 'Try another name or filter.',
   'damage.accessibleLabel': '{critical}damage {damage}',
   'damage.criticalPrefix': 'Critical ',
-  'map.navigation': 'Explore map'
+  'map.navigation': 'Explore map',
+  'map.placement.title': 'Position monster',
+  'map.placement.done': 'Done',
+  'map.placement.copy': 'Copy coordinates',
+  'map.placement.copied': 'Copied',
+  'map.placement.reset': 'Reset',
+  'map.placement.hint': 'Drag monster · Arrows 1px · Shift 10px · Feet anchor',
+  'map.placement.copyFallback': 'Select and copy the coordinates below.'
 }
 
 const japanese: TranslationTable = {
@@ -267,9 +288,12 @@ const japanese: TranslationTable = {
   'background.current': '現在の背景',
   'background.defaultDescription': '単色の背景に戻す',
   'background.loading': 'マップを読み込み中…',
+  'background.progress': '背景と足場を読み込み中… {completed}/{total}',
+  'background.restoring': 'マップを準備中…',
   'background.error': 'マップを読み込めませんでした。',
   'background.emptyHint': '別のマップ名で検索してください。',
   'background.mapNumber': 'マップ #{id}',
+  'background.loadMore': 'もっと見る',
   'skin.selectCurrent': 'ダメージスキン選択：現在 {name}',
   'skin.title': 'ダメージスキン選択',
   'skin.description': 'スキンを検索してすぐに適用できます。',
@@ -288,7 +312,14 @@ const japanese: TranslationTable = {
   'skin.emptyHint': '別の名前またはフィルターをお試しください。',
   'damage.accessibleLabel': '{critical}ダメージ {damage}',
   'damage.criticalPrefix': 'クリティカル ',
-  'map.navigation': 'マップ探索'
+  'map.navigation': 'マップ探索',
+  'map.placement.title': '位置調整',
+  'map.placement.done': '完了',
+  'map.placement.copy': '座標をコピー',
+  'map.placement.copied': 'コピー済み',
+  'map.placement.reset': 'リセット',
+  'map.placement.hint': 'ドラッグ · 矢印 1px · Shift 10px · 足元基準',
+  'map.placement.copyFallback': '以下の座標を選択してコピーしてください。'
 }
 
 const simplifiedChinese: TranslationTable = {
@@ -356,9 +387,12 @@ const simplifiedChinese: TranslationTable = {
   'background.current': '当前背景',
   'background.defaultDescription': '返回纯色背景',
   'background.loading': '正在加载地图…',
+  'background.progress': '正在加载背景和平台… {completed}/{total}',
+  'background.restoring': '正在准备地图…',
   'background.error': '无法加载地图。',
   'background.emptyHint': '请尝试其他地图名称。',
   'background.mapNumber': '地图 #{id}',
+  'background.loadMore': '加载更多',
   'skin.selectCurrent': '选择伤害皮肤：当前为{name}',
   'skin.title': '选择伤害皮肤',
   'skin.description': '搜索皮肤并立即应用。',
@@ -377,7 +411,14 @@ const simplifiedChinese: TranslationTable = {
   'skin.emptyHint': '请尝试其他名称或筛选条件。',
   'damage.accessibleLabel': '{critical}伤害 {damage}',
   'damage.criticalPrefix': '暴击',
-  'map.navigation': '探索地图'
+  'map.navigation': '探索地图',
+  'map.placement.title': '调整位置',
+  'map.placement.done': '完成',
+  'map.placement.copy': '复制坐标',
+  'map.placement.copied': '已复制',
+  'map.placement.reset': '重置',
+  'map.placement.hint': '拖动怪物 · 方向键 1px · Shift 10px · 脚底坐标',
+  'map.placement.copyFallback': '请选择并复制下方坐标。'
 }
 
 const traditionalChinese: TranslationTable = {
@@ -445,9 +486,12 @@ const traditionalChinese: TranslationTable = {
   'background.current': '目前背景',
   'background.defaultDescription': '返回純色背景',
   'background.loading': '正在載入地圖…',
+  'background.progress': '正在載入背景和平台… {completed}/{total}',
+  'background.restoring': '正在準備地圖…',
   'background.error': '無法載入地圖。',
   'background.emptyHint': '請嘗試其他地圖名稱。',
   'background.mapNumber': '地圖 #{id}',
+  'background.loadMore': '載入更多',
   'skin.selectCurrent': '選擇傷害字型：目前為{name}',
   'skin.title': '選擇傷害字型',
   'skin.description': '搜尋傷害字型並立即套用。',
@@ -466,7 +510,14 @@ const traditionalChinese: TranslationTable = {
   'skin.emptyHint': '請嘗試其他名稱或篩選條件。',
   'damage.accessibleLabel': '{critical}傷害 {damage}',
   'damage.criticalPrefix': '爆擊',
-  'map.navigation': '探索地圖'
+  'map.navigation': '探索地圖',
+  'map.placement.title': '調整位置',
+  'map.placement.done': '完成',
+  'map.placement.copy': '複製座標',
+  'map.placement.copied': '已複製',
+  'map.placement.reset': '重設',
+  'map.placement.hint': '拖曳怪物 · 方向鍵 1px · Shift 10px · 腳底座標',
+  'map.placement.copyFallback': '請選取並複製下方座標。'
 }
 
 const translations: Record<Locale, TranslationTable> = {

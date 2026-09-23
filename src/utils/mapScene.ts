@@ -29,6 +29,10 @@ export type MapBackgroundLayer = {
   type: number
   x: number
   y: number
+  rx?: number
+  ry?: number
+  cx?: number
+  cy?: number
 }
 
 type MapBackgroundLoad = {
@@ -74,7 +78,7 @@ const runNextMapRequest = () => {
 const limitedMapFetch = (url: string) =>
   new Promise<Response>((resolve, reject) => {
     mapRequestQueue.push(() => {
-      fetch(url)
+      fetch(url, { signal: AbortSignal.timeout(15000) })
         .then(resolve)
         .catch(reject)
         .finally(() => {
@@ -143,18 +147,35 @@ const loadBackgroundEntry = async (
   const children = readChildren(await readNode(entryUrl))
   if (children.length === 0) return undefined
 
-  const [backgroundSet, imageNumber, type, x, y, alpha, flip, animated, front] =
-    await Promise.all([
-      readChildValue(entryUrl, 'bS', children),
-      readChildValue(entryUrl, 'no', children),
-      readChildValue(entryUrl, 'type', children),
-      readChildValue(entryUrl, 'x', children),
-      readChildValue(entryUrl, 'y', children),
-      readChildValue(entryUrl, 'a', children),
-      readChildValue(entryUrl, 'f', children),
-      readChildValue(entryUrl, 'ani', children),
-      readChildValue(entryUrl, 'front', children)
-    ])
+  const [
+    backgroundSet,
+    imageNumber,
+    type,
+    x,
+    y,
+    alpha,
+    flip,
+    animated,
+    front,
+    rx,
+    ry,
+    cx,
+    cy
+  ] = await Promise.all([
+    readChildValue(entryUrl, 'bS', children),
+    readChildValue(entryUrl, 'no', children),
+    readChildValue(entryUrl, 'type', children),
+    readChildValue(entryUrl, 'x', children),
+    readChildValue(entryUrl, 'y', children),
+    readChildValue(entryUrl, 'a', children),
+    readChildValue(entryUrl, 'f', children),
+    readChildValue(entryUrl, 'ani', children),
+    readChildValue(entryUrl, 'front', children),
+    readChildValue(entryUrl, 'rx', children),
+    readChildValue(entryUrl, 'ry', children),
+    readChildValue(entryUrl, 'cx', children),
+    readChildValue(entryUrl, 'cy', children)
+  ])
 
   if (
     typeof backgroundSet !== 'string' ||
@@ -185,7 +206,11 @@ const loadBackgroundEntry = async (
     sequence,
     type: Math.trunc(readNumber(type, 0)),
     x: readNumber(x, 0),
-    y: readNumber(y, 0)
+    y: readNumber(y, 0),
+    rx: readNumber(rx, 0),
+    ry: readNumber(ry, 0),
+    cx: readNumber(cx, 0),
+    cy: readNumber(cy, 0)
   }
 }
 
@@ -383,11 +408,10 @@ export const getMapCameraBounds = ({
   viewportWidth: number
 }): MapCameraBounds => {
   const maxX = Math.max(0, (foregroundWidth - viewportWidth) / 2)
-  const canMoveVertically = foregroundHeight > viewportHeight
-  const minY = canMoveVertically ? Math.min(0, foregroundTop) : 0
-  const maxY = canMoveVertically
-    ? Math.max(0, foregroundTop + foregroundHeight - viewportHeight)
-    : 0
+  // Ground alignment can push even a short map partly outside a tall desktop
+  // viewport. Its hidden platforms must remain reachable with the camera.
+  const minY = Math.min(0, foregroundTop)
+  const maxY = Math.max(0, foregroundTop + foregroundHeight - viewportHeight)
 
   return {
     maxX,
@@ -466,10 +490,24 @@ export const findMapGroundYFromAlpha = (
 const loadImage = (url: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
+    const timer = setTimeout(() => {
+      image.onload = null
+      image.onerror = null
+      image.src = ''
+      reject(new Error(`맵 이미지 요청 시간 초과: ${url}`))
+    }, 20000)
     image.crossOrigin = 'anonymous'
     image.decoding = 'async'
-    image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error(`맵 이미지 요청 실패: ${url}`))
+    image.onload = () => {
+      clearTimeout(timer)
+      if (image.naturalWidth <= 1 || image.naturalHeight <= 1) {
+        reject(new Error(`빈 맵 이미지: ${url}`))
+      } else resolve(image)
+    }
+    image.onerror = () => {
+      clearTimeout(timer)
+      reject(new Error(`맵 이미지 요청 실패: ${url}`))
+    }
     image.src = url
   })
 

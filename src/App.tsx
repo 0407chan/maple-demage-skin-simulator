@@ -10,6 +10,10 @@ import {
 import { wzVersionState } from 'atoms/wzVersion'
 import { BackgroundSelectModal } from 'components/modals/BackgroundSelectModal'
 import MapScene from 'components/MapScene'
+import MonsterPlacement from 'components/MonsterPlacement'
+import { useMonsterPlacement } from 'hooks/useMonsterPlacement'
+import { restoreMapSelection } from 'utils/mapSelection'
+import { getMonsterFootPoint } from 'utils/monsterPlacement'
 import type { MapMovementState } from 'components/MapScene'
 import { MonsterSelectModal } from 'components/modals/MonsterSelectModal'
 import SettingModal from 'components/modals/SettingModal'
@@ -159,24 +163,6 @@ const getStoredMonster = (value: unknown): Monster => {
   }
 }
 
-const getStoredBackground = (value: unknown): MapleMap | undefined => {
-  if (
-    !isRecord(value) ||
-    typeof value.id !== 'number' ||
-    !Number.isSafeInteger(value.id) ||
-    typeof value.name !== 'string' ||
-    typeof value.streetName !== 'string'
-  ) {
-    return undefined
-  }
-
-  return {
-    id: value.id,
-    name: value.name,
-    streetName: value.streetName
-  }
-}
-
 const loadInitialState = (): AppState => {
   const defaultState = createDefaultState()
 
@@ -244,7 +230,7 @@ const loadInitialState = (): AppState => {
       monsterStatus: 'alive',
       currentSkin: getStoredSkin(parsedState.currentSkin),
       currentMonster,
-      currentBackground: getStoredBackground(parsedState.currentBackground),
+      currentBackground: restoreMapSelection(parsedState.currentBackground),
       setting
     }
   } catch {
@@ -261,6 +247,7 @@ const App: React.FC = () => {
     useState<MonsterFacingDirection>('left')
   const [, setMonsterMetricsRevision] = useState(0)
   const [monsterFootY, setMonsterFootY] = useState<number>()
+  const [monsterFootX, setMonsterFootX] = useState<number>()
   const [deathPlaybackDuration, setDeathPlaybackDuration] = useState(
     DEATH_ANIMATION_DURATION
   )
@@ -273,6 +260,7 @@ const App: React.FC = () => {
   const bodyRef = useRef<HTMLDivElement>(null)
   const monsterButtonRef = useRef<HTMLButtonElement>(null)
   const monsterImageRef = useRef<HTMLImageElement>(null)
+  const mapImageRef = useRef<HTMLImageElement>(null)
   const idleMonsterTopOffsetRef = useRef<{
     monsterId: number
     topOffset: number
@@ -423,6 +411,13 @@ const App: React.FC = () => {
     ? monsterFallbackImage
     : (remoteMonsterImage ?? monsterFallbackImage)
   const idleMonsterImage = remoteIdleMonsterImage ?? idleMonsterFallback
+  const placement = useMonsterPlacement({
+    map: state.currentBackground,
+    bodyRef,
+    imageRef: monsterImageRef,
+    mapImageRef,
+    imageUrl: monsterImage
+  })
   const monsterMetricsImage =
     !monsterImageFailed && deathPlaybackImage && remoteDeathMonsterImage
       ? remoteDeathMonsterImage
@@ -478,12 +473,28 @@ const App: React.FC = () => {
     const imageRect = image?.getBoundingClientRect()
     if (!bodyRect || !image || !imageRect) return
 
-    const metrics = getCachedImageMetrics(idleMonsterImage)
+    const metrics = getCachedImageMetrics(monsterImage)
+    if (metrics) {
+      const foot = getMonsterFootPoint(
+        imageRect,
+        metrics,
+        image.dataset.monsterFacing === 'right'
+      )
+      const nextFootX = foot.x - bodyRect.left - placement.offsetRef.current.x
+      setMonsterFootX((current) =>
+        current === undefined || Math.abs(current - nextFootX) >= 0.5
+          ? nextFootX
+          : current
+      )
+    }
     const renderedTransparentBottom = metrics
       ? metrics.transparentBottom * (imageRect.height / metrics.naturalHeight)
       : 0
     const nextFootY =
-      imageRect.bottom - bodyRect.top - renderedTransparentBottom
+      imageRect.bottom -
+      bodyRect.top -
+      renderedTransparentBottom -
+      placement.offsetRef.current.y
 
     setMonsterFootY((current) =>
       current === undefined || Math.abs(current - nextFootY) >= 0.5
@@ -491,7 +502,8 @@ const App: React.FC = () => {
         : current
     )
   }, [
-    idleMonsterImage,
+    monsterImage,
+    placement.offsetRef,
     mapMovement.isMoving,
     state.isAttacked,
     state.monsterStatus
@@ -886,17 +898,19 @@ const App: React.FC = () => {
         </a>
       )}
       <div ref={bodyRef} className={clsx(styles.Body, 'no-drag')}>
-        {state.currentBackground &&
-          wzVersion.version !== undefined &&
-          wzVersion.region !== undefined && (
-            <MapScene
-              mapId={state.currentBackground.id}
-              monsterFootY={monsterFootY}
-              onMovementChange={handleMapMovementChange}
-              version={wzVersion.version}
-              region={wzVersion.region}
-            />
-          )}
+        {state.currentBackground && (
+          <MapScene
+            mapId={state.currentBackground.id}
+            region={wzVersion.region}
+            version={wzVersion.version}
+            monsterFootY={monsterFootY}
+            monsterFootX={monsterFootX}
+            onPlacementOffsetChange={placement.setInitialOffset}
+            foregroundRef={mapImageRef}
+            navigationEnabled={!placement.editing}
+            onMovementChange={handleMapMovementChange}
+          />
+        )}
         {state.damageWrapperList.map((item) => (
           <DamageWrapper
             key={item.id}
@@ -905,7 +919,16 @@ const App: React.FC = () => {
             currentSkin={state.currentSkin}
           />
         ))}
-        <div className={styles.MonsterActor}>
+        <div
+          className={styles.MonsterActor}
+          data-position-editing={placement.editing ? 'true' : undefined}
+          style={
+            {
+              '--monster-offset-x': `${placement.offset.x}px`,
+              '--monster-offset-y': `${placement.offset.y}px`
+            } as React.CSSProperties
+          }
+        >
           <div
             className={styles.MonsterHealth}
             role="progressbar"
@@ -940,22 +963,25 @@ const App: React.FC = () => {
                 state.monsterStatus === 'respawning'
             })}
             disabled={state.monsterStatus !== 'alive'}
-            onClick={handleAttack}
+            onClick={placement.editing ? undefined : handleAttack}
+            {...placement.pointerHandlers}
             style={
               {
                 '--monster-death-duration': `${deathPlaybackDuration}ms`
               } as React.CSSProperties
             }
             aria-label={
-              state.monsterStatus === 'alive'
-                ? t('app.monster.attack', { name: currentMonsterName })
-                : state.monsterStatus === 'dying'
-                  ? t('app.monster.dying', {
-                      name: currentMonsterName
-                    })
-                  : t('app.monster.respawning', {
-                      name: currentMonsterName
-                    })
+              placement.editing
+                ? t('map.placement.title')
+                : state.monsterStatus === 'alive'
+                  ? t('app.monster.attack', { name: currentMonsterName })
+                  : state.monsterStatus === 'dying'
+                    ? t('app.monster.dying', {
+                        name: currentMonsterName
+                      })
+                    : t('app.monster.respawning', {
+                        name: currentMonsterName
+                      })
             }
           >
             <img
@@ -1002,6 +1028,7 @@ const App: React.FC = () => {
             />
           </button>
         </div>
+        {state.currentBackground && <MonsterPlacement placement={placement} />}
       </div>
     </>
   )

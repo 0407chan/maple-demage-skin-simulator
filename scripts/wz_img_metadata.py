@@ -102,6 +102,10 @@ class ImgReader:
                 elif kind == "UOL":
                     self.read(1)
                     value = self.string_block()
+                elif kind == "Shape2D#Convex2D":
+                    # Collision polygons are not needed for static map sprites.
+                    # Their bounded payload is skipped below, like Canvas pixels.
+                    pass
                 else:
                     raise ValueError(f"Unsupported IMG extended property: {kind}")
                 if self.position > end:

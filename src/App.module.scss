@@ -18,7 +18,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateX(-50%);
+  transform: translate(
+    calc(-50% + var(--monster-offset-x, 0px)),
+    var(--monster-offset-y, 0px)
+  );
+
+  &[data-position-editing='true'] .MonsterButton {
+    cursor: grab;
+    touch-action: none;
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }
 
 .MonsterButton {
